@@ -1,0 +1,48 @@
+disabled_rules:
+- blanket_disable_command
+- trailing_whitespace
+- empty_count
+- large_tuple
+- vertical_whitespace
+- comment_spacing
+- mark
+- private_over_fileprivate
+- trailing_newline
+- void_return
+- redundant_void_return
+- nesting
+- switch_case_alignment
+- compiler_protocol_init
+- orphaned_doc_comment
+
+opt_in_rules:
+- empty_count
+- empty_string
+excluded:
+- Carthage
+- Pods
+- SwiftLint/Common/3rdPartyLib
+line_length:
+    warning: 300
+    error: 400
+    ignores_function_declarations: true
+    ignores_comments: true
+    ignores_urls: true
+
+function_body_length:
+    warning: 300
+    error: 500
+function_parameter_count:
+    warning: 6
+    error: 8
+type_body_length:
+    warning: 300
+    error: 500
+file_length:
+    warning: 1000
+    error: 1500
+    ignore_comment_only_lines: true
+cyclomatic_complexity:
+    warning: 100
+    error: 200
+reporter: "xcode"

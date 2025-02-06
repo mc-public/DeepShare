@@ -6,13 +6,33 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		E52146182D5253220055E0F7 /* MarkdownView in Frameworks */ = {isa = PBXBuildFile; productRef = E52146172D5253220055E0F7 /* MarkdownView */; };
+		E5418F7D2D51F26600A6655C /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = E5418F7C2D51F26600A6655C /* SwiftUIIntrospect */; };
+		E5418F802D51F2A400A6655C /* EnvironmentOverrides in Frameworks */ = {isa = PBXBuildFile; productRef = E5418F7F2D51F2A400A6655C /* EnvironmentOverrides */; };
+		E5418F832D51F42E00A6655C /* SVProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = E5418F822D51F42E00A6655C /* SVProgressHUD */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		E5418EEC2D51F06F00A6655C /* ChatShare.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatShare.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		E52146AA2D5279840055E0F7 /* Exceptions for "ChatShare" folder in "ChatShare" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = E5418EEB2D51F06E00A6655C /* ChatShare */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		E5418EEE2D51F06F00A6655C /* ChatShare */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				E52146AA2D5279840055E0F7 /* Exceptions for "ChatShare" folder in "ChatShare" target */,
+			);
 			path = ChatShare;
 			sourceTree = "<group>";
 		};
@@ -23,16 +43,28 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E5418F832D51F42E00A6655C /* SVProgressHUD in Frameworks */,
+				E5418F802D51F2A400A6655C /* EnvironmentOverrides in Frameworks */,
+				E52146182D5253220055E0F7 /* MarkdownView in Frameworks */,
+				E5418F7D2D51F26600A6655C /* SwiftUIIntrospect in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E52146162D5253220055E0F7 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		E5418EE32D51F06E00A6655C = {
 			isa = PBXGroup;
 			children = (
 				E5418EEE2D51F06F00A6655C /* ChatShare */,
+				E52146162D5253220055E0F7 /* Frameworks */,
 				E5418EED2D51F06F00A6655C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -59,12 +91,17 @@
 			buildRules = (
 			);
 			dependencies = (
+				E5418F852D51F43800A6655C /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				E5418EEE2D51F06F00A6655C /* ChatShare */,
 			);
 			name = ChatShare;
 			packageProductDependencies = (
+				E5418F7C2D51F26600A6655C /* SwiftUIIntrospect */,
+				E5418F7F2D51F2A400A6655C /* EnvironmentOverrides */,
+				E5418F822D51F42E00A6655C /* SVProgressHUD */,
+				E52146172D5253220055E0F7 /* MarkdownView */,
 			);
 			productName = ChatShare;
 			productReference = E5418EEC2D51F06F00A6655C /* ChatShare.app */;
@@ -86,14 +123,22 @@
 				};
 			};
 			buildConfigurationList = E5418EE72D51F06E00A6655C /* Build configuration list for PBXProject "ChatShare" */;
-			developmentRegion = en;
+			developmentRegion = "zh-Hans";
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hans",
 			);
 			mainGroup = E5418EE32D51F06E00A6655C;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				E5418F7A2D51F1F600A6655C /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
+				E5418F7B2D51F26600A6655C /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
+				E5418F7E2D51F2A400A6655C /* XCRemoteSwiftPackageReference "EnvironmentOverrides" */,
+				E5418F812D51F42E00A6655C /* XCRemoteSwiftPackageReference "SVProgressHUD" */,
+				E5D82EE32D524E6C000CAE11 /* XCLocalSwiftPackageReference "SwiftMarkdown" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E5418EED2D51F06F00A6655C /* Products */;
 			projectDirPath = "";
@@ -123,6 +168,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E5418F852D51F43800A6655C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			productRef = E5418F842D51F43800A6655C /* SwiftLintBuildToolPlugin */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		E5418EF82D51F07000A6655C /* Debug */ = {
@@ -251,15 +303,20 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"ChatShare/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "$(SRCROOT)/ChatShare/Resources/Preview.xcassets";
 				DEVELOPMENT_TEAM = X99K33J58B;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ChatShare/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ChatShare;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Save Image";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -267,9 +324,13 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.chaomeng.ChatShare;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -280,15 +341,20 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"ChatShare/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "$(SRCROOT)/ChatShare/Resources/Preview.xcassets";
 				DEVELOPMENT_TEAM = X99K33J58B;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ChatShare/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ChatShare;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Save Image";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -296,9 +362,13 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.chaomeng.ChatShare;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -324,6 +394,76 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		E5D82EE32D524E6C000CAE11 /* XCLocalSwiftPackageReference "SwiftMarkdown" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = SwiftMarkdown;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E5418F7A2D51F1F600A6655C /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.58.2;
+			};
+		};
+		E5418F7B2D51F26600A6655C /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/siteline/SwiftUI-Introspect.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.0;
+			};
+		};
+		E5418F7E2D51F2A400A6655C /* XCRemoteSwiftPackageReference "EnvironmentOverrides" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/nalexn/EnvironmentOverrides.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.0.4;
+			};
+		};
+		E5418F812D51F42E00A6655C /* XCRemoteSwiftPackageReference "SVProgressHUD" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SVProgressHUD/SVProgressHUD.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.3.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E52146172D5253220055E0F7 /* MarkdownView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E5D82EE32D524E6C000CAE11 /* XCLocalSwiftPackageReference "SwiftMarkdown" */;
+			productName = MarkdownView;
+		};
+		E5418F7C2D51F26600A6655C /* SwiftUIIntrospect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E5418F7B2D51F26600A6655C /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
+			productName = SwiftUIIntrospect;
+		};
+		E5418F7F2D51F2A400A6655C /* EnvironmentOverrides */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E5418F7E2D51F2A400A6655C /* XCRemoteSwiftPackageReference "EnvironmentOverrides" */;
+			productName = EnvironmentOverrides;
+		};
+		E5418F822D51F42E00A6655C /* SVProgressHUD */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E5418F812D51F42E00A6655C /* XCRemoteSwiftPackageReference "SVProgressHUD" */;
+			productName = SVProgressHUD;
+		};
+		E5418F842D51F43800A6655C /* SwiftLintBuildToolPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E5418F7A2D51F1F600A6655C /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
+			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E5418EE42D51F06E00A6655C /* Project object */;
 }
