@@ -11,15 +11,16 @@ import SVProgressHUD
 @_spi(Advanced) import SwiftUIIntrospect
 import WebKit
 
-//MARK: - Chat Result Display View
+//MARK: - QA Result Display (Rendering) View
 
-struct ChatResultDisplayView: View {
-    @Binding var model: MainViewModel
+struct QARenderingView: View {
+    
+    @Environment(QAViewModel.self) var model: QAViewModel
     @Environment(\.dismiss) var dismiss
     @State private var isLoading: Bool = true
-    @State private var contentViewController: UIViewController?
     @State private var contentSize: CGSize = .zero
     @State private var contentWebView: MarkdownView.WebView?
+    
     var body: some View {
         GeometryReader { proxy in
             NavigationStack {
@@ -35,7 +36,7 @@ struct ChatResultDisplayView: View {
             }
         }
         .interactiveDismissDisabled()
-        .imageShareSheet(item: $model.imageResult, imageName: "image")
+        .imageShareSheet(item: model.binding(for: \.imageResult), imageName: "image")
     }
     
     var content: some View {
@@ -50,7 +51,7 @@ struct ChatResultDisplayView: View {
                         .padding(.horizontal, 5)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.top)
-                    ChatModelInfoCell(chatModel: self.model.chatModel)
+                    ChatModelInfoCell(chatModel: self.model.selectedChatAI)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.vertical, 5.0)
                 }
@@ -65,11 +66,7 @@ struct ChatResultDisplayView: View {
                     .padding(.horizontal, 10.0)
                     .frame(maxWidth: .infinity, alignment: .center)
             }
-            .introspect(.viewController, on: .iOS(.v17...)) { viewController in
-                contentViewController = viewController
-            }
         }
-        
         .onAppear {
             isLoading = true
             SVProgressHUD.show()
@@ -80,7 +77,7 @@ struct ChatResultDisplayView: View {
     }
 }
 
-extension ChatResultDisplayView {
+extension QARenderingView {
     @ToolbarContentBuilder
     func toolbarContent(width: CGFloat) -> some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
@@ -126,7 +123,7 @@ extension ChatResultDisplayView {
 
 //MARK: - Chat Robot Display Cell
 struct ChatModelInfoCell: View {
-    let chatModel: ChatModel
+    let chatModel: QAChatAIModel
     var body: some View {
         HStackLayout(alignment: .firstTextBaseline) {
             Image(systemName: "checkmark.icloud.fill")

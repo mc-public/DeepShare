@@ -6,10 +6,15 @@
 //
 
 import Observation
+import SwiftUI
 import UIKit
 
+/// The shared singleton view model about current application.
 @MainActor @Observable
-class MainViewModel {
+final class QAViewModel {
+    /// The shared view model about current application.
+    static let current = QAViewModel()
+    private init() {}
     
 #if true
     var questionContent = "Test Question Content"
@@ -21,11 +26,15 @@ class MainViewModel {
     var questionContent = ""
     var answerContent = ""
 #endif
+    
     var isContentEmpty: Bool {
         questionContent.isEmpty || answerContent.isEmpty
     }
-    var chatModel = ChatModel.deepseek_R1
+    
+    var selectedChatAI = QAChatAIModel.deepseek_R1
+    
     var imageResult: UIImage?
+    
     var isShowingPreviewer: Bool = false
     
 }

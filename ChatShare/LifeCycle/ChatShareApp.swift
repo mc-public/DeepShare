@@ -12,7 +12,7 @@ struct ChatShareApp: App {
     static nonisolated let Name = "ChatShare"
     var body: some Scene {
         WindowGroup {
-            MainView()
+            QANavigationView()
         }
     }
 }

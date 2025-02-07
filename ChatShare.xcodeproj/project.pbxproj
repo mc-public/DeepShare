@@ -11,6 +11,7 @@
 		E5418F7D2D51F26600A6655C /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = E5418F7C2D51F26600A6655C /* SwiftUIIntrospect */; };
 		E5418F802D51F2A400A6655C /* EnvironmentOverrides in Frameworks */ = {isa = PBXBuildFile; productRef = E5418F7F2D51F2A400A6655C /* EnvironmentOverrides */; };
 		E5418F832D51F42E00A6655C /* SVProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = E5418F822D51F42E00A6655C /* SVProgressHUD */; };
+		E5B1373F2D5514C100724F18 /* NavigationTransitions in Frameworks */ = {isa = PBXBuildFile; productRef = E5B1373E2D5514C100724F18 /* NavigationTransitions */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +47,7 @@
 				E5418F832D51F42E00A6655C /* SVProgressHUD in Frameworks */,
 				E5418F802D51F2A400A6655C /* EnvironmentOverrides in Frameworks */,
 				E52146182D5253220055E0F7 /* MarkdownView in Frameworks */,
+				E5B1373F2D5514C100724F18 /* NavigationTransitions in Frameworks */,
 				E5418F7D2D51F26600A6655C /* SwiftUIIntrospect in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -102,6 +104,7 @@
 				E5418F7F2D51F2A400A6655C /* EnvironmentOverrides */,
 				E5418F822D51F42E00A6655C /* SVProgressHUD */,
 				E52146172D5253220055E0F7 /* MarkdownView */,
+				E5B1373E2D5514C100724F18 /* NavigationTransitions */,
 			);
 			productName = ChatShare;
 			productReference = E5418EEC2D51F06F00A6655C /* ChatShare.app */;
@@ -138,6 +141,7 @@
 				E5418F7E2D51F2A400A6655C /* XCRemoteSwiftPackageReference "EnvironmentOverrides" */,
 				E5418F812D51F42E00A6655C /* XCRemoteSwiftPackageReference "SVProgressHUD" */,
 				E5D82EE32D524E6C000CAE11 /* XCLocalSwiftPackageReference "SwiftMarkdown" */,
+				E5B1373D2D5514C100724F18 /* XCRemoteSwiftPackageReference "swiftui-navigation-transitions" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E5418EED2D51F06F00A6655C /* Products */;
@@ -435,6 +439,14 @@
 				minimumVersion = 2.3.1;
 			};
 		};
+		E5B1373D2D5514C100724F18 /* XCRemoteSwiftPackageReference "swiftui-navigation-transitions" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/davdroman/swiftui-navigation-transitions.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.14.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -462,6 +474,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E5418F7A2D51F1F600A6655C /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
 			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+		E5B1373E2D5514C100724F18 /* NavigationTransitions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E5B1373D2D5514C100724F18 /* XCRemoteSwiftPackageReference "swiftui-navigation-transitions" */;
+			productName = NavigationTransitions;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

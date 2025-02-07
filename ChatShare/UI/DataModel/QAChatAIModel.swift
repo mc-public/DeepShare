@@ -5,11 +5,11 @@
 //  Created by 孟超 on 2025/2/4.
 //
 
-struct ChatModel: RawRepresentable, CaseIterable, Identifiable, Hashable {
+struct QAChatAIModel: RawRepresentable, CaseIterable, Identifiable, Hashable {
     var id: String {
         self.rawValue
     }
-    static var allCases: [ChatModel] {
+    static var allCases: [QAChatAIModel] {
         [deepseek_R1, deepseek_V3, chatgpt_o3_mini, chatgpt_4o, chatgpt_4o_mini, chatgpt_o1, chatgpt_o1_mini]
     }
     

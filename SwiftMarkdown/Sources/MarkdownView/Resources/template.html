@@ -132,14 +132,18 @@
                 if (!content) return;
                 const parentWidth = container.parentElement.clientWidth;
                 const contentWidth = content.scrollWidth;
-                const scale = Math.min(1, (parentWidth * 0.95) / contentWidth);
+                if (parentWidth < window.innerWidth) {
+                    return
+                }
+                const scale = Math.min(1, (parentWidth) / contentWidth);
                 container.style.transform = `scale(${scale})`;
                 container.style.height = `${content.clientHeight * scale}px`;
+                container.style.width = `${content.clientWidth * scale}px`;
             });
         }
         window.addEventListener('DOMContentLoaded', autoScaleKaTeX);
         window.addEventListener('resize', autoScaleKaTeX);
-        new MutationObserver(debouncedScale).observe(document.body, {
+        new MutationObserver(autoScaleKaTeX).observe(document.body, {
             subtree: true,
             childList: true
         });

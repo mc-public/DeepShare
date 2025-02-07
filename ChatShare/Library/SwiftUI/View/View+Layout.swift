@@ -125,8 +125,6 @@ extension View {
                     .fill(style)
             }
             .clipShape(RoundedRectangle(cornerRadius: radius))
-            
-        
     }
 }
 

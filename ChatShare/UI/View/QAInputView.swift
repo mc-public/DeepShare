@@ -6,29 +6,39 @@
 //
 
 import SwiftUI
-import SVProgressHUD
+import NavigationTransitions
 
-
-struct MainView: View {
-    @State var model = MainViewModel()
+struct QAInputView: QANavigationComponent {
+    
+    typealias Target = Never
+    
     
     var body: some View {
-        NavigationStack {
-            GeometryReader { proxy in
-                VStackLayout(spacing: 0.0) {
-                    self.textInputStack(height: proxy.size.height)
-                }
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbarBackground(.hidden, for: .navigationBar)
-                .toolbarRole(.browser)
-                .sheet(isPresented: $model.isShowingPreviewer) {
-                    ChatResultDisplayView(model: $model)
-                }
-            }
-            .background(Color.listBackgroundColor, ignoresSafeAreaEdges: .all)
-            .toolbar(content: toolbarContent)
-        }
+        self.content
     }
+    
+    @Environment(QAViewModel.self) var model: QAViewModel
+    @Environment(QANavigationModel.self) var navigation: QANavigationModel
+    
+    var content: some View {
+        GeometryReader { proxy in
+            VStackLayout(spacing: 0.0) {
+                self.textInputStack(height: proxy.size.height)
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .toolbarRole(.browser)
+            .sheet(isPresented: model.binding(for: \.isShowingPreviewer)) {
+                QARenderingView()
+                    .environment(navigation)
+                    .environment(model)
+            }
+        }
+        .background(Color.listBackgroundColor, ignoresSafeAreaEdges: .all)
+        .toolbar(content: toolbarContent)
+        .navigationBarBackButtonHidden()
+    }
+    
     
     var questionBlock: some View {
         HStack(alignment: .top, spacing: 0.0) {
@@ -50,10 +60,10 @@ struct MainView: View {
             self.circleImage(image: Image(systemName: "person.fill.checkmark").foregroundStyle(HierarchicalShapeStyle.secondary), backgroundStyle: Color.listCellBackgroundColor, width: 40.0)
                 .padding(.horizontal)
             VStack(alignment: .leading) {
-                MenuPicker(source: ChatModel.allCases, selectedItem: $model.chatModel) { item in
+                MenuPicker(source: QAChatAIModel.allCases, selectedItem: model.binding(for: \.selectedChatAI)) { item in
                     Text(item.rawValue)
                 } menuLabel: {
-                    Text(model.chatModel.rawValue)
+                    Text(model.selectedChatAI.rawValue)
                         .underline()
                         .font(.footnote)
                         .fontWeight(.semibold)
@@ -61,7 +71,6 @@ struct MainView: View {
                 }
                 .menuStyle(.button)
                 .foregroundStyle(.secondary)
-                
                 TextArea(text: model.binding(for: \.answerContent), prompt: "请输入Markdown格式的回答", promptColor: Color.gray.opacity(0.3), initalFocused: false)
                     .font(.title2)
                     .fontWeight(model.answerContent.isEmpty ? .semibold : .regular)
@@ -96,17 +105,20 @@ struct MainView: View {
     }
 }
 
-extension MainView {
+extension QAInputView {
     @ToolbarContentBuilder
     func toolbarContent() -> some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
-            Button(systemImage: "list.bullet", scale: .large) {
-                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            Button {
+                navigation.popLast()
+            } label: {
+                Image(systemName: "list.bullet")
+                    .imageScale(.large)
             }
             .foregroundStyle(Color.deepOrange)
         }
         ToolbarItem(placement: .navigation) {
-            Text("ChatShare")
+            Text(ChatShareApp.Name)
                 .font(.title2)
                 .fontWeight(.medium)
                 .fontDesign(.serif)
