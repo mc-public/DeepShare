@@ -1,5 +1,5 @@
 //
-//  ChatResultDisplayView.swift
+//  QARenderingView.swift
 //  ChatShare
 //
 //  Created by 孟超 on 2025/2/4.
@@ -25,7 +25,7 @@ struct QARenderingView: QANavigationLeaf {
     @ViewBuilder
     var content: some View {
         GeometryReader { proxy in
-            let scrollView = ScrollView(.vertical, content: self.verticalStack)
+            let scrollView = ScrollView(.vertical, content: verticalStack)
                 .toolbar {
                     self.toolbarContent(width: proxy.size.width)
                 }
@@ -45,7 +45,7 @@ struct QARenderingView: QANavigationLeaf {
     func verticalStack() -> some View {
         VStackLayout(alignment: .leading, spacing: 0.0) {
             Group {
-                Text(self.model.questionContent)
+                Text(model.questionContent)
                     .multilineTextAlignment(.center)
                     .font(.title)
                     .fontWidth(.condensed)
@@ -54,11 +54,11 @@ struct QARenderingView: QANavigationLeaf {
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.top)
                 
-                ChatModelInfoCell(chatModel: self.model.selectedChatAI)
+                ChatModelInfoCell(chatModel: model.selectedChatAI)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 5.0)
             }
-            MarkdownView(self.model.answerContent)
+            MarkdownView(model.answerContent)
                 .onRendered { _ in
                     Task {
                         try? await Task.sleep(for: .seconds(0.5))
@@ -90,12 +90,12 @@ extension QARenderingView {
             Menu("Share") {
                 Button("全文分享", systemImage: "square.and.arrow.up") {
                     Task {
-                        self.model.imageResult = await self.fetchSingleImage()
+                        model.imageResult = await fetchSingleImage()
                     }
                 }
                 Button("按段落划分后分享", systemImage: "square.and.arrow.up") {
                     Task {
-                        self.model.imageResult = await self.fetchSplitedImage()
+                        model.imageResult = await fetchSplitedImage()
                     }
                 }
             }

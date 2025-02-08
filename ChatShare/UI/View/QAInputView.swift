@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  QAInputView.swift
 //  ChatShare
 //
 //  Created by 孟超 on 2025/2/4.
@@ -18,7 +18,7 @@ struct QAInputView: QANavigationLeaf {
     var content: some View {
         GeometryReader { proxy in
             VStackLayout(spacing: 0.0) {
-                self.textInputStack(height: proxy.size.height)
+                textInputStack(height: proxy.size.height)
             }
 //            .sheet(isPresented: model.binding(for: \.isShowingPreviewer)) {
 //                QARenderingView()
@@ -35,7 +35,7 @@ struct QAInputView: QANavigationLeaf {
     
     var questionBlock: some View {
         HStack(alignment: .top, spacing: 0.0) {
-            self.circleImage(image: Image(systemName: "person.fill.questionmark").foregroundStyle(HierarchicalShapeStyle.secondary), backgroundStyle: Color.listCellBackgroundColor, width: 40.0)
+            circleImage(image: Image(systemName: "person.fill.questionmark").foregroundStyle(HierarchicalShapeStyle.secondary), backgroundStyle: Color.listCellBackgroundColor, width: 40.0)
                 .padding(.horizontal)
             TextArea(text: model.binding(for: \.questionContent), prompt: "请输入问题内容", promptColor: Color.gray.opacity(0.3), initalFocused: true)
                 .font(.title2)
@@ -50,7 +50,7 @@ struct QAInputView: QANavigationLeaf {
     
     var answerBlock: some View {
         HStack(alignment: .top, spacing: 0.0) {
-            self.circleImage(image: Image(systemName: "person.fill.checkmark").foregroundStyle(HierarchicalShapeStyle.secondary), backgroundStyle: Color.listCellBackgroundColor, width: 40.0)
+            circleImage(image: Image(systemName: "person.fill.checkmark").foregroundStyle(HierarchicalShapeStyle.secondary), backgroundStyle: Color.listCellBackgroundColor, width: 40.0)
                 .padding(.horizontal)
             VStack(alignment: .leading) {
                 MenuPicker(source: QAChatAIModel.allCases, selectedItem: model.binding(for: \.selectedChatAI)) { item in

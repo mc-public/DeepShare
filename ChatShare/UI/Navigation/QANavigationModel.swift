@@ -33,7 +33,7 @@ final class QANavigationModel {
     
     /// Create an empty navigation model.
     private init() {
-        self.navigationPath = [QAInputView.NavigationTarget]
+        navigationPath = [QAInputView.NavigationTarget]
     }
     
     /// Remove the last view from the current navigation stack.
@@ -43,7 +43,7 @@ final class QANavigationModel {
         if rootFlag, let dismiss {
             dismiss()
         } else {
-            _ = self.navigationPath.popLast()
+            _ = navigationPath.popLast()
         }
     }
 }
