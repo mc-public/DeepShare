@@ -1,0 +1,13 @@
+### 6. **量子力学：一维无限深势阱的波函数**
+**问题**：写出归一化的波函数并计算能级。
+**答案**：
+1. **波函数**：$\psi_n(x) = \sqrt{\frac{2}{L}} \sin\left(\frac{n\pi x}{L}\right)$；
+2. **能级**：$E_n = \frac{n^2 h^2}{8mL^2}$；
+3. **代码**（绘制波函数）：
+```python
+import matplotlib.pyplot as plt
+L = 1; n = 1
+x = np.linspace(0, L, 100)
+psi = np.sqrt(2/L) * np.sin(n*np.pi*x/L)
+plt.plot(x, psi)
+```

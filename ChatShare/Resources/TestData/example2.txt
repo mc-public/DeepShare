@@ -1,0 +1,15 @@
+### 2. **物理学：简谐运动的能量守恒**
+**问题**：推导弹簧振子系统的总能量表达式。
+**答案**：
+1. **动能**：$E_k = \frac{1}{2}mv^2$；
+2. **势能**：$E_p = \frac{1}{2}kx^2$；
+3. **总能量**：$E = \frac{1}{2}m\omega^2 A^2$（$\omega = \sqrt{k/m}$）。
+**代码**（模拟能量变化）：
+```python
+import matplotlib.pyplot as plt
+t = np.linspace(0, 10, 100)
+x = A * np.cos(omega * t)
+Ek = 0.5 * m * (A * omega * np.sin(omega * t))**2
+Ep = 0.5 * k * x**2
+plt.plot(t, Ek + Ep)
+```

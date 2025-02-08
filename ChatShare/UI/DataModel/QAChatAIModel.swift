@@ -5,7 +5,7 @@
 //  Created by 孟超 on 2025/2/4.
 //
 
-struct QAChatAIModel: RawRepresentable, CaseIterable, Identifiable, Hashable {
+struct QAChatAIModel: RawRepresentable, CaseIterable, Identifiable, Hashable, Codable {
     var id: String {
         self.rawValue
     }

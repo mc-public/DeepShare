@@ -9,26 +9,41 @@ import SwiftUICore
 import SwiftUI
 
 
-extension Button where Label == AnyView {
+extension Button {
     
     /// Creates a button that displays a custom system symbol.
     ///
     /// - Parameter systemImage: The name of the system symbol image. Use the SF Symbols app to look up the names of system symbol images.
     /// - Parameter action: A view that describes the purpose of the button’s action.
-    init(systemImage: String, scale: Image.Scale? = nil, action: @escaping () -> ()) {
+    init(systemImage: String, scale: Image.Scale? = nil, role: ButtonRole? = nil, action: @escaping () -> ()) where Label == AnyView {
         if let scale {
-            self.init(action: action) {
+            self.init(role: role) {
+                action()
+            } label: {
                 AnyView(
                     Image(systemName: systemImage)
                         .imageScale(scale)
                 )
             }
         } else {
-            self.init(action: action) {
+            self.init(role: role, action: action) {
                 AnyView(
                     Image(systemName: systemImage)
                 )
             }
+        }
+    }
+    
+    
+    /// Creates a button that displays a custom system symbol.
+    ///
+    /// - Parameter systemImage: The name of the system symbol image. Use the SF Symbols app to look up the names of system symbol images.
+    /// - Parameter action: A view that describes the purpose of the button’s action.
+    init(systemImage: String, role: ButtonRole? = nil, action: @escaping () -> ()) where Label == Image {
+        self.init(role: role) {
+            action()
+        } label: {
+            Image(systemName: systemImage)
         }
     }
 }

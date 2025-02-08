@@ -1,0 +1,10 @@
+### 14. **密码学：RSA加密算法的密钥生成**
+**问题**：描述RSA密钥生成步骤并给出模数计算过程。
+**答案**：
+1. **步骤**：选素数 $p,q$ → 计算 $n=pq$ 和 $\phi(n)=(p-1)(q-1)$ → 选 $e$ 使得 $\gcd(e, \phi(n))=1$ → 计算 $d = e^{-1} \mod \phi(n)$；
+2. **公式**：公钥 $(e,n)$，私钥 $(d,n)$；
+3. **代码**（Python示例）：
+```python
+from Crypto.PublicKey import RSA
+key = RSA.generate(2048)
+```

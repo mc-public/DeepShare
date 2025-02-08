@@ -1,0 +1,70 @@
+[
+    {
+      "filename": "example1.txt",
+      "question": "如何推导线性回归的闭式解（解析解）？"
+    },
+    {
+      "filename": "example2.txt",
+      "question": "推导弹簧振子系统的总能量表达式。"
+    },
+    {
+      "filename": "example3.txt",
+      "question": "0-1背包问题的动态规划递推公式是什么？"
+    },
+    {
+      "filename": "example4.txt",
+      "question": "用牛顿迭代法求 $\\sqrt{a}$ 的公式和收敛性分析。"
+    },
+    {
+      "filename": "example5.txt",
+      "question": "推导DFT的公式并解释其物理意义。"
+    },
+    {
+      "filename": "example6.txt",
+      "question": "写出归一化的波函数并计算能级。"
+    },
+    {
+      "filename": "example7.txt",
+      "question": "比较动量法和Adam优化器的更新规则。"
+    },
+    {
+      "filename": "example8.txt",
+      "question": "描述Canny算法的步骤并给出梯度计算公式。"
+    },
+    {
+      "filename": "example9.txt",
+      "question": "推导Skip-Gram的损失函数和负采样优化。"
+    },
+    {
+      "filename": "example10.txt",
+      "question": "用贝叶斯定理计算疾病检测的假阳性问题。"
+    },
+    {
+      "filename": "example11.txt",
+      "question": "说明Dijkstra算法的贪心策略并给出复杂度分析。"
+    },
+    {
+      "filename": "example12.txt",
+      "question": "写出欧式看涨期权的定价公式并解释参数。"
+    },
+    {
+      "filename": "example13.txt",
+      "question": "计算一个卷积层的参数量和输出尺寸。"
+    },
+    {
+      "filename": "example14.txt",
+      "question": "描述RSA密钥生成步骤并给出模数计算过程。"
+    },
+    {
+      "filename": "example15.txt",
+      "question": "推导显性表型频率公式并验证平衡条件。"
+    },
+    {
+      "filename": "example16.txt",
+      "question": "详细推导Transformer模型的自注意力机制，并解释其在自然语言处理中的应用。"
+    },
+    {
+      "filename": "example17.txt",
+      "question": "如何计算两个向量的点积？"
+    }
+  ]

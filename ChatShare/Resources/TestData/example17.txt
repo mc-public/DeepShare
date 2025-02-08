@@ -1,0 +1,11 @@
+
+### **超短问题：计算两个向量的点积**
+**问题**：如何计算两个向量的点积？
+**答案**：
+1. **公式**：$\mathbf{a} \cdot \mathbf{b} = \sum_{i=1}^n a_i b_i$；
+2. **代码**：
+```python
+a = [1, 2, 3]
+b = [4, 5, 6]
+dot_product = sum(x * y for x, y in zip(a, b))
+```

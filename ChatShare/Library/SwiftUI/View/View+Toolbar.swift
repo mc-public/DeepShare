@@ -78,11 +78,12 @@ fileprivate struct ViewPersistent: ViewModifier {
     }
 }
 
-fileprivate class SplitViewModifierModel: ObservableObject {
-    weak var viewController: UISplitViewController?
-}
-
 fileprivate struct SplitViewModifier: ViewModifier {
+    
+    fileprivate class SplitViewModifierModel: ObservableObject {
+        weak var viewController: UISplitViewController?
+    }
+    
     let withIntrospect: (_ splitController: UISplitViewController) -> Void
     let onDisappear: (_ splitController: UISplitViewController) -> Void
     

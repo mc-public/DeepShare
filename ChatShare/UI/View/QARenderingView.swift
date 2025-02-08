@@ -13,60 +13,66 @@ import WebKit
 
 //MARK: - QA Result Display (Rendering) View
 
-struct QARenderingView: View {
+struct QARenderingView: QANavigationLeaf {
+    
+    static let isUsingSheet: Bool = false
     
     @Environment(QAViewModel.self) var model: QAViewModel
-    @Environment(\.dismiss) var dismiss
     @State private var isLoading: Bool = true
     @State private var contentSize: CGSize = .zero
     @State private var contentWebView: MarkdownView.WebView?
     
-    var body: some View {
+    @ViewBuilder
+    var content: some View {
         GeometryReader { proxy in
-            NavigationStack {
-                ScrollView(.vertical) {
-                    content
-                }
-                .navigationTitle("预览样式")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbarBackground(.visible, for: .navigationBar)
+            let scrollView = ScrollView(.vertical, content: self.verticalStack)
                 .toolbar {
                     self.toolbarContent(width: proxy.size.width)
                 }
+            if Self.isUsingSheet {
+                NavigationStack { scrollView }
+            } else {
+                scrollView
             }
         }
+        .navigationTitle("Preview")
+        .navigationBarTitleDisplayMode(.inline)
         .interactiveDismissDisabled()
         .imageShareSheet(item: model.binding(for: \.imageResult), imageName: "image")
     }
     
-    var content: some View {
+    @ViewBuilder
+    func verticalStack() -> some View {
         VStackLayout(alignment: .leading, spacing: 0.0) {
             Group {
-                if !isLoading {
-                    Text(self.model.questionContent)
-                        .multilineTextAlignment(.center)
-                        .font(.title)
-                        .fontWidth(.condensed)
-                        .fontWeight(.bold)
-                        .padding(.horizontal, 5)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.top)
-                    ChatModelInfoCell(chatModel: self.model.selectedChatAI)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.vertical, 5.0)
-                }
-                MarkdownView(self.model.answerContent)
-                    .onRendered { _ in
-                        isLoading = false
-                        SVProgressHUD.dismiss()
-                    }
-                    .withWebView { webView in
-                        contentWebView = webView
-                    }
-                    .padding(.horizontal, 10.0)
+                Text(self.model.questionContent)
+                    .multilineTextAlignment(.center)
+                    .font(.title)
+                    .fontWidth(.condensed)
+                    .fontWeight(.bold)
+                    .padding(.horizontal, 5)
                     .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.top)
+                
+                ChatModelInfoCell(chatModel: self.model.selectedChatAI)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, 5.0)
             }
+            MarkdownView(self.model.answerContent)
+                .onRendered { _ in
+                    Task {
+                        try? await Task.sleep(for: .seconds(0.5))
+                        isLoading = false
+                        await SVProgressHUD.dismiss()
+                    }
+                }
+                .withWebView { webView in
+                    contentWebView = webView
+                }
+                .padding(.horizontal, 10.0)
+                .frame(maxWidth: .infinity, alignment: .center)
         }
+        .hidden(isLoading)
         .onAppear {
             isLoading = true
             SVProgressHUD.show()
@@ -80,11 +86,8 @@ struct QARenderingView: View {
 extension QARenderingView {
     @ToolbarContentBuilder
     func toolbarContent(width: CGFloat) -> some ToolbarContent {
-        ToolbarItem(placement: .topBarLeading) {
-            Button("取消", action: self.dismiss.callAsFunction)
-        }
         ToolbarItem(placement: .topBarTrailing) {
-            Menu("分享") {
+            Menu("Share") {
                 Button("全文分享", systemImage: "square.and.arrow.up") {
                     Task {
                         self.model.imageResult = await self.fetchSingleImage()
@@ -114,7 +117,7 @@ extension QARenderingView {
             return nil
         }
         Task {
-            let image = await contentWebView.splitToImages()
+            //let image = await contentWebView.splitToImages()
             
         }
         return nil

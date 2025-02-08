@@ -1,0 +1,12 @@
+### 11. **图论：Dijkstra算法的最短路径**
+**问题**：说明Dijkstra算法的贪心策略并给出复杂度分析。
+**答案**：
+1. **算法步骤**：维护优先队列，每次选择距离最小的节点；
+2. **复杂度**：使用堆时为 $O((V+E)\log V)$；
+3. **代码**（NetworkX库）：
+```python
+import networkx as nx
+G = nx.Graph()
+G.add_weighted_edges_from([(0,1,1), (0,2,3)])
+path = nx.dijkstra_path(G, 0, 2)
+```

@@ -6,34 +6,27 @@
 //
 
 import SwiftUI
-import NavigationTransitions
 
-struct QAInputView: QANavigationComponent {
+struct QAInputView: QANavigationLeaf {
     
     typealias Target = Never
     
-    
-    var body: some View {
-        self.content
-    }
-    
     @Environment(QAViewModel.self) var model: QAViewModel
     @Environment(QANavigationModel.self) var navigation: QANavigationModel
+    @Environment(\.dismiss) var dismiss
     
     var content: some View {
         GeometryReader { proxy in
             VStackLayout(spacing: 0.0) {
                 self.textInputStack(height: proxy.size.height)
             }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbarRole(.browser)
-            .sheet(isPresented: model.binding(for: \.isShowingPreviewer)) {
-                QARenderingView()
-                    .environment(navigation)
-                    .environment(model)
-            }
+//            .sheet(isPresented: model.binding(for: \.isShowingPreviewer)) {
+//                QARenderingView()
+//                    .environment(navigation)
+//                    .environment(model)
+//            }
         }
+        .navigationBarTitleDisplayMode(.inline)
         .background(Color.listBackgroundColor, ignoresSafeAreaEdges: .all)
         .toolbar(content: toolbarContent)
         .navigationBarBackButtonHidden()
@@ -110,7 +103,7 @@ extension QAInputView {
     func toolbarContent() -> some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
             Button {
-                navigation.popLast()
+                navigation.popLast(dismiss)
             } label: {
                 Image(systemName: "list.bullet")
                     .imageScale(.large)
@@ -125,11 +118,14 @@ extension QAInputView {
                 .foregroundStyle(Color.deepOrange)
         }
         ToolbarItem(placement: .topBarTrailing) {
-            Button("转换为图片") {
-                model.answerContent.replace("\\[", with: "$$")
-                model.answerContent.replace("\\]", with: "$$")
-                model.isShowingPreviewer = true
+            QANavigationLink(QARenderingView.self) {
+                Text("Convert")
             }
+//            Button("转换为图片") {
+//                model.answerContent.replace("\\[", with: "$$")
+//                model.answerContent.replace("\\]", with: "$$")
+//                model.isShowingPreviewer = true
+//            }
             .disabled(model.isContentEmpty)
             .buttonStyle(.plain)
             .foregroundStyle(Color.deepOrange)

@@ -103,6 +103,7 @@ extension View {
     }
 }
 
+
 fileprivate struct NavigationBarModifier: ViewModifier {
     
     @Binding var state: NavigationBarState

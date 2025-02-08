@@ -108,6 +108,11 @@ extension View {
         }
     }
     
+    /// Add a rounded corner border to the view.
+    ///
+    /// - Parameter radius: The radius about the border.
+    /// - Parameter border: The style about the border.
+    /// - Parameter borderWidth: The width of the border.
     @ViewBuilder
     public func withCornerBorder<S: ShapeStyle>(radius: CGFloat, border: S, borderWidth: CGFloat) -> some View {
         self
@@ -117,6 +122,10 @@ extension View {
             }
     }
     
+    /// Add a rounded background to the view.
+    ///
+    /// - Parameter radius: The radius about the background.
+    /// - Parameter style: The style of the background.
     @ViewBuilder
     public func withCornerBackground<S: ShapeStyle>(radius: CGFloat, style: S) -> some View {
         self
@@ -125,6 +134,24 @@ extension View {
                     .fill(style)
             }
             .clipShape(RoundedRectangle(cornerRadius: radius))
+    }
+    
+    /// Hides view conditionally.
+    ///
+    /// - Parameter isHidden: Indicates whether to hide the current view. Hiding this view will not change its frame size.
+    /// - Parameter usingRedraw: Whether to rebuild the view when hiding or recovering. Default is `false`.
+    @ViewBuilder
+    public nonisolated func hidden(_ isHidden: Bool, usingRedraw: Bool = false) -> some View {
+        if usingRedraw {
+            if isHidden {
+                self.hidden()
+            } else {
+                self
+            }
+        } else {
+            self.opacity(isHidden ? 0 : 1)
+        }
+        
     }
 }
 
