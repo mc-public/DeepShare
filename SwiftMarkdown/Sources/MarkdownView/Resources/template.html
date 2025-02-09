@@ -122,9 +122,9 @@
                     });
                 });
             })(window);
-
-
-        /// Observing block-equation size scaling.
+    </script>
+    <script>
+        // Observing block-equation size scaling.
         function autoScaleKaTeX() {
             const katexDisplays = document.querySelectorAll('.katex-display');
             katexDisplays.forEach(container => {
@@ -141,15 +141,79 @@
                 container.style.width = `${content.clientWidth * scale}px`;
             });
         }
+        
         window.addEventListener('DOMContentLoaded', autoScaleKaTeX);
         window.addEventListener('resize', autoScaleKaTeX);
+        
         new MutationObserver(autoScaleKaTeX).observe(document.body, {
             subtree: true,
             childList: true
         });
 
     </script>
-
+    <script>
+        // Get primary markdown elements.
+        function getAllSubnodeFrames(node) {
+            var childDivs = node.childNodes;
+            var frames = [];
+            for (var i = 0; i < childDivs.length; i++) {
+                try {
+                    var rect = childDivs[i].getBoundingClientRect();
+                    var nodeName = childDivs[i].nodeName
+                    frames.push({
+                        x: rect.x,
+                        y: rect.y,
+                        width: rect.width,
+                        height: rect.height,
+                        node: nodeName
+                    });
+                } catch { }
+            }
+            return frames
+        }
+        
+        function getPrimaryMarkdownElementFrames() {
+            var parentDiv = document.getElementById('markdown-rendered');
+            var childDivs = parentDiv.childNodes;
+            var frames = [];
+            for (var i = 0; i < childDivs.length; i++) {
+                let currentNode = childDivs[i]
+                try {
+                    var nodeName = currentNode.nodeName
+                    if (nodeName === "#text") {
+                        let range = document.createRange()
+                        range.selectNode(currentNode)
+                        let rect = range.getBoundingClientRect();
+                        if ((rect.width !== 0) && (rect.height !== 0)) {
+                            frames.push({
+                                x: rect.x,
+                                y: rect.y,
+                                width: rect.width,
+                                height: rect.height,
+                                node: "TEXT",
+                                subnodes: []
+                            });
+                        }
+                        continue
+                    }
+                    var rect = currentNode.getBoundingClientRect();
+                    let subframes = []
+                    if ((nodeName === "UL") || (nodeName === "OL")) {
+                        subframes = getAllSubnodeFrames(currentNode)
+                    }
+                    frames.push({
+                        x: rect.x,
+                        y: rect.y,
+                        width: rect.width,
+                        height: rect.height,
+                        node: nodeName,
+                        subnodes: subframes
+                    });
+                } catch { }
+            }
+            return frames;
+        }
+    </script>
 
 
 </head>
@@ -177,7 +241,7 @@
             .use(window.markdownitTaskLists)
             .use(window.texmath, {
                 engine: window.katex,
-                delimiters: ['dollars', 'brackets', 'doxygen', 'gitlab', 'julia', 'kramdown', 'beg_end'],
+                delimiters: ['dollars', 'brackets', 'doxygen', 'gitlab', 'julia', 'kramdown'],
                 katexOptions: {
                     throwOnError: false,
                     errorColor: '#cc0000',
@@ -227,7 +291,10 @@
             window.webkit.messageHandlers.renderedContentHandler.postMessage(markdownContentBase64Encoded);
         }
 
-        const resizeObserver = new ResizeObserver((entries) => { window.webkit.messageHandlers.sizeChangeHandler.postMessage(entries[0].borderBoxSize[0].blockSize) });
+        const resizeObserver = new ResizeObserver((entries) => {
+            let rect = document.getElementById(`markdown-rendered`).getBoundingClientRect();
+            window.webkit.messageHandlers.sizeChangeHandler.postMessage(rect.height)
+        });
         resizeObserver.observe(markdownRenderedElement);
     </script>
 </body>

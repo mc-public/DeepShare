@@ -27,7 +27,7 @@ final class QAViewModel {
             .filter(prompt: listSearchText)
     }
     var listSort: QADataManager.Sort = .date(.created)
-    var listSordOrder: SortOrder = .forward
+    var listSordOrder: SortOrder = .reverse
     var listSelectedModels = Set<QADataModel>()
     
     //MARK: - Data Share
@@ -92,8 +92,7 @@ final class QAViewModel {
     //MARK: - Image Result
     
     var isShowingPreviewer: Bool = false
-    var imageResult: UIImage?
-    
-    
+    var pdfResult: ShareFileURL?
+    var imageResult: ShareFileURL?
     
 }

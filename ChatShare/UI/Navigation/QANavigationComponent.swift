@@ -84,7 +84,7 @@ protocol QANavigationRoot: View {
 
 extension QANavigationRoot {
     var body: some View {
-        NavigationStack(path: QANavigationModel.current.binding(for: \.navigationPath, animation: nil)) {
+        NavigationStack(path: QANavigationModel.current.binding(for: \.navigationPath)) {
             content
                 .navigationTitleColor(navigationTitleColor)
                 .navigationLargeTitleDesign(navigationTitleDesign)

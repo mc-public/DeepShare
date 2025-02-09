@@ -10,6 +10,7 @@ import MarkdownView
 import SVProgressHUD
 @_spi(Advanced) import SwiftUIIntrospect
 import WebKit
+import Localization
 
 //MARK: - QA Result Display (Rendering) View
 
@@ -17,7 +18,7 @@ struct QARenderingView: QANavigationLeaf {
     
     static let isUsingSheet: Bool = false
     
-    @Environment(QAViewModel.self) var model: QAViewModel
+    @Environment(QAViewModel.self) var viewModel: QAViewModel
     @State private var isLoading: Bool = true
     @State private var contentSize: CGSize = .zero
     @State private var contentWebView: MarkdownView.WebView?
@@ -38,15 +39,16 @@ struct QARenderingView: QANavigationLeaf {
         .navigationTitle("Preview")
         .navigationBarTitleDisplayMode(.inline)
         .interactiveDismissDisabled()
-        .imageShareSheet(item: model.binding(for: \.imageResult), imageName: "image")
+        .fileShareSheet(item: viewModel.binding(for: \.imageResult))
+        .fileShareSheet(item: viewModel.binding(for: \.pdfResult))
     }
     
     @ViewBuilder
     func verticalStack() -> some View {
         VStackLayout(alignment: .leading, spacing: 0.0) {
-            if !model.questionContent.isEmpty {
+            if !viewModel.questionContent.isEmpty {
                 Group {
-                    Text(model.questionContent)
+                    Text(viewModel.questionContent)
                         .multilineTextAlignment(.center)
                         .font(.title)
                         .fontWidth(.condensed)
@@ -54,12 +56,12 @@ struct QARenderingView: QANavigationLeaf {
                         .padding(.horizontal, 5)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.top)
-                    ChatModelInfoCell(chatModel: model.selectedChatAI)
+                    ChatModelInfoCell(chatModel: viewModel.selectedChatAI)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.vertical, 5.0)
                 }
             }
-            MarkdownView(model.answerContent)
+            MarkdownView(viewModel.answerContent)
                 .onRendered { _ in
                     Task {
                         try? await Task.sleep(for: .seconds(0.5))
@@ -70,6 +72,7 @@ struct QARenderingView: QANavigationLeaf {
                 .withWebView { webView in
                     contentWebView = webView
                 }
+                .border(.black, width: 1.0)
                 .padding(.horizontal, 10.0)
                 .frame(maxWidth: .infinity, alignment: .center)
         }
@@ -89,14 +92,19 @@ extension QARenderingView {
     func toolbarContent(width: CGFloat) -> some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
             Menu("Share") {
-                Button("全文分享", systemImage: "square.and.arrow.up") {
+                Button("Share as PDF") {
                     Task {
-                        model.imageResult = await fetchSingleImage()
+                        viewModel.pdfResult = ShareFileURL(url: await fetchPDFResult())
+                    }
+                }
+                Button("Share as Long Image", systemImage: "square.and.arrow.up") {
+                    Task {
+                        viewModel.imageResult = ShareFileURL(url: await fetchLongImageResult())
                     }
                 }
                 Button("按段落划分后分享", systemImage: "square.and.arrow.up") {
                     Task {
-                        model.imageResult = await fetchSplitedImage()
+//                        viewModel.imageResult = await fetchSplitedImage()
                     }
                 }
             }
@@ -108,9 +116,19 @@ extension QARenderingView {
         }
     }
     
-    func fetchSingleImage() async -> UIImage? {
+    func fetchLongImageResult() async -> URL? {
         guard let contentWebView else { return nil }
-        return await contentWebView.contentImage()
+        guard let image = await contentWebView.contentImage(width: nil) else {
+            return nil
+        }
+        guard let pngData = image.pngData() else {
+            return nil
+        }
+        let fileName = viewModel.questionContent.sanitizedFileName(empty: #localized("Untitled"))
+        guard let url = await URL.temporaryFileURL(data: pngData, fileName: fileName, conformTo: .png) else {
+            return nil
+        }
+        return url
     }
     
     func fetchSplitedImage() async -> UIImage? {
@@ -118,10 +136,19 @@ extension QARenderingView {
             return nil
         }
         Task {
-            //let image = await contentWebView.splitToImages()
-            
+            _ = await contentWebView.splitToImages()
         }
         return nil
+    }
+    
+    func fetchPDFResult() async -> URL? {
+        guard let contentWebView else { return nil }
+        guard let data = await contentWebView.contentPDFData(width: nil) else { return nil }
+        let fileName = viewModel.questionContent.sanitizedFileName(empty: #localized("Untitled"))
+        guard let pdfURL = await URL.temporaryFileURL(data: data, fileName: fileName, conformTo: .pdf) else {
+            return nil
+        }
+        return pdfURL
     }
 }
 

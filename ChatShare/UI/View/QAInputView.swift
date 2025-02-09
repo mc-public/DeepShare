@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Localization
 
 struct QAInputView: QANavigationLeaf {
     
@@ -37,7 +38,7 @@ struct QAInputView: QANavigationLeaf {
         HStack(alignment: .top, spacing: 0.0) {
             circleImage(image: Image(systemName: "person.fill.questionmark").foregroundStyle(HierarchicalShapeStyle.secondary), backgroundStyle: Color.listCellBackgroundColor, width: 40.0)
                 .padding(.horizontal)
-            TextArea(text: model.binding(for: \.questionContent), prompt: "请输入问题内容", promptColor: Color.gray.opacity(0.3), initalFocused: true)
+            TextArea(text: model.binding(for: \.questionContent), prompt: #localized("请输入问题内容"), promptColor: Color.gray.opacity(0.3), initalFocused: true)
                 .font(.title2)
                 .fontWidth(.condensed)
                 .fontWeight(.semibold)
@@ -64,7 +65,7 @@ struct QAInputView: QANavigationLeaf {
                 }
                 .menuStyle(.button)
                 .foregroundStyle(.secondary)
-                TextArea(text: model.binding(for: \.answerContent), prompt: "请输入Markdown格式的回答", promptColor: Color.gray.opacity(0.3), initalFocused: false)
+                TextArea(text: model.binding(for: \.answerContent), prompt: #localized("请输入Markdown格式的回答"), promptColor: Color.gray.opacity(0.3), initalFocused: false)
                     .font(.title2)
                     .fontWeight(model.answerContent.isEmpty ? .semibold : .regular)
                     .padding(.horizontal, 3)
@@ -121,11 +122,6 @@ extension QAInputView {
             QANavigationLink(QARenderingView.self) {
                 Text("Convert")
             }
-//            Button("转换为图片") {
-//                model.answerContent.replace("\\[", with: "$$")
-//                model.answerContent.replace("\\]", with: "$$")
-//                model.isShowingPreviewer = true
-//            }
             .disabled(model.isContentEmpty)
             .buttonStyle(.plain)
             .foregroundStyle(Color.deepOrange)

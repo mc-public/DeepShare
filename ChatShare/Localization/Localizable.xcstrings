@@ -206,6 +206,12 @@
         }
       }
     },
+    "Share as Long Image" : {
+
+    },
+    "Share as PDF" : {
+
+    },
     "Sorted By" : {
       "localizations" : {
         "zh-Hans" : {
@@ -226,10 +232,16 @@
         }
       }
     },
-    "全文分享" : {
+    "Untitled" : {
 
     },
     "按段落划分后分享" : {
+
+    },
+    "请输入Markdown格式的回答" : {
+
+    },
+    "请输入问题内容" : {
 
     }
   },
