@@ -33,7 +33,8 @@ final class QAViewModel {
     //MARK: - Data Share
     
     private var isSettingDataModelID: Bool = false
-    var selectDataModelID: QADataModel.QAID? {
+    /// Selected data model about the `QAInputView`.
+    private(set) var selectDataModelID: QADataModel.QAID? {
         didSet {
             if let selectDataModelID, let model = QADataManager.current[selectDataModelID] {
                 questionContent = model.question
@@ -42,23 +43,43 @@ final class QAViewModel {
         }
     }
     
+    /// The content about the QA-question.
     var questionContent = String() {
-        didSet { saveQAContent() }
+        didSet { saveQAModel() }
     }
+    /// The content about the QA-answer.
     var answerContent = String() {
-        didSet { saveQAContent() }
+        didSet { saveQAModel() }
     }
-    var selectedChatAI = QAChatAIModel.deepseek_R1 {
-        didSet { saveQAContent() }
-    }
-    var isContentEmpty: Bool { questionContent.isEmpty || answerContent.isEmpty }
     
-    func saveQAContent() {
+    var selectedChatAI = QAChatAIModel.deepseek_R1 {
+        didSet { saveQAModel() }
+    }
+    var isContentEmpty: Bool { questionContent.isEmpty && answerContent.isEmpty }
+    
+    func prepareForQAModel(_ model: QADataModel) {
+        selectDataModelID = model.id
+    }
+    
+    func prepareNewQAContent() {
+        if isSettingDataModelID { return }
+        isSettingDataModelID = true
+        selectDataModelID = nil
+        questionContent = .init()
+        answerContent = .init()
+        isSettingDataModelID = false
+    }
+    
+    func saveQAModel() {
         if isSettingDataModelID { return }
         if let selectDataModelID { // Need to save data
-            QADataManager.current.update(id: selectDataModelID) { model in
-                model.answer = answerContent
-                model.question = questionContent
+            if isContentEmpty {
+                QADataManager.current.remove(id: selectDataModelID)
+            } else {
+                QADataManager.current.update(id: selectDataModelID) { model in
+                    model.answer = answerContent
+                    model.question = questionContent
+                }
             }
         } else {
             if isContentEmpty { return }

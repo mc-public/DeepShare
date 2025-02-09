@@ -89,6 +89,10 @@ class QADataManager {
     
     /// All question-answer models managed by current `QAManager`.
     var allModels: [QADataModel] = []
+    
+    var untitledCount: Int {
+        self.allModels.filter(\.question, String()).count
+    }
 
     static private let testModelData: [QADataModel] = {
         struct JSONModel: Decodable {
@@ -181,8 +185,8 @@ class QADataManager {
         self.allModels
             .sorted { left, right in
                 var result = switch sort {
-                    case .title: left.question < right.answer
-                    case .date(let dateSort): dateSort == .edited ? (left.editedDate < right.editedDate) : (left.createDate < right.createDate)
+                    case .title: left.question > right.answer
+                    case .date(let dateSort): dateSort == .edited ? (left.editedDate > right.editedDate) : (left.createDate > right.createDate)
                 }
                 if order == .reverse { result.toggle() }
                 return result

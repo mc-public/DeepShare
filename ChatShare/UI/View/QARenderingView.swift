@@ -44,19 +44,20 @@ struct QARenderingView: QANavigationLeaf {
     @ViewBuilder
     func verticalStack() -> some View {
         VStackLayout(alignment: .leading, spacing: 0.0) {
-            Group {
-                Text(model.questionContent)
-                    .multilineTextAlignment(.center)
-                    .font(.title)
-                    .fontWidth(.condensed)
-                    .fontWeight(.bold)
-                    .padding(.horizontal, 5)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.top)
-                
-                ChatModelInfoCell(chatModel: model.selectedChatAI)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, 5.0)
+            if !model.questionContent.isEmpty {
+                Group {
+                    Text(model.questionContent)
+                        .multilineTextAlignment(.center)
+                        .font(.title)
+                        .fontWidth(.condensed)
+                        .fontWeight(.bold)
+                        .padding(.horizontal, 5)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.top)
+                    ChatModelInfoCell(chatModel: model.selectedChatAI)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.vertical, 5.0)
+                }
             }
             MarkdownView(model.answerContent)
                 .onRendered { _ in

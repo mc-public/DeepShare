@@ -226,6 +226,9 @@ import PDFKit
                 case unknown(rect: CGRect)
             }
             
+            
+            
+            
             /// Get all the element frame about the markdown document.
             func primaryElementsFrame() async -> [ElementRect] {
                 let javascript = """

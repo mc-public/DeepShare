@@ -17,18 +17,18 @@ struct QAListView: QANavigationRoot {
     
     @Environment(\.editMode) var editMode: Binding<EditMode>?
     
+    var isEditing: Bool { editMode?.wrappedValue.isEditing == true }
+    
     var content: some View {
-        GeometryReader { proxy in
-            QAListDateView()
-                .environment(viewModel)
-                .environment(navigationModel)
-                .environment(dataManager)
-                .listStyle(.sidebar)
-                .toolbar(content: self.toolbar)
-                .searchable(text: viewModel.binding(for: \.listSearchText), isPresented: viewModel.binding(for: \.isListSearching), placement: .navigationBarDrawer(displayMode: .always), prompt: nil)
-                .navigationTitle("History")
-                .navigationBarTitleDisplayMode(.large)
-        }
+        QAListDateView()
+            .environment(viewModel)
+            .environment(navigationModel)
+            .environment(dataManager)
+            .listStyle(.sidebar)
+            .toolbar(content: self.toolbar)
+            .searchable(text: viewModel.binding(for: \.listSearchText), isPresented: viewModel.binding(for: \.isListSearching), placement: .navigationBarDrawer(displayMode: .always), prompt: nil)
+            .navigationTitle("History")
+            .navigationBarTitleDisplayMode(.large)
     }
 }
 
@@ -84,10 +84,10 @@ extension QAListView {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .overlay(alignment: .trailing) {
-                QANavigationLink(Target.self) {
+                QANavigationLink(Target.self, onCompletion: viewModel.prepareNewQAContent) {
                     Image(systemName: "square.and.pencil")
                 }
-                .hidden(viewModel.isListSearching || editMode?.wrappedValue.isEditing == true)
+                .hidden(viewModel.isListSearching || isEditing)
             }
             .overlay(alignment: .leading) {
                 Button {
@@ -101,7 +101,7 @@ extension QAListView {
                 }
                 .buttonStyle(.plain)
                 .disabled(viewModel.listSelectedModels.isEmpty)
-                .hidden(editMode?.wrappedValue.isEditing != true)
+                .hidden(!isEditing)
             }
         }
     }
@@ -129,8 +129,8 @@ fileprivate struct QAListDateView: View {
                     dateSortContent(dateSortType: dateSort)
             }
         }
-//        .background(Color.listBackgroundColor, ignoresSafeAreaEdges: .all)
-//        .scrollContentBackground(.hidden)
+        .background(Color.listBackgroundColor, ignoresSafeAreaEdges: .all)
+        .scrollContentBackground(.hidden)
     }
     
     @ViewBuilder
@@ -141,7 +141,7 @@ fileprivate struct QAListDateView: View {
         List(selection: viewModel.binding(for: \.listSelectedModels)) {
             ForEach(models, id: \.id) { model in
                 QANavigationLink(Target.self) {
-                    viewModel.selectDataModelID = model.id
+                    viewModel.prepareForQAModel(model)
                 } label: {
                     label(model: model)
                 }
@@ -166,7 +166,7 @@ fileprivate struct QAListDateView: View {
                         .filter(prompt: viewModel.listSearchText)
                     ForEach(models, id: \.id) { model in
                         QANavigationLink(Target.self) {
-                            viewModel.selectDataModelID = model.id
+                            viewModel.prepareForQAModel(model)
                         } label: {
                             label(model: model)
                         }
@@ -193,7 +193,6 @@ fileprivate struct QAListDateView: View {
     }
     
     var searchingPlaceHolder: some View {
-        
         ContentUnavailableView("No results for \"\(viewModel.listSearchText)\"", systemImage: "magnifyingglass", description: Text("Please Check spelling or input a new search text."))
             .listRowBackground(Color.clear)
             .listRowInsets(.init())
@@ -205,13 +204,15 @@ fileprivate struct QAListDateView: View {
     @ViewBuilder
     func label(model: QADataModel) -> some View {
         VStack(alignment: .leading) {
-            Text(model.question)
+            Text(model.question.isEmpty ? "Untitled" : model.question)
                 .lineLimit(1, reservesSpace: true)
                 .fontWeight(.medium)
             HStack {
                 Text(model.createDate.formatted())
                 Text(LocalizedStringKey(model.answer))
-                    .lineLimit(1, reservesSpace: true)
+                    .lineLimit(1, reservesSpace: false)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .multilineTextAlignment(.leading)
             }
             .foregroundStyle(.secondary)
             .font(.footnote)
