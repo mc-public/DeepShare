@@ -23,6 +23,8 @@ struct QARenderingView: QANavigationLeaf {
     @State private var contentSize: CGSize = .zero
     @State private var contentWebView: MarkdownView.WebView?
     
+    @StateObject var controller = MarkdownViewController()
+    
     @ViewBuilder
     var content: some View {
         GeometryReader { proxy in
@@ -53,7 +55,6 @@ struct QARenderingView: QANavigationLeaf {
                         .font(.title)
                         .fontWidth(.condensed)
                         .fontWeight(.bold)
-                        .padding(.horizontal, 5)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.top)
                     ChatModelInfoCell(chatModel: viewModel.selectedChatAI)
@@ -61,7 +62,7 @@ struct QARenderingView: QANavigationLeaf {
                         .padding(.vertical, 5.0)
                 }
             }
-            MarkdownView(viewModel.answerContent)
+            MarkdownView(viewModel.answerContent, controller: controller)
                 .onRendered { _ in
                     Task {
                         try? await Task.sleep(for: .seconds(0.5))
@@ -72,8 +73,6 @@ struct QARenderingView: QANavigationLeaf {
                 .withWebView { webView in
                     contentWebView = webView
                 }
-                .border(.black, width: 1.0)
-                .padding(.horizontal, 10.0)
                 .frame(maxWidth: .infinity, alignment: .center)
         }
         .hidden(isLoading)

@@ -75,6 +75,9 @@ final class QAViewModel {
         if let selectDataModelID { // Need to save data
             if isContentEmpty {
                 QADataManager.current.remove(id: selectDataModelID)
+                isSettingDataModelID = true
+                self.selectDataModelID = nil
+                isSettingDataModelID = false
             } else {
                 QADataManager.current.update(id: selectDataModelID) { model in
                     model.answer = answerContent

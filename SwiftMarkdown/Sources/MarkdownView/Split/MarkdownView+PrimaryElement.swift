@@ -15,7 +15,9 @@ import UIKit
 
 @preconcurrency import PDFKit
 
+@available(macOS 14.0, iOS 17.0, *)
 extension MarkdownView.WebView {
+    @available(macOS 14.0, iOS 17.0, *)
     /// The enumerate representing the element rect in the view.
     public enum PrimaryElement {
         case h1(rect: CGRect)
@@ -36,6 +38,7 @@ extension MarkdownView.WebView {
     }
     
     /// Get all the primary markdown-element frames about current document.
+    @available(macOS 14.0, iOS 17.0, *)
     public func primaryFrames() async -> [PrimaryElement] {
         var rectArray = [PrimaryElement]()
         let result = try? await self.evaluateJavaScript("getPrimaryMarkdownElementFrames()")

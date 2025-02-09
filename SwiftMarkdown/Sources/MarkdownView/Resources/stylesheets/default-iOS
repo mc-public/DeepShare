@@ -4,6 +4,8 @@
     font-size: 13pt;
     line-height: 1.5;
     word-wrap: break-word;
+    padding-left: 5pt;
+    padding-right: 5pt;
 }
 
 #markdown-rendered details,

@@ -1,0 +1,218 @@
+#markdown-rendered pre,
+code {
+    font-family: Avenir, "PingFangSC-Light";
+
+}
+
+#markdown-rendered code {
+    background-color: #f8f8f8;
+    padding: 0.2em 0.5em;
+    color: #c7254e;
+    font-size: 0.9em;
+    border-radius: 2px;
+    display: inline;
+    white-space: pre-wrap;
+}
+
+#markdown-rendered pre {
+    font-size: 1em;
+    line-height: 1.2em;
+}
+
+#markdown-rendered pre code {
+    white-space: pre;
+    overflow: auto;
+    padding: 0.5em 0.7em;
+    display: block !important;
+}
+
+#markdown-rendered p {
+    font-family: Avenir, "PingFangSC-Light" !important;
+    font-size: 1em !important;
+    color: #333 !important;
+    line-height: 1.8em !important;
+    letter-spacing: 0.1em !important;
+    margin: 1em 1em !important;
+    /* 增加段落边距 */
+    text-align: justify !important;
+}
+
+#markdown-rendered table,
+pre,
+dl,
+blockquote,
+q,
+ul,
+ol {
+    margin: 1.2em 0em;
+}
+
+#markdown-rendered ul,
+ol {
+    padding-left: 0em;
+    margin: 1.2em 2em;
+
+}
+
+#markdown-rendered li {
+    margin: 0.2em 0;
+    font-family: Avenir, "PingFangSC-Light" !important;
+    font-size: 1em !important;
+    color: #333 !important;
+    line-height: 1.8em !important;
+    letter-spacing: 0.1em !important;
+    margin: 0.2em 0.2em !important;
+}
+
+#markdown-rendered ul li {
+    margin: 0.2em 0;
+    font-family: Avenir, "PingFangSC-Light" !important;
+    font-size: 1em !important;
+    color: #333 !important;
+    line-height: 1.8em !important;
+    letter-spacing: 0.1em !important;
+    margin: 0.2em 0.2em !important;
+}
+
+#markdown-rendered ul ul,
+ul ol,
+ol ul,
+ol ol {
+    margin: 0;
+    padding-left: 1em;
+}
+
+#markdown-rendered ol ol,
+ul ol {
+    list-style-type: circle;
+}
+
+#markdown-rendered ul ul ol,
+ul ol ol,
+ol ul ol,
+ol ol ol {
+    list-style-type: square;
+}
+
+#markdown-rendered dl {
+    padding: 0;
+}
+
+#markdown-rendered dl dt {
+    font-size: 1em;
+    font-weight: bold;
+    font-style: italic;
+}
+
+#markdown-rendered dl dd {
+    margin: 0 0 1em;
+    padding: 0 1em;
+}
+
+#markdown-rendered blockquote,
+q {
+    border-left: 4px solid #3bb8af;
+    padding: 0em;
+    margin: 0em 1em;
+    color: #777;
+    quotes: none;
+}
+
+
+#markdown-rendered strong,
+b {
+    color: #3bb8af;
+}
+
+#markdown-rendered blockquote p {
+    color: rgb(119, 117, 117) !important
+}
+
+#markdown-rendered blockquote::before,
+blockquote::after,
+q::before,
+q::after {
+    content: none;
+}
+
+#markdown-rendered h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 1.3em 0 1em;
+    padding: 0;
+    font-weight: bold;
+    letter-spacing: 0.1em !important;
+}
+
+#markdown-rendered h1 {
+    font-size: 1.7em;
+    border-bottom: 1px solid #ddd;
+    color: black;
+}
+
+#markdown-rendered h2 {
+    font-size: 1.4em;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    color: #3bb8af;
+}
+
+#markdown-rendered h3 {
+    font-size: 1.3em;
+}
+
+#markdown-rendered h4 {
+    font-size: 1.2em;
+}
+
+#markdown-rendered h5 {
+    font-size: 1em;
+}
+
+#markdown-rendered h6 {
+    font-size: 1em;
+    color: #777;
+}
+
+#markdown-rendered table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    font-size: .8em;
+    border: 0;
+    font-family: Avenir, "PingFangSC-Light";
+}
+
+#markdown-rendered tbody {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+#markdown-rendered table tr {
+    border: 0;
+    border-top: 1px solid #CCC;
+    background-color: white;
+    margin: 0;
+    padding: 0;
+
+}
+
+#markdown-rendered table tr:nth-child(2n) {
+    background-color: #F8F8F8;
+}
+
+#markdown-rendered table tr th,
+table tr td {
+    font-size: 0.8em;
+    border: 1px solid #CCC;
+    margin: 0;
+    padding: 0.5em 1em;
+}
+
+#markdown-rendered table tr th {
+    font-weight: bold;
+    background-color: #F0F0F0;
+}

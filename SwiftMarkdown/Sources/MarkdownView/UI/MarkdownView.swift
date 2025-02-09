@@ -12,30 +12,44 @@ public typealias PlatformImage = UIImage
 public typealias PlatformView = UIView
 #endif
 
-
 #if !os(visionOS)
-@available(macOS 11.0, iOS 14.0, *)
-public struct MarkdownView: PlatformViewRepresentable {
-    var markdownContent: String
-    let customStylesheet: String?
-    let linkActivationHandler: ((URL) -> Void)?
-    let renderedContentHandler: ((String) -> Void)?
-    let webviewHandler: ((WebView) -> Void)?
+
+@MainActor
+@available(macOS 14.0, iOS 17.0, *)
+public class MarkdownViewController: ObservableObject {
+    public let container = MarkdownView.WebView()
+    public var isRenderingContent: Bool = true
+    public var onLinkActivation: ((URL) -> Void)? = nil
     
-    public init(_ markdownContent: String, customStylesheet: String? = nil) {
+    
+    public init() {}
+}
+
+
+@available(macOS 14.0, iOS 17.0, *)
+public struct MarkdownView: PlatformViewRepresentable {
+    
+    @ObservedObject var controller: MarkdownViewController
+    
+    private(set) var markdownContent: String
+    private(set) var linkActivationHandler: ((URL) -> Void)?
+    private(set) var renderedContentHandler: ((String) -> Void)?
+    private(set) var webviewHandler: ((WebView) -> Void)?
+    
+    public init(_ markdownContent: String, controller: MarkdownViewController) {
         self.markdownContent = markdownContent
-        self.customStylesheet = customStylesheet
         linkActivationHandler = nil
         renderedContentHandler = nil
         webviewHandler = nil
+        self._controller = .init(wrappedValue: controller)
     }
     
-    init(_ markdownContent: String, customStylesheet: String?, linkActivationHandler: ((URL) -> Void)?, renderedContentHandler: ((String) -> Void)?, webview: ((WebView) -> Void)?) {
+    init(_ markdownContent: String, linkActivationHandler: ((URL) -> Void)?, renderedContentHandler: ((String) -> Void)?, webview: ((WebView) -> Void)?, controller: MarkdownViewController) {
         self.markdownContent = markdownContent
-        self.customStylesheet = customStylesheet
         self.linkActivationHandler = linkActivationHandler
         self.renderedContentHandler = renderedContentHandler
         self.webviewHandler = webview
+        self._controller = .init(initialValue: controller)
     }
     
     public func makeCoordinator() -> Coordinator {
@@ -48,7 +62,7 @@ public struct MarkdownView: PlatformViewRepresentable {
     }
 #elseif os(iOS)
     public func makeUIView(context: Context) -> WebView {
-        context.coordinator.platformView
+        context.coordinator.platformView!
     }
 #endif
     
@@ -68,20 +82,26 @@ public struct MarkdownView: PlatformViewRepresentable {
 #endif
     
     public func onLinkActivation(_ linkActivationHandler: @escaping (URL) -> Void) -> Self {
-        .init(markdownContent, customStylesheet: customStylesheet, linkActivationHandler: linkActivationHandler, renderedContentHandler: renderedContentHandler, webview: webviewHandler)
+        var current = self
+        current.linkActivationHandler = linkActivationHandler
+        return current
     }
     
     public func onRendered(_ renderedContentHandler: @escaping (String) -> Void) -> Self {
-        .init(markdownContent, customStylesheet: customStylesheet, linkActivationHandler: linkActivationHandler, renderedContentHandler: renderedContentHandler, webview: webviewHandler)
+        var current = self
+        current.renderedContentHandler = renderedContentHandler
+        return current
     }
     
     public func withWebView(_ webviewHandler: @escaping (WebView) -> Void) -> Self {
-        .init(markdownContent, customStylesheet: customStylesheet, linkActivationHandler: linkActivationHandler, renderedContentHandler: renderedContentHandler, webview: webviewHandler)
+        var current = self
+        current.webviewHandler = webviewHandler
+        return current
     }
     
     public class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
         let parent: MarkdownView
-        let platformView: WebView
+        weak var platformView: WebView?
         var startTime: CFAbsoluteTime?
         
         init(parent: MarkdownView) {
@@ -90,32 +110,32 @@ public struct MarkdownView: PlatformViewRepresentable {
             platformView = .init()
             super.init()
             
-            platformView.navigationDelegate = self
+            platformView?.navigationDelegate = self
             
 #if DEBUG && os(iOS)
             if #available(iOS 16.4, *) {
-                self.platformView.isInspectable = true
+                self.platformView?.isInspectable = true
             }
 #endif
             
             /// So that the `View` adjusts its height automatically.
-            platformView.setContentHuggingPriority(.required, for: .vertical)
+            platformView?.setContentHuggingPriority(.required, for: .vertical)
             /// Disables scrolling.
 #if os(iOS)
-            platformView.scrollView.isScrollEnabled = false
+            platformView?.scrollView.isScrollEnabled = false
 #endif
             /// Set transparent background.
 #if os(macOS)
-            platformView.setValue(false, forKey: "drawsBackground")
+            platformView?.setValue(false, forKey: "drawsBackground")
             /// Equavalent to `.setValue(true, forKey: "drawsTransparentBackground")` on macOS 10.12 and before, which this library doesn't target.
 #elseif os(iOS)
-            platformView.isOpaque = false
+            platformView?.isOpaque = false
 #endif
             /// Receive messages from the web view.
-            platformView.configuration.userContentController = .init()
-            platformView.configuration.userContentController.add(self, name: "sizeChangeHandler")
-            platformView.configuration.userContentController.add(self, name: "renderedContentHandler")
-            platformView.configuration.userContentController.add(self, name: "copyToPasteboard")
+            platformView?.configuration.userContentController = .init()
+            platformView?.configuration.userContentController.add(self, name: "sizeChangeHandler")
+            platformView?.configuration.userContentController.add(self, name: "renderedContentHandler")
+            platformView?.configuration.userContentController.add(self, name: "copyToPasteboard")
 #if os(macOS)
             let defaultStylesheetFileName = "default-macOS"
 #elseif os(iOS)
@@ -131,14 +151,12 @@ public struct MarkdownView: PlatformViewRepresentable {
                 fatalError("[\(MarkdownView.self)][FatalError] Failed to load resources. Please check resource files. ")
             }
             // Append custom styles
-            let stylesheet: String? = self.parent.customStylesheet.map { str in
-                defaultStylesheet + str
-            }
+            let stylesheet: String? = defaultStylesheet
             
             let htmlString = templateString
                 .replacingOccurrences(of: "PLACEHOLDER_SCRIPT", with: script)
                 .replacingOccurrences(of: "PLACEHOLDER_STYLESHEET", with: stylesheet ?? defaultStylesheet)
-            platformView.loadHTMLString(htmlString, baseURL: Bundle.module.bundleURL.appendingPathComponent("index", conformingTo: .html))
+            platformView?.loadHTMLString(htmlString, baseURL: Bundle.module.bundleURL.appendingPathComponent("index", conformingTo: .html))
         }
         
         /// Update the content on first finishing loading.
@@ -149,7 +167,6 @@ public struct MarkdownView: PlatformViewRepresentable {
         public func webView(_: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
             if navigationAction.navigationType == .linkActivated {
                 guard let url = navigationAction.request.url else { return .cancel }
-                
                 if let linkActivationHandler = parent.linkActivationHandler {
                     linkActivationHandler(url)
                 } else {
@@ -168,6 +185,7 @@ public struct MarkdownView: PlatformViewRepresentable {
         }
         
         public func userContentController(_: WKUserContentController, didReceive message: WKScriptMessage) {
+            guard let platformView else { return }
             if let webviewHandler = parent.webviewHandler {
                 webviewHandler(platformView)
             }
@@ -192,6 +210,13 @@ public struct MarkdownView: PlatformViewRepresentable {
                           let renderedContent = String(data: renderedContentBase64EncodedData, encoding: .utf8)
                     else { return }
                     renderedContentHandler(renderedContent)
+                    Task {
+                        if #available(iOS 16.0, macOS 13.0, *) {
+                            await platformView.updateTheme(for: .github)
+                            await platformView.updateTheme(for: .blood)
+                            await platformView.updateFontSize(25)
+                        }
+                    }
                 case "copyToPasteboard":
                     guard let base64EncodedString = message.body as? String else { return }
                     base64EncodedString.trimmingCharacters(in: .whitespacesAndNewlines).copyToPasteboard()

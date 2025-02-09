@@ -1,0 +1,195 @@
+#markdown-rendered {
+    line-height: 1.8em;
+    letter-spacing: 0.1em;
+}
+
+
+#markdown-rendered pre,
+code {
+    font-size: 0.875em;
+    font-family: Roboto, 'Courier New', Consolas, Inconsolata, Courier, monospace;
+    margin: auto 5px;
+}
+
+#markdown-rendered code {
+    white-space: pre-wrap;
+    border-radius: 2px;
+    display: inline;
+}
+
+#markdown-rendered pre {
+    font-size: 1em;
+    line-height: 1.4em;
+    display: block;
+    !important;
+}
+
+#markdown-rendered pre code {
+    white-space: pre;
+    overflow: auto;
+    border-radius: 3px;
+    padding: 1px 1px;
+    display: block !important;
+}
+
+#markdown-rendered strong,
+b {
+    color: #BF360C;
+}
+
+#markdown-rendered em,
+i {
+    color: #009688;
+}
+
+#markdown-rendered hr {
+    border: 1px solid #BF360C;
+    margin: 1.5em auto;
+}
+
+#markdown-rendered p {
+    margin: 1.5em 5px !important;
+}
+
+#markdown-rendered table,
+pre,
+dl,
+blockquote,
+q,
+ul,
+ol {
+    margin: 10px 5px;
+}
+
+#markdown-rendered ul,
+ol {
+    padding-left: 15px;
+}
+
+#markdown-rendered li {
+    margin: 10px;
+}
+
+#markdown-rendered li p {
+    margin: 10px 0 !important;
+}
+
+#markdown-rendered ul ul,
+ul ol,
+ol ul,
+ol ol {
+    margin: 0;
+    padding-left: 10px;
+}
+
+#markdown-rendered ul {
+    list-style-type: circle;
+}
+
+#markdown-rendered dl {
+    padding: 0;
+}
+
+#markdown-rendered dl dt {
+    font-size: 1em;
+    font-weight: bold;
+    font-style: italic;
+}
+
+#markdown-rendered dl dd {
+    margin: 0 0 10px;
+    padding: 0 10px;
+}
+
+#markdown-rendered blockquote,
+q {
+    border-left: 2px solid #009688;
+    padding: 0 10px;
+    color: #777;
+    quotes: none;
+    margin-left: 1em;
+}
+
+#markdown-rendered blockquote::before,
+blockquote::after,
+q::before,
+q::after {
+    content: none;
+}
+
+#markdown-rendered h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 20px 0 10px;
+    padding: 0;
+    font-style: bold !important;
+    color: #009688 !important;
+    text-align: center !important;
+    margin: 1.5em 5px !important;
+    padding: 0.5em 1em !important;
+}
+
+#markdown-rendered h1 {
+    font-size: 1.625em !important;
+    border-bottom: 1px solid #ddd !important;
+}
+
+#markdown-rendered h2 {
+    font-size: 1.25em !important;
+    border-bottom: 1px solid #eee !important;
+}
+
+#markdown-rendered h3 {
+    font-size: 1.125em;
+}
+
+#markdown-rendered h4 {
+    font-size: 1em;
+}
+
+
+#markdown-rendered table {
+    padding: 0;
+    border-collapse: collapse;
+    border-spacing: 0;
+    font-size: 1em;
+    font: inherit;
+    border: 0;
+    margin: 0 auto;
+}
+
+#markdown-rendered tbody {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+#markdown-rendered table tr {
+    border: 0;
+    border-top: 1px solid #CCC;
+    background-color: white;
+    margin: 0;
+    padding: 0;
+}
+
+#markdown-rendered table tr:nth-child(2n) {
+    background-color: #F8F8F8;
+}
+
+#markdown-rendered table tr th,
+table tr td {
+    font-size: 1em;
+    border: 1px solid #CCC;
+    margin: 0;
+    padding: 5px 10px;
+}
+
+#markdown-rendered table tr th {
+    font-weight: bold;
+    color: #eee;
+    border: 1px solid #009688;
+    background-color: #009688;
+}

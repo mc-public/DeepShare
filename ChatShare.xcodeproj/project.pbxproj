@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E51729572D59226C00A65085 /* ObservableDefaults in Frameworks */ = {isa = PBXBuildFile; productRef = E51729562D59226C00A65085 /* ObservableDefaults */; };
 		E52146182D5253220055E0F7 /* MarkdownView in Frameworks */ = {isa = PBXBuildFile; productRef = E52146172D5253220055E0F7 /* MarkdownView */; };
 		E5418F7D2D51F26600A6655C /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = E5418F7C2D51F26600A6655C /* SwiftUIIntrospect */; };
 		E5418F802D51F2A400A6655C /* EnvironmentOverrides in Frameworks */ = {isa = PBXBuildFile; productRef = E5418F7F2D51F2A400A6655C /* EnvironmentOverrides */; };
@@ -45,6 +46,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E5418F832D51F42E00A6655C /* SVProgressHUD in Frameworks */,
+				E51729572D59226C00A65085 /* ObservableDefaults in Frameworks */,
 				E5C907BE2D57845000730092 /* Localization in Frameworks */,
 				E5418F802D51F2A400A6655C /* EnvironmentOverrides in Frameworks */,
 				E52146182D5253220055E0F7 /* MarkdownView in Frameworks */,
@@ -105,6 +107,7 @@
 				E5418F822D51F42E00A6655C /* SVProgressHUD */,
 				E52146172D5253220055E0F7 /* MarkdownView */,
 				E5C907BD2D57845000730092 /* Localization */,
+				E51729562D59226C00A65085 /* ObservableDefaults */,
 			);
 			productName = ChatShare;
 			productReference = E5418EEC2D51F06F00A6655C /* ChatShare.app */;
@@ -142,6 +145,7 @@
 				E5418F812D51F42E00A6655C /* XCRemoteSwiftPackageReference "SVProgressHUD" */,
 				E5D82EE32D524E6C000CAE11 /* XCLocalSwiftPackageReference "SwiftMarkdown" */,
 				E5C907BC2D57845000730092 /* XCLocalSwiftPackageReference "Localization" */,
+				E51729552D59226C00A65085 /* XCRemoteSwiftPackageReference "ObservableDefaults" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E5418EED2D51F06F00A6655C /* Products */;
@@ -413,6 +417,14 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		E51729552D59226C00A65085 /* XCRemoteSwiftPackageReference "ObservableDefaults" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mc-public/ObservableDefaults.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		E5418F7A2D51F1F600A6655C /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
@@ -448,6 +460,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		E51729562D59226C00A65085 /* ObservableDefaults */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E51729552D59226C00A65085 /* XCRemoteSwiftPackageReference "ObservableDefaults" */;
+			productName = ObservableDefaults;
+		};
 		E52146172D5253220055E0F7 /* MarkdownView */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E5D82EE32D524E6C000CAE11 /* XCLocalSwiftPackageReference "SwiftMarkdown" */;

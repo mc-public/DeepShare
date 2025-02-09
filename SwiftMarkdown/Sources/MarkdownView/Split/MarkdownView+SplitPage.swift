@@ -15,13 +15,13 @@ import UIKit
 #endif
 
 //MARK: - Single Page Image
-
+@available(macOS 14.0, iOS 17.0, *)
 extension MarkdownView.WebView {
     
     /// Generate a full-page image of the Markdown document.
     ///
     /// - Parameter width: The page width of the image. The height of the image will be automatically calculated based on the content of the Markdown document.
-    @available(iOS 16.0, macOS 12.0, *)
+    @available(macOS 14.0, iOS 17.0, *)
     public func contentImage(width: CGFloat?) async -> PlatformImage? {
         let config = WKPDFConfiguration()
         if #available(iOS 17.0, macOS 14.0, *) {
@@ -52,7 +52,7 @@ extension MarkdownView.WebView {
     /// Generate a full-page image of the Markdown document.
     ///
     /// - Parameter width: The page width of the image. The height of the image will be automatically calculated based on the content of the Markdown document.
-    @available(iOS 16.0, macOS 12.0, *)
+    @available(macOS 14.0, iOS 17.0, *)
     public func contentPDFData(width: CGFloat?) async -> Data? {
         let config = WKPDFConfiguration()
         if #available(iOS 17.0, macOS 14.0, *) {
@@ -74,12 +74,13 @@ extension MarkdownView.WebView {
 }
 
 //MARK: - Page Split Images
-
+@available(macOS 14.0, iOS 17.0, *)
 extension MarkdownView.WebView {
     
     /// Possible page break points when dividing a Markdown page.
     ///
     /// The pagination algorithm will divide the pages using the set of options specified at the time of partitioning.
+    @available(macOS 14.0, iOS 17.0, *)
     public struct PageSplitLocation: OptionSet, Sendable {
         /// The raw value about current location.
         public var rawValue: Int
@@ -98,6 +99,7 @@ extension MarkdownView.WebView {
     }
     
     /// Pagination algorithms available for dividing Markdown page.
+    @available(macOS 14.0, iOS 17.0, *)
     public enum PageSplitAlgorithm {
         /// Use the greedy algorithm to partition the page from top to bottom.
         case greedy

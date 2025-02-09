@@ -105,8 +105,6 @@ extension QANavigationRoot {
                                 .environment(QADataManager.current)
                         )
                     }
-                        
-
                 }
         }
     }

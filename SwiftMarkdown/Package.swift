@@ -2,7 +2,9 @@
 
 import PackageDescription
 
-let webResources: [Resource] = [
+let webResources: [Resource] = ["concise", "github", "blood", "boundless_left", "tree", "succinct_cyan"].map { Resource.copy("Resources/stylesheets/\($0).css") }
+
++ [
     "fa-regular-400.woff2",
     "fa-solid-900.woff2",
     "KaTeX_Main-Bold.woff2",
@@ -25,8 +27,8 @@ let webResources: [Resource] = [
 let package = Package(
     name: "SwiftMarkdown",
     platforms: [
-        .macOS(.v11),
-        .iOS(.v14),
+        .macOS(.v14),
+        .iOS(.v17),
     ],
     products: [
         .library(

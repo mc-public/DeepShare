@@ -15,6 +15,7 @@ import UIKit
 
 #if !os(visionOS)
 
+@available(macOS 14.0, iOS 17.0, *)
 extension MarkdownView {
     /// The internal `WKWebView` for displaying the markdown content.
     public class WebView: WKWebView {
@@ -72,6 +73,7 @@ extension MarkdownView {
     }
 }
 
+@available(macOS 14.0, iOS 17.0, *)
 extension MarkdownView.WebView {
     /// Update markdown text in the webview.
     func updateMarkdownContent(_ markdownContent: String) {
@@ -87,9 +89,81 @@ extension MarkdownView.WebView {
             DispatchQueue.main.async {
                 self.evaluateJavaScript("window.updateWithMarkdownContentBase64Encoded(`\(markdownContentBase64Encoded)`)", completionHandler: nil)
             }
-            
+        }
+    }
+    
+    func updateFontSize(_ size: Int) async {
+        try? await self.evaluateJavaScript("document.getElementById('markdown-rendered').style.fontSize = '\(size)pt'")
+    }
+    
+    func updateHorizontalPadding(_ length: Int) async {
+        try! await self.evaluateJavaScript(
+"""
+document.getElementById('markdown-rendered').style.paddingLeft = '\(length)pt';
+document.getElementById('markdown-rendered').style.paddingRight = '\(length)pt';
+"""
+        )
+    }
+    
+    @available(macOS 14.0, iOS 17.0, *)
+    func updateTheme(for theme: MarkdownView.Theme) async {
+        try! await self.evaluateJavaScript(
+"""
+try {  document.body.removeChild(window.md_style)  } catch {};
+window.md_style = document.createElement('style');
+window.md_style.type = 'text/css';
+window.md_style.innerHTML = `
+\(theme.styleContent)
+`
+document.body.appendChild(window.md_style);
+1;
+"""
+        )
+    }
+    
+    
+}
+
+@available(macOS 14.0, iOS 17.0, *)
+extension MarkdownView {
+    
+    @available(macOS 14.0, iOS 17.0, *)
+    public struct Theme: Sendable {
+        private let styleURL: URL
+        public let name: String
+        public let colorSupport: ColorSupport
+        public enum ColorSupport: Sendable {
+            case light
+            case dynamic
+        }
+        private init(styleName: String, fileName: String, color: ColorSupport) {
+            self.name = styleName
+            guard let fileURL = Bundle.module.url(forResource: fileName, withExtension: "css") else {
+                fatalError("[\(Self.self)][\(#function)] Resource file named `\(fileName).css` not found. Please check the package resources carefully.")
+            }
+            styleURL = fileURL
+            colorSupport = color
+        }
+        
+        public static let concise   = Self(styleName: "Concise", fileName: "concise", color: .dynamic)
+        public static let github    = Self(styleName: "GitHub", fileName: "github", color: .dynamic)
+        public static let blood     = Self(styleName: "Blood", fileName: "blood", color: .light)
+        public static let boundless = Self(styleName: "Boundless Left", fileName: "boundless_left", color: .light)
+        public static let tree      = Self(styleName: "Tree", fileName: "tree", color: .light)
+        public static let succinct  = Self(styleName: "Succinct Cyan", fileName: "succinct_cyan", color: .light)
+        
+        var styleContent: String {
+            guard let content = try? String(contentsOf: styleURL, encoding: .utf8) else {
+                fatalError("[\(Self.self)][\(#function)] Style file `\(styleURL.path(percentEncoded: false))` cannot be read properly. Please check the package resources carefully.")
+            }
+            return content
         }
     }
 }
+
+
+
+
+
 
 #endif

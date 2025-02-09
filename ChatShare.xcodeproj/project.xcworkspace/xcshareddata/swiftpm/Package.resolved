@@ -1,5 +1,5 @@
 {
-  "originHash" : "085d997bdbda581d04c7b2366124fa25e6384974283112c7005313520b7d477e",
+  "originHash" : "d8a1150ff65e895c04910f70fc9d3fc526a0500921141ed4efe7af30f1665ac0",
   "pins" : [
     {
       "identity" : "environmentoverrides",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "d0b763a678d254e51c74c48e83119bd063250ba3",
         "version" : "0.0.4"
+      }
+    },
+    {
+      "identity" : "observabledefaults",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mc-public/ObservableDefaults.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "4740e2c39043b7daff946aa3bbec22e6a68850d3"
       }
     },
     {
@@ -22,10 +31,10 @@
     {
       "identity" : "swift-syntax",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-syntax.git",
+      "location" : "https://github.com/swiftlang/swift-syntax.git",
       "state" : {
-        "revision" : "64889f0c732f210a935a0ad7cda38f77f876262d",
-        "version" : "509.1.1"
+        "revision" : "0687f71944021d616d34d922343dcef086855920",
+        "version" : "600.0.1"
       }
     },
     {

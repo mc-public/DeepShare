@@ -1,0 +1,125 @@
+#markdown-rendered {
+    font-family: sans-serif;
+    margin: 0 auto;
+}
+
+#markdown-rendered h1,
+#markdown-rendered h2,
+#markdown-rendered h3 {
+    cursor: default;
+}
+
+#markdown-rendered h1 {
+    margin: 20px 0;
+    text-align: center;
+}
+
+#markdown-rendered h2 {
+    margin: 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+#markdown-rendered h3 {
+    position: relative;
+    margin: 10px 0;
+}
+
+#markdown-rendered h3::before {
+    content: "#";
+    position: absolute;
+    top: 0;
+    left: -16px;
+    color: rgb(61, 158, 238);
+}
+
+#markdown-rendered h4 {
+    margin: 10px 0;
+}
+
+#markdown-rendered p {
+    margin: 12px 0;
+}
+
+#markdown-rendered code {
+    margin: 0 2px;
+    padding: 3px 5px;
+    border-radius: 2px;
+    color: rgb(236, 90, 22);
+    background-color: #eee;
+}
+
+#markdown-rendered hr {
+    height: 2px;
+    margin: 16px 0;
+    border: none;
+    background-color: #ccc;
+}
+
+#markdown-rendered blockquote {
+    border-left: 4px solid #0eaeec;
+    padding: 10px 15px;
+    color: #666;
+    background-color: #dbf3fd;
+}
+
+#markdown-rendered table {
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+#markdown-rendered table th,
+#markdown-rendered table td {
+    padding: 6px 12px;
+    border: 1px solid #dfe2e5;
+}
+
+#markdown-rendered table tr {
+    background-color: #fff;
+}
+
+#markdown-rendered table thead tr,
+#markdown-rendered table tbody tr:nth-child(even) {
+    background-color: #f8f8f8;
+}
+
+#markdown-rendered pre code {
+    display: block;
+    padding: 16px 20px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f8f8f8;
+    color: #525252;
+    font-size: 0.875em;
+    line-height: 1.375em;
+    white-space: pre;
+    overflow-x: auto;
+}
+
+#markdown-rendered ul {
+    padding-left: 20px;
+    list-style-type: disc;
+}
+
+#markdown-rendered ul li {
+    margin: 8px 0;
+}
+
+#markdown-rendered ul ul {
+    list-style-type: circle;
+}
+
+#markdown-rendered ul ul ul {
+    list-style-type: square;
+}
+#markdown-rendered a {
+    color: #0eaeec;
+    font-weight: bold;
+}
+
+#markdown-rendered img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 16px auto;
+}

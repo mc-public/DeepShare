@@ -1,0 +1,46 @@
+[
+    {
+        "themeName": "Boundless Left",
+        "zh_name": "无边",
+        "isLight": true,
+        "isDark": false,
+        "fileName": "boundless_left.css",
+        "resource": "https://github.com/simonlc/Markdown-CSS.git"
+    },
+    {
+        "themeName": "GitHub",
+        "zh_name": "GitHub",
+        "isLight": true,
+        "isDark": true,
+        "fileName": "github.css",
+        "resource": "https://github.com/sindresorhus/github-markdown-css.git"
+    },
+    {
+        "themeName": "Concise",
+        "zh_name": "极简",
+        "isLight": true,
+        "isDark": true,
+        "fileName": "concise.css"
+    },
+    {
+        "themeName": "Succinct Cyan",
+        "zh_name": "青涩",
+        "isLight": true,
+        "isDark": false,
+        "fileName": "succinct_cyan.css"
+    }, 
+    {
+        "themeName": "Tree",
+        "zh_name": "树荫",
+        "isLight": true,
+        "isDark": false,
+        "fileName": "tree.css"
+    },
+    {
+        "themeName": "Blood",
+        "zh_name": "深红",
+        "isLight": true,
+        "isDark": false,
+        "fileName": "blood.css"
+    }
+]
