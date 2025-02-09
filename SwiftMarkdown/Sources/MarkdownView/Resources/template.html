@@ -287,8 +287,8 @@
                     return true;
                 }
             });
-
-            window.webkit.messageHandlers.renderedContentHandler.postMessage(markdownContentBase64Encoded);
+            //window.webkit.messageHandlers.renderedContentHandler.postMessage(markdownContentBase64Encoded);
+            return markdownContentBase64Encoded;
         }
 
         const resizeObserver = new ResizeObserver((entries) => {

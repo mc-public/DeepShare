@@ -19,9 +19,7 @@ struct QARenderingView: QANavigationLeaf {
     static let isUsingSheet: Bool = false
     
     @Environment(QAViewModel.self) var viewModel: QAViewModel
-    @State private var isLoading: Bool = true
     @State private var contentSize: CGSize = .zero
-    @State private var contentWebView: MarkdownView.WebView?
     
     @StateObject var controller = MarkdownViewController()
     
@@ -62,22 +60,13 @@ struct QARenderingView: QANavigationLeaf {
                         .padding(.vertical, 5.0)
                 }
             }
-            MarkdownView(viewModel.answerContent, controller: controller)
-                .onRendered { _ in
-                    Task {
-                        try? await Task.sleep(for: .seconds(0.5))
-                        isLoading = false
-                        await SVProgressHUD.dismiss()
-                    }
-                }
-                .withWebView { webView in
-                    contentWebView = webView
-                }
+            MarkdownView(controller: controller)
+                .onRendered(SVProgressHUD.dismiss)
                 .frame(maxWidth: .infinity, alignment: .center)
         }
-        .hidden(isLoading)
+        .hidden(controller.isRenderingContent)
         .onAppear {
-            isLoading = true
+            controller.text = viewModel.answerContent
             SVProgressHUD.show()
         }
         .onGeometryChange { size in
@@ -116,8 +105,7 @@ extension QARenderingView {
     }
     
     func fetchLongImageResult() async -> URL? {
-        guard let contentWebView else { return nil }
-        guard let image = await contentWebView.contentImage(width: nil) else {
+        guard let image = await controller.container.contentImage(width: nil) else {
             return nil
         }
         guard let pngData = image.pngData() else {
@@ -131,18 +119,15 @@ extension QARenderingView {
     }
     
     func fetchSplitedImage() async -> UIImage? {
-        guard let contentWebView else {
-            return nil
-        }
+        
         Task {
-            _ = await contentWebView.splitToImages()
+            _ = await controller.container.splitToImages()
         }
         return nil
     }
     
     func fetchPDFResult() async -> URL? {
-        guard let contentWebView else { return nil }
-        guard let data = await contentWebView.contentPDFData(width: nil) else { return nil }
+        guard let data = await controller.container.contentPDFData(width: nil) else { return nil }
         let fileName = viewModel.questionContent.sanitizedFileName(empty: #localized("Untitled"))
         guard let pdfURL = await URL.temporaryFileURL(data: data, fileName: fileName, conformTo: .pdf) else {
             return nil
