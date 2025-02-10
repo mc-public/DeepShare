@@ -36,9 +36,15 @@ let package = Package(
             targets: ["MarkdownView"]
         ),
     ],
+    dependencies: [
+        .package(url: "https://github.com/mc-public/ObservableDefaults.git", branch: "main")
+    ],
     targets: [
         .target(
             name: "MarkdownView",
+            dependencies: [
+                .product(name: "ObservableDefaults", package: "ObservableDefaults")
+            ],
             resources: [.copy("Resources/template.html"),
                         .copy("Resources/script"),
                         .copy("Resources/stylesheets/default-macOS"),

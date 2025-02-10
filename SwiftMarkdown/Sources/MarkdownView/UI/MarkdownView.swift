@@ -13,13 +13,16 @@ import PDFKit
 typealias PlatformViewRepresentable = NSViewRepresentable
 public typealias PlatformImage = NSImage
 public typealias PlatformView = NSView
+public typealias PlatformColor = NSColor
 #elseif os(iOS)
 typealias PlatformViewRepresentable = UIViewRepresentable
 public typealias PlatformImage = UIImage
 public typealias PlatformView = UIView
+public typealias PlatformColor = UIColor
 #endif
 
 #if !os(visionOS)
+
 
 /// The class used to perform control over `Markdown` view.
 @MainActor @Observable
@@ -85,13 +88,17 @@ public class MarkdownState {
     /// The default color is `.white`.
     public var backgroundColor: Color {
         didSet {
-            container.backgroundColor = UIColor(backgroundColor)
-            container.scrollView.backgroundColor = UIColor(backgroundColor)
+            #if os(iOS)
+            container.backgroundColor = PlatformColor(backgroundColor)
+            container.scrollView.backgroundColor = PlatformColor(backgroundColor)
+#elseif os(macOS)
+            Task { await container.updateBackgroundColor(PlatformColor(backgroundColor)) }
+            #endif
         }
     }
     /// Return color schemes suggested based on the background color.
     var suggestColorScheme: ColorScheme {
-        UIColor(backgroundColor).luminance > 0.5 ? .light : .dark
+        PlatformColor(backgroundColor).luminance > 0.5 ? .light : .dark
     }
     
     @ObservationIgnored
@@ -120,7 +127,9 @@ public class MarkdownState {
     /// Create a `Markdown` state.
     public init() {
         backgroundColor = .white
-        container.backgroundColor = UIColor(.white)
+        #if os(iOS)
+        container.backgroundColor = PlatformColor(.white)
+        #endif
     }
 }
 
@@ -139,13 +148,13 @@ public struct Markdown: View {
     }
     
     public func onLinkActivation(_ linkActivationHandler: @escaping (URL) -> Void) -> Self {
-        var current = self
+        let current = self
         current.state.onLinkActivation = linkActivationHandler
         return current
     }
     
     public func onRendered(_ renderedContentHandler: @escaping () async throws -> Void) -> Self {
-        var current = self
+        let current = self
         current.state.onContentRendered = renderedContentHandler
         return current
     }
@@ -171,7 +180,7 @@ public struct MarkdownView: PlatformViewRepresentable {
     
 #if os(macOS)
     public func makeNSView(context: Context) -> WebView {
-        context.coordinator.platformView
+        controller.container
     }
 #elseif os(iOS)
     public func makeUIView(context: Context) -> WebView {
@@ -205,9 +214,9 @@ public struct MarkdownView: PlatformViewRepresentable {
             platformView?.navigationDelegate = self
             
 #if DEBUG && os(iOS)
-            if #available(iOS 16.4, *) {
-                self.platformView?.isInspectable = true
-            }
+            self.platformView?.isInspectable = true
+#elseif os(iOS)
+            self.platformView?.isInspectable = false
 #endif
             /// So that the `View` adjusts its height automatically.
             platformView?.setContentHuggingPriority(.required, for: .vertical)
@@ -252,7 +261,6 @@ public struct MarkdownView: PlatformViewRepresentable {
         
         /// Update the content on first finishing loading.
         public func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
-            guard let webView = webView as? WebView else { fatalError() }
             Task {
                 await self.controller?.updateText(await: true)
             }

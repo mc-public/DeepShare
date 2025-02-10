@@ -1,0 +1,24 @@
+{
+  "originHash" : "f506ce58c3478804ec90b2c4fb80ad9244a2c46ed846e8bfb95a7413c34a483c",
+  "pins" : [
+    {
+      "identity" : "observabledefaults",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mc-public/ObservableDefaults.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "4740e2c39043b7daff946aa3bbec22e6a68850d3"
+      }
+    },
+    {
+      "identity" : "swift-syntax",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiftlang/swift-syntax.git",
+      "state" : {
+        "revision" : "0687f71944021d616d34d922343dcef086855920",
+        "version" : "600.0.1"
+      }
+    }
+  ],
+  "version" : 3
+}

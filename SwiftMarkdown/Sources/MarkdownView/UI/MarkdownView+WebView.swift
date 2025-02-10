@@ -27,11 +27,16 @@ extension MarkdownView {
             .init(width: super.intrinsicContentSize.width, height: contentHeight)
         }
         
-        override public var backgroundColor: UIColor? {
+        #if os(iOS)
+        override public var backgroundColor: PlatformColor? {
             didSet {
-                Task { await self.updateBackgroundColor() }
+                Task { await self.updateBackgroundColor(nil) }
             }
         }
+        #elseif os(macOS)
+        
+        
+        #endif
         
         nonisolated var isRenderingContent: Bool {
             get { lock.withLock { unsafe_isRenderingContent } }
@@ -111,11 +116,11 @@ extension MarkdownView.WebView {
     }
     
     func updateFontSize(_ pointSize: CGFloat) async {
-        try? await self.evaluateJavaScript("document.getElementById('markdown-rendered').style.fontSize = '\(pointSize)pt';1")
+        _ = try? await self.evaluateJavaScript("document.getElementById('markdown-rendered').style.fontSize = '\(pointSize)pt';1")
     }
     
     func updateHorizontalPadding(_ length: CGFloat) async {
-        try? await self.evaluateJavaScript(
+        _ = try? await self.evaluateJavaScript(
 """
 document.getElementById('markdown-rendered').style.paddingLeft = '\(length / 2)pt';
 document.getElementById('markdown-rendered').style.paddingRight = '\(length / 2)pt';
@@ -126,7 +131,7 @@ document.getElementById('markdown-rendered').style.paddingRight = '\(length / 2)
     
     @available(macOS 14.0, iOS 17.0, *)
     func updateTheme(for theme: MarkdownView.Theme) async {
-        try? await self.evaluateJavaScript(
+        _ = try? await self.evaluateJavaScript(
 """
 try {  document.body.removeChild(window.md_style)  } catch {};
 window.md_style = document.createElement('style');
@@ -138,16 +143,29 @@ document.body.appendChild(window.md_style);
 1;
 """
         )
-        await updateBackgroundColor()
+        await updateBackgroundColor(nil)
     }
     
     @available(macOS 14.0, iOS 17.0, *)
-    private func updateBackgroundColor() async {
-        guard let color = self.backgroundColor?.toHexString() else {
+    func updateBackgroundColor(_ color: PlatformColor?) async {
+
+        #if os(iOS)
+        guard let color = (color ?? self.backgroundColor)?.toRGBComponents() else {
             assertionFailure()
             return
         }
-        try? await self.evaluateJavaScript("document.getElementById('markdown-rendered').style.backgroundColor = '\(color)';0")
+        #else
+        guard let color = (color ?? .white).toHexString() else {
+            assertionFailure()
+            return
+        }
+        #endif
+        let colorString =
+"""
+color(srgb \(color.red) \(color.green) \(color.blue))
+"""
+        _ = try? await self.evaluateJavaScript("document.getElementById('markdown-rendered').style.backgroundColor = '\(colorString)';0")
+        
     }
     
     
@@ -202,30 +220,4 @@ extension MarkdownView {
 }
 
 #endif
-
-
-extension UIColor {
-    
-    var luminance: CGFloat {
-        var red: CGFloat = 0
-        var green: CGFloat = 0
-        var blue: CGFloat = 0
-        var alpha: CGFloat = 0
-        self.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
-        return 0.299 * red + 0.587 * green + 0.114 * blue
-    }
-    
-    func toHexString() -> String? {
-        var red: CGFloat = 0
-        var green: CGFloat = 0
-        var blue: CGFloat = 0
-        var alpha: CGFloat = 0
-        guard self.getRed(&red, green: &green, blue: &blue, alpha: &alpha) else {
-            return nil
-        }
-        let rgb: Int = (Int)(red * 255) << 16 | (Int)(green * 255) << 8 | (Int)(blue * 255) << 0
-        return String(format: "#%06x", rgb)
-    }
-}
-
 

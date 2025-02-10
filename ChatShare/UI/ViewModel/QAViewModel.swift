@@ -9,31 +9,39 @@ import Observation
 import SwiftUI
 import UIKit
 
+
 /// The shared singleton view model about current application.
 @MainActor @Observable
 final class QAViewModel {
     
     /// The shared view model about current application.
+    
     static let current = QAViewModel()
-    private init() {}
+    
     
     //MARK: - QAListView
     
     var listSearchText = String()
+    
     var isListSearching = false
+    
     var listSearchingResult: [QADataModel] {
         QADataManager.current
             .models(sort: listSort, order: listSordOrder)
             .filter(prompt: listSearchText)
     }
+    
     var listSort: QADataManager.Sort = .title//.date(.created)
+    
     var listSordOrder: SortOrder = .forward
+    
     var listSelectedModels = Set<QADataModel>()
     
     //MARK: - Data Share
     
     private var isSettingDataModelID: Bool = false
     /// Selected data model about the `QAInputView`.
+    
     private(set) var selectDataModelID: QADataModel.QAID? {
         didSet {
             if let selectDataModelID, let model = QADataManager.current[selectDataModelID] {
@@ -55,6 +63,7 @@ final class QAViewModel {
     var selectedChatAI = QAChatAIModel.deepseek_R1 {
         didSet { saveQAModel() }
     }
+
     var isContentEmpty: Bool { questionContent.isEmpty && answerContent.isEmpty }
     
     func prepareForQAModel(_ model: QADataModel) {
@@ -92,8 +101,8 @@ final class QAViewModel {
         }
     }
     
-    //MARK: - Image Result
-    
+    //MARK: - QARenderingView
+    var usingWaterMark = true
     var pdfResult: ShareFileURL?
     var imageResult: ShareFileURL?
     
