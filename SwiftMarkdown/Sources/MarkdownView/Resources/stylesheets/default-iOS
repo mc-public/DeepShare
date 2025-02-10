@@ -477,6 +477,7 @@
 #markdown-rendered pre code {
     font-size: 100%;
     white-space: pre-wrap !important;
+    word-wrap: break-word !important;
 }
 
 #markdown-rendered pre>code {

@@ -121,6 +121,7 @@ protocol QANavigationLeaf: View {
     associatedtype Content: View
     init()
     /// The view component.
+    @ViewBuilder
     var content: Content { get }
     var navigationTitleColor: Color { get }
     var navigationTitleDesign: UIFontDescriptor.SystemDesign { get }

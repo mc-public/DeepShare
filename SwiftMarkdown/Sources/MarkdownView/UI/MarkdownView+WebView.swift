@@ -28,10 +28,10 @@ extension MarkdownView {
         }
         
         nonisolated var isRenderingContent: Bool {
-            get { lock.withLock { _isRenderingContent } }
-            set { lock.withLock { _isRenderingContent = newValue } }
+            get { lock.withLock { unsafe_isRenderingContent } }
+            set { lock.withLock { unsafe_isRenderingContent = newValue } }
         }
-        nonisolated(unsafe) var _isRenderingContent: Bool = false
+        nonisolated(unsafe) var unsafe_isRenderingContent: Bool = false
         nonisolated private let lock = NSLock()
         
         /// Disables scrolling.
@@ -92,9 +92,7 @@ extension MarkdownView.WebView {
             let formatedString = markdownContent
                 .replacingOccurrences(of: patternLeft, with: "\n\n\\\\[", options: .regularExpression)
                 .replacingOccurrences(of: patternRight, with: "\\\\]\n\n")
-            guard let markdownContentBase64Encoded = formatedString.data(using: .utf8)?.base64EncodedString() else {
-                return
-            }
+            guard let markdownContentBase64Encoded = formatedString.data(using: .utf8)?.base64EncodedString() else { return }
             await withCheckedContinuation { (cont: CheckedContinuation<Void, Never>) in
                 DispatchQueue.main.async {
                     self.evaluateJavaScript("window.updateWithMarkdownContentBase64Encoded(`\(markdownContentBase64Encoded)`);0") { _,_  in
@@ -106,7 +104,7 @@ extension MarkdownView.WebView {
         }
     }
     
-    func updateFontSize(_ size: Int) async {
+    func updateFontSize(_ size: CGFloat) async {
         try? await self.evaluateJavaScript("document.getElementById('markdown-rendered').style.fontSize = '\(size)pt'")
     }
     
@@ -141,15 +139,27 @@ document.body.appendChild(window.md_style);
 @available(macOS 14.0, iOS 17.0, *)
 extension MarkdownView {
     
+    /// The Markdown rendered theme about the `MarkdownView`.
     @available(macOS 14.0, iOS 17.0, *)
-    public struct Theme: Sendable {
+    public struct Theme: Sendable, CaseIterable, Hashable, Identifiable {
+        public var id: Self { self }
+        
+        public static var allCases: [MarkdownView.Theme] {
+            [.concise, .blood, .boundless, .github, .succinct, .tree]
+        }
+        
         private let styleURL: URL
+        /// The display name of the current theme.
         public let name: String
+        /// The color configurations supported by the current theme.
         public let colorSupport: ColorSupport
+        /// An enumeration representing the color configurations supported by the theme.
         public enum ColorSupport: Sendable {
+            case dark
             case light
             case dynamic
         }
+        
         private init(styleName: String, fileName: String, color: ColorSupport) {
             self.name = styleName
             guard let fileURL = Bundle.module.url(forResource: fileName, withExtension: "css") else {
@@ -174,10 +184,5 @@ extension MarkdownView {
         }
     }
 }
-
-
-
-
-
 
 #endif

@@ -16,24 +16,23 @@ import Localization
 
 struct QARenderingView: QANavigationLeaf {
     
-    static let isUsingSheet: Bool = false
-    
+    @State var controller = MarkdownViewController()
     @Environment(QAViewModel.self) var viewModel: QAViewModel
-    @State private var contentSize: CGSize = .zero
     
-    @StateObject var controller = MarkdownViewController()
-    
-    @ViewBuilder
     var content: some View {
         GeometryReader { proxy in
-            let scrollView = ScrollView(.vertical, content: verticalStack)
-                .toolbar {
-                    self.toolbarContent(width: proxy.size.width)
-                }
-            if Self.isUsingSheet {
-                NavigationStack { scrollView }
-            } else {
-                scrollView
+            ScrollView(.vertical) {
+                verticalStack()
+            }
+            .scrollIndicatorsStyle(.black)
+            .scrollIndicatorsFlash(onAppear: true)
+            .environment(\.colorScheme, .light)
+            .toolbar {
+                self.toolbarContent(width: proxy.size.width)
+            }
+            .safeAreaInset(edge: .bottom, alignment: .center, spacing: 0.0) {
+                QARenderingSettingsView(markdownController: $controller)
+                    .frame(maxWidth: .infinity, maxHeight: 0.4 * proxy.size.height)
             }
         }
         .navigationTitle("Preview")
@@ -49,18 +48,20 @@ struct QARenderingView: QANavigationLeaf {
             if !viewModel.questionContent.isEmpty {
                 Group {
                     Text(viewModel.questionContent)
+                        .lineLimit(nil)
                         .multilineTextAlignment(.center)
                         .font(.title)
                         .fontWidth(.condensed)
                         .fontWeight(.bold)
-                        .frame(maxWidth: .infinity, alignment: .center)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                         .padding(.top)
                     ChatModelInfoCell(chatModel: viewModel.selectedChatAI)
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.vertical, 5.0)
                 }
+                .background(controller.backgroundColor, ignoresSafeAreaEdges: .all)
             }
-            MarkdownView(controller: controller)
+            MarkdownView(controller: $controller)
                 .onRendered(SVProgressHUD.dismiss)
                 .frame(maxWidth: .infinity, alignment: .center)
         }
@@ -68,9 +69,6 @@ struct QARenderingView: QANavigationLeaf {
         .onAppear {
             controller.text = viewModel.answerContent
             SVProgressHUD.show()
-        }
-        .onGeometryChange { size in
-            self.contentSize = size
         }
     }
 }
@@ -92,7 +90,7 @@ extension QARenderingView {
                 }
                 Button("按段落划分后分享", systemImage: "square.and.arrow.up") {
                     Task {
-//                        viewModel.imageResult = await fetchSplitedImage()
+                        //                        viewModel.imageResult = await fetchSplitedImage()
                     }
                 }
             }
@@ -136,8 +134,57 @@ extension QARenderingView {
     }
 }
 
+//MARK: - Chat Rendering Setting View
+fileprivate struct QARenderingSettingsView: View {
+    @Binding var markdownController: MarkdownViewController
+    var body: some View {
+        VStack(alignment: .center, spacing: 0.0) {
+            Divider()
+            content
+                .dynamicTypeSize(.small)
+        }
+        .background(Material.ultraThick, ignoresSafeAreaEdges: .all)
+    }
+    
+    var content: some View {
+        List {
+            Section("Style") {
+                themeLabel
+                fontSizeLabel
+                backgroundColorLabel
+            }
+            
+        }
+        .scrollContentBackground(.hidden)
+    }
+    
+    var fontSizeLabel: some View {
+        VStack {
+            HStack {
+                Text("Text Size")
+                Spacer()
+                Text(String(format: "%.1f", markdownController.fontSize) + " pt")
+            }
+            Slider(value: $markdownController.fontSize, in: 3.0...25.0, step: 0.1, label: {  }, minimumValueLabel: { Image(systemName: "textformat.size.smaller") }, maximumValueLabel: { Image(systemName: "textformat.size.larger") })
+        }
+    }
+    
+    var backgroundColorLabel: some View {
+        ColorPicker("Background Color", selection: markdownController.binding(for: \.backgroundColor), supportsOpacity: false)
+    }
+    
+    var themeLabel: some View {
+        Picker("Markdown Theme", selection: markdownController.binding(for: \.theme)) {
+            ForEach(MarkdownView.Theme.allCases) { theme in
+                Text(theme.name).tag(theme)
+            }
+        }
+    }
+}
+
+
 //MARK: - Chat Robot Display Cell
-struct ChatModelInfoCell: View {
+fileprivate struct ChatModelInfoCell: View {
     let chatModel: QAChatAIModel
     var body: some View {
         HStackLayout(alignment: .firstTextBaseline) {

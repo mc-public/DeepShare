@@ -1,3 +1,10 @@
+//
+//  MarkdownView+WebView.swift
+//  SwiftMarkdown
+//
+//  Created by 孟超 on 2025/2/9.
+//
+
 import SwiftUI
 import WebKit
 import PDFKit
@@ -15,16 +22,19 @@ public typealias PlatformView = UIView
 #if !os(visionOS)
 
 /// The class used to perform control over `MarkdownView`.
-@MainActor
+@MainActor @Observable
 @available(macOS 14.0, iOS 17.0, *)
-public class MarkdownViewController: ObservableObject {
+public class MarkdownViewController {
+    
+    public typealias Theme = MarkdownView.Theme
+    
     /// A subclass instance of WKWebView that displays Markdown text content.
+    @ObservationIgnored
     public let container = MarkdownView.WebView()
     
     /// Indicates whether a Markdown rendering operation is currently in progress.
     ///
     /// The default value is `true`. This value can only become false after the first load is completed.
-    @Published
     public private(set) var isRenderingContent: Bool = true
     
     /// The text displayed in the current Markdown view.
@@ -36,13 +46,61 @@ public class MarkdownViewController: ObservableObject {
         }
     }
     
+    /// The theme displayed in the current Markdown view.
+    ///
+    /// The default theme is `.github`.
+    public var theme: Theme = .github {
+        didSet {
+            Task { await updateTheme(theme) }
+        }
+    }
+    
+    /// The font size about the Markdown content.
+    ///
+    /// The default value is `16.0`.
+    /// - Warning: The font size must be within the range [3, 25].
+    public var fontSize: CGFloat = 16.0 {
+        didSet {
+            Task { await updateFontSize(fontSize) }
+        }
+    }
+    
+    /// The background color about the Markdown content.
+    ///
+    /// The default color is `.white`.
+    public var backgroundColor: Color {
+        didSet {
+            container.backgroundColor = UIColor(backgroundColor)
+            container.scrollView.backgroundColor = UIColor(backgroundColor)
+        }
+    }
+    
+    @ObservationIgnored
     var onLinkActivation: ((URL) -> Void)? = nil
+    @ObservationIgnored
     var onContentRendered: (() async throws -> Void)? = nil
+    
+    /// Set the text displayed in the current Markdown view.
+    public func setText(_ content: String) async {
+        await updateText(await: false)
+    }
+    
+    /// Set the font size about the Markdown content.
+    public func setFontSize(_ fontSize: CGFloat) async {
+        await updateFontSize(fontSize)
+    }
+    
+    /// Set the theme displayed in the current Markdown view.
+    public func setTheme(_ theme: Theme) async {
+        await updateTheme(theme)
+    }
     
     func updateText(await: Bool = false) async {
         if container.isLoading { return }
         self.isRenderingContent = true
         await container.updateMarkdownContent(self.text)
+        await updateTheme(theme)
+        await updateFontSize(fontSize)
         if `await` {
             try? await Task.sleep(for: .seconds(0.2))
         }
@@ -50,22 +108,38 @@ public class MarkdownViewController: ObservableObject {
         try? await onContentRendered?()
     }
     
+    func updateTheme(_ theme: MarkdownView.Theme) async {
+        await container.updateTheme(for: theme)
+        await container.updateFontSize(fontSize)
+    }
+    
+    func updateFontSize(_ size: CGFloat) async {
+        assert(size >= 3 && size <= 25, "[\(Self.self)][\(#function)] The font size must be within the range [3, 25]. This assertion will be ignored in release mode.")
+        let size = max(3, min(25, size))
+        await container.updateTheme(for: theme)
+        await container.updateFontSize(size)
+    }
+    
     /// Create a `MarkdownView` controller.
-    public init() {}
+    public init() {
+        backgroundColor = .white
+        container.backgroundColor = UIColor(.white)
+    }
+    
 }
 
 
 @available(macOS 14.0, iOS 17.0, *)
 public struct MarkdownView: PlatformViewRepresentable {
     
-    @ObservedObject var controller: MarkdownViewController
+    @Binding var controller: MarkdownViewController
     
     var markdownContent: String {
         controller.text
     }
 
-    public init(controller: MarkdownViewController) {
-        self._controller = .init(wrappedValue: controller)
+    public init(controller: Binding<MarkdownViewController>) {
+        self._controller = controller
     }
     
     public func makeCoordinator() -> Coordinator {

@@ -94,7 +94,6 @@ final class QAViewModel {
     
     //MARK: - Image Result
     
-    var isShowingPreviewer: Bool = false
     var pdfResult: ShareFileURL?
     var imageResult: ShareFileURL?
     

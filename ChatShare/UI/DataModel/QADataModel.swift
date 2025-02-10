@@ -166,7 +166,7 @@ class QADataManager {
     
     func update(id: QAID, body: (inout QADataModel) -> Void) {
         guard let index = self.allModels.firstIndex(\.id, id) else {
-            assertionFailure("[\(Self.self)][\(#function)] Trying to delete a `deleted` or `undefined` model.")
+            assertionFailure("[\(Self.self)][\(#function)] Trying to update a `deleted` or `undefined` model.")
             return
         }
         body(&self.allModels[index])
@@ -185,7 +185,7 @@ class QADataManager {
         self.allModels
             .sorted { left, right in
                 var result = switch sort {
-                    case .title: left.question > right.answer
+                    case .title: left.question < right.question
                     case .date(let dateSort): dateSort == .edited ? (left.editedDate > right.editedDate) : (left.createDate > right.createDate)
                 }
                 if order == .reverse { result.toggle() }
