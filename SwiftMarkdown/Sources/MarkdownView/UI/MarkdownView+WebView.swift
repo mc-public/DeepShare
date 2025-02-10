@@ -27,6 +27,12 @@ extension MarkdownView {
             .init(width: super.intrinsicContentSize.width, height: contentHeight)
         }
         
+        override public var backgroundColor: UIColor? {
+            didSet {
+                Task { await self.updateBackgroundColor() }
+            }
+        }
+        
         nonisolated var isRenderingContent: Bool {
             get { lock.withLock { unsafe_isRenderingContent } }
             set { lock.withLock { unsafe_isRenderingContent = newValue } }
@@ -104,22 +110,23 @@ extension MarkdownView.WebView {
         }
     }
     
-    func updateFontSize(_ size: CGFloat) async {
-        try? await self.evaluateJavaScript("document.getElementById('markdown-rendered').style.fontSize = '\(size)pt'")
+    func updateFontSize(_ pointSize: CGFloat) async {
+        try? await self.evaluateJavaScript("document.getElementById('markdown-rendered').style.fontSize = '\(pointSize)pt';1")
     }
     
-    func updateHorizontalPadding(_ length: Int) async {
-        try! await self.evaluateJavaScript(
+    func updateHorizontalPadding(_ length: CGFloat) async {
+        try? await self.evaluateJavaScript(
 """
-document.getElementById('markdown-rendered').style.paddingLeft = '\(length)pt';
-document.getElementById('markdown-rendered').style.paddingRight = '\(length)pt';
+document.getElementById('markdown-rendered').style.paddingLeft = '\(length / 2)pt';
+document.getElementById('markdown-rendered').style.paddingRight = '\(length / 2)pt';
+1;
 """
         )
     }
     
     @available(macOS 14.0, iOS 17.0, *)
     func updateTheme(for theme: MarkdownView.Theme) async {
-        try! await self.evaluateJavaScript(
+        try? await self.evaluateJavaScript(
 """
 try {  document.body.removeChild(window.md_style)  } catch {};
 window.md_style = document.createElement('style');
@@ -131,6 +138,16 @@ document.body.appendChild(window.md_style);
 1;
 """
         )
+        await updateBackgroundColor()
+    }
+    
+    @available(macOS 14.0, iOS 17.0, *)
+    private func updateBackgroundColor() async {
+        guard let color = self.backgroundColor?.toHexString() else {
+            assertionFailure()
+            return
+        }
+        try? await self.evaluateJavaScript("document.getElementById('markdown-rendered').style.backgroundColor = '\(color)';0")
     }
     
     
@@ -155,7 +172,6 @@ extension MarkdownView {
         public let colorSupport: ColorSupport
         /// An enumeration representing the color configurations supported by the theme.
         public enum ColorSupport: Sendable {
-            case dark
             case light
             case dynamic
         }
@@ -172,8 +188,8 @@ extension MarkdownView {
         public static let concise   = Self(styleName: "Concise", fileName: "concise", color: .dynamic)
         public static let github    = Self(styleName: "GitHub", fileName: "github", color: .dynamic)
         public static let blood     = Self(styleName: "Blood", fileName: "blood", color: .light)
-        public static let boundless = Self(styleName: "Boundless Left", fileName: "boundless_left", color: .light)
-        public static let tree      = Self(styleName: "Tree", fileName: "tree", color: .light)
+        public static let boundless = Self(styleName: "Boundless Left", fileName: "boundless_left", color: .dynamic)
+        public static let tree      = Self(styleName: "Tree", fileName: "tree", color: .dynamic)
         public static let succinct  = Self(styleName: "Succinct Cyan", fileName: "succinct_cyan", color: .light)
         
         var styleContent: String {
@@ -186,3 +202,30 @@ extension MarkdownView {
 }
 
 #endif
+
+
+extension UIColor {
+    
+    var luminance: CGFloat {
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        self.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        return 0.299 * red + 0.587 * green + 0.114 * blue
+    }
+    
+    func toHexString() -> String? {
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        guard self.getRed(&red, green: &green, blue: &blue, alpha: &alpha) else {
+            return nil
+        }
+        let rgb: Int = (Int)(red * 255) << 16 | (Int)(green * 255) << 8 | (Int)(blue * 255) << 0
+        return String(format: "#%06x", rgb)
+    }
+}
+
+

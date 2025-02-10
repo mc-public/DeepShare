@@ -104,6 +104,16 @@
         }
       }
     },
+    "Horizontal Page Margins" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "水平页边距"
+          }
+        }
+      }
+    },
     "Markdown Theme" : {
       "localizations" : {
         "zh-Hans" : {

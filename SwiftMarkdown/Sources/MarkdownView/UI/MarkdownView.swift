@@ -21,10 +21,10 @@ public typealias PlatformView = UIView
 
 #if !os(visionOS)
 
-/// The class used to perform control over `MarkdownView`.
+/// The class used to perform control over `Markdown` view.
 @MainActor @Observable
 @available(macOS 14.0, iOS 17.0, *)
-public class MarkdownViewController {
+public class MarkdownState {
     
     public typealias Theme = MarkdownView.Theme
     
@@ -51,7 +51,12 @@ public class MarkdownViewController {
     /// The default theme is `.github`.
     public var theme: Theme = .github {
         didSet {
-            Task { await updateTheme(theme) }
+            Task {
+                if theme.colorSupport == .light {
+                    backgroundColor = .white
+                }
+                await applyStyle()
+            }
         }
     }
     
@@ -61,7 +66,17 @@ public class MarkdownViewController {
     /// - Warning: The font size must be within the range [3, 25].
     public var fontSize: CGFloat = 16.0 {
         didSet {
-            Task { await updateFontSize(fontSize) }
+            Task { await applyStyle() }
+        }
+    }
+    
+    /// The horizontal padding about the Markdown page.
+    ///
+    /// The default value is `50.0`, which means left and right paddings are equal to `5.0`.
+    /// - Warning: The length must be within the range [0, 100].
+    public var horizontalPadding: CGFloat = 50.0 {
+        didSet {
+            Task { await applyStyle() }
         }
     }
     
@@ -74,33 +89,21 @@ public class MarkdownViewController {
             container.scrollView.backgroundColor = UIColor(backgroundColor)
         }
     }
+    /// Return color schemes suggested based on the background color.
+    var suggestColorScheme: ColorScheme {
+        UIColor(backgroundColor).luminance > 0.5 ? .light : .dark
+    }
     
     @ObservationIgnored
     var onLinkActivation: ((URL) -> Void)? = nil
     @ObservationIgnored
     var onContentRendered: (() async throws -> Void)? = nil
     
-    /// Set the text displayed in the current Markdown view.
-    public func setText(_ content: String) async {
-        await updateText(await: false)
-    }
-    
-    /// Set the font size about the Markdown content.
-    public func setFontSize(_ fontSize: CGFloat) async {
-        await updateFontSize(fontSize)
-    }
-    
-    /// Set the theme displayed in the current Markdown view.
-    public func setTheme(_ theme: Theme) async {
-        await updateTheme(theme)
-    }
-    
     func updateText(await: Bool = false) async {
         if container.isLoading { return }
         self.isRenderingContent = true
         await container.updateMarkdownContent(self.text)
-        await updateTheme(theme)
-        await updateFontSize(fontSize)
+        await applyStyle()
         if `await` {
             try? await Task.sleep(for: .seconds(0.2))
         }
@@ -108,37 +111,57 @@ public class MarkdownViewController {
         try? await onContentRendered?()
     }
     
-    func updateTheme(_ theme: MarkdownView.Theme) async {
+    func applyStyle() async {
         await container.updateTheme(for: theme)
         await container.updateFontSize(fontSize)
+        await container.updateHorizontalPadding(horizontalPadding)
     }
     
-    func updateFontSize(_ size: CGFloat) async {
-        assert(size >= 3 && size <= 25, "[\(Self.self)][\(#function)] The font size must be within the range [3, 25]. This assertion will be ignored in release mode.")
-        let size = max(3, min(25, size))
-        await container.updateTheme(for: theme)
-        await container.updateFontSize(size)
-    }
-    
-    /// Create a `MarkdownView` controller.
+    /// Create a `Markdown` state.
     public init() {
         backgroundColor = .white
         container.backgroundColor = UIColor(.white)
     }
+}
+
+@available(macOS 14.0, iOS 17.0, *)
+public struct Markdown: View {
     
+    @Binding var state: MarkdownState
+    
+    public init(state: Binding<MarkdownState>) {
+        self._state = state
+    }
+    
+    public var body: some View {
+        MarkdownView(controller: $state)
+            .environment(\.colorScheme, state.suggestColorScheme)
+    }
+    
+    public func onLinkActivation(_ linkActivationHandler: @escaping (URL) -> Void) -> Self {
+        var current = self
+        current.state.onLinkActivation = linkActivationHandler
+        return current
+    }
+    
+    public func onRendered(_ renderedContentHandler: @escaping () async throws -> Void) -> Self {
+        var current = self
+        current.state.onContentRendered = renderedContentHandler
+        return current
+    }
 }
 
 
 @available(macOS 14.0, iOS 17.0, *)
 public struct MarkdownView: PlatformViewRepresentable {
-    
-    @Binding var controller: MarkdownViewController
+
+    @Binding var controller: MarkdownState
     
     var markdownContent: String {
         controller.text
     }
 
-    public init(controller: Binding<MarkdownViewController>) {
+    fileprivate init(controller: Binding<MarkdownState>) {
         self._controller = controller
     }
     
@@ -168,24 +191,12 @@ public struct MarkdownView: PlatformViewRepresentable {
     }
 #endif
     
-    public func onLinkActivation(_ linkActivationHandler: @escaping (URL) -> Void) -> Self {
-        var current = self
-        current.controller.onLinkActivation = linkActivationHandler
-        return current
-    }
-    
-    public func onRendered(_ renderedContentHandler: @escaping () async throws -> Void) -> Self {
-        var current = self
-        current.controller.onContentRendered = renderedContentHandler
-        return current
-    }
-    
     public class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler {
         weak var platformView: WebView?
-        weak var controller: MarkdownViewController?
+        weak var controller: MarkdownState?
         var startTime: CFAbsoluteTime?
         
-        init(controller: MarkdownViewController) {
+        init(controller: MarkdownState) {
             startTime = CFAbsoluteTimeGetCurrent()
             platformView = controller.container
             self.controller = controller

@@ -14,7 +14,7 @@ import Localization
 
 struct QARenderingView: QANavigationLeaf {
     
-    @State var controller = MarkdownViewController()
+    @State var controller = MarkdownState()
     @Environment(QAViewModel.self) var viewModel: QAViewModel
     
     var content: some View {
@@ -62,7 +62,7 @@ struct QARenderingView: QANavigationLeaf {
                 }
                 .background(controller.backgroundColor, ignoresSafeAreaEdges: .all)
             }
-            MarkdownView(controller: $controller)
+            Markdown(state: $controller)
                 .onRendered(SVProgressHUD.dismiss)
                 .frame(maxWidth: .infinity, alignment: .center)
         }
@@ -138,7 +138,7 @@ extension QARenderingView {
 
 //MARK: - Chat Rendering Setting View
 fileprivate struct QARenderingSettingsView: View {
-    @Binding var markdownController: MarkdownViewController
+    @Binding var markdownController: MarkdownState
     var body: some View {
         VStack(alignment: .center, spacing: 0.0) {
             Divider()
@@ -153,7 +153,10 @@ fileprivate struct QARenderingSettingsView: View {
             Section("Style") {
                 themeLabel
                 fontSizeLabel
-                backgroundColorLabel
+                if markdownController.theme.colorSupport == .dynamic {
+                    backgroundColorLabel
+                }
+                pageHorizontalPaddingLabel
             }
             
         }
@@ -166,6 +169,7 @@ fileprivate struct QARenderingSettingsView: View {
                 Text("Text Size")
                 Spacer()
                 Text(String(format: "%.1f", markdownController.fontSize) + " pt")
+                    .foregroundStyle(.secondary)
             }
             Slider(value: $markdownController.fontSize, in: 3.0...25.0, step: 0.1, label: {  }, minimumValueLabel: { Image(systemName: "textformat.size.smaller") }, maximumValueLabel: { Image(systemName: "textformat.size.larger") })
         }
@@ -180,6 +184,18 @@ fileprivate struct QARenderingSettingsView: View {
             ForEach(MarkdownView.Theme.allCases) { theme in
                 Text(theme.name).tag(theme)
             }
+        }
+    }
+    
+    var pageHorizontalPaddingLabel: some View {
+        VStack {
+            HStack {
+                Text("Horizontal Page Margins")
+                Spacer()
+                Text(String(format: "%.1f", markdownController.horizontalPadding) + " pt")
+                    .foregroundStyle(.secondary)
+            }
+            Slider(value: $markdownController.horizontalPadding, in: 0...100.0, step: 1.0, label: {  }, minimumValueLabel: { Image(systemName: "number").imageScale(.small) }, maximumValueLabel: { Image(systemName: "number").imageScale(.medium) })
         }
     }
 }

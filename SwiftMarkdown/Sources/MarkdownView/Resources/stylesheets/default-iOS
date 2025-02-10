@@ -269,10 +269,10 @@
     font-size: 12px;
     word-wrap: normal;
     overflow-x: scroll;
-    padding: 12px;
-    background-color: -apple-system-background;
-    border-radius: 8px;
-    border: thin solid -apple-system-separator;
+    /*padding: 12px;*/
+    /*background-color: -apple-system-background;*/
+    /*border-radius: 8px;*/
+    /*border: thin solid -apple-system-separator;*/
 }
 
 #markdown-rendered::before {
@@ -477,7 +477,6 @@
 #markdown-rendered pre code {
     font-size: 100%;
     white-space: pre-wrap !important;
-    word-wrap: break-word !important;
 }
 
 #markdown-rendered pre>code {
