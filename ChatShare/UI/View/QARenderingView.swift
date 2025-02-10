@@ -11,6 +11,7 @@ import SVProgressHUD
 @_spi(Advanced) import SwiftUIIntrospect
 import WebKit
 import Localization
+import EnvironmentOverrides
 
 //MARK: - QA Result Display (Rendering) View
 
@@ -40,6 +41,11 @@ struct QARenderingView: QANavigationLeaf {
         .interactiveDismissDisabled()
         .fileShareSheet(item: viewModel.binding(for: \.imageResult))
         .fileShareSheet(item: viewModel.binding(for: \.pdfResult))
+        .onAppear(perform: onAppear)
+        .onDisappear(perform: SVProgressHUD.dismiss)
+#if DEBUG
+        .attachEnvironmentOverrides()
+#endif
     }
     
     @ViewBuilder
@@ -66,10 +72,11 @@ struct QARenderingView: QANavigationLeaf {
                 .frame(maxWidth: .infinity, alignment: .center)
         }
         .hidden(controller.isRenderingContent)
-        .onAppear {
-            controller.text = viewModel.answerContent
-            SVProgressHUD.show()
-        }
+    }
+    
+    func onAppear() {
+        controller.text = viewModel.answerContent
+        SVProgressHUD.show()
     }
 }
 

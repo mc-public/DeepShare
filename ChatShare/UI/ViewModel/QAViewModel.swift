@@ -26,8 +26,8 @@ final class QAViewModel {
             .models(sort: listSort, order: listSordOrder)
             .filter(prompt: listSearchText)
     }
-    var listSort: QADataManager.Sort = .date(.created)
-    var listSordOrder: SortOrder = .reverse
+    var listSort: QADataManager.Sort = .title//.date(.created)
+    var listSordOrder: SortOrder = .forward
     var listSelectedModels = Set<QADataModel>()
     
     //MARK: - Data Share

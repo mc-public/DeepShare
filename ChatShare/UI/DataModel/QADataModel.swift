@@ -182,10 +182,10 @@ class QADataManager {
     }
     
     func models(sort: Sort, order: SortOrder) -> [QADataModel] {
-        self.allModels
+        return self.allModels
             .sorted { left, right in
                 var result = switch sort {
-                    case .title: left.question < right.question
+                    case .title: left.question.localizedStandardCompare(right.question) == .orderedAscending
                     case .date(let dateSort): dateSort == .edited ? (left.editedDate > right.editedDate) : (left.createDate > right.createDate)
                 }
                 if order == .reverse { result.toggle() }
