@@ -10,7 +10,6 @@ import Localization
 import SwiftUI
 
 private let USING_TEST_DATA = true
-
 //MARK: - Data Model
 
 /// The question-answer model of current project.

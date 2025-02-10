@@ -204,8 +204,8 @@ fileprivate struct QAListDateView: View {
     @ViewBuilder
     func label(model: QADataModel) -> some View {
         let questionTitle = model.question
-            .trimmingCharacters(in: .whitespacesAndNewlines)
             .isEmpty ? "Untitled" : model.question
+            .trimmingCharacters(in: .whitespacesAndNewlines )
         let answerResult = model.answer
             .trimmingCharacters(in: .whitespacesAndNewlines)
         VStack(alignment: .leading) {
