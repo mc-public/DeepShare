@@ -43,9 +43,7 @@ struct QARenderingView: QANavigationLeaf {
         .fileShareSheet(item: viewModel.binding(for: \.pdfResult))
         .onAppear(perform: onAppear)
         .onDisappear(perform: SVProgressHUD.dismiss)
-#if DEBUG
-        .attachEnvironmentOverrides()
-#endif
+        .environment(\.dynamicTypeSize, .medium)
     }
     
     @ViewBuilder
