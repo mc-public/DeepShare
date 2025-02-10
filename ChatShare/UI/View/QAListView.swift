@@ -203,13 +203,18 @@ fileprivate struct QAListDateView: View {
     
     @ViewBuilder
     func label(model: QADataModel) -> some View {
+        let questionTitle = model.question
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .isEmpty ? "Untitled" : model.question
+        let answerResult = model.answer
+            .trimmingCharacters(in: .whitespacesAndNewlines)
         VStack(alignment: .leading) {
-            Text(model.question.isEmpty ? "Untitled" : model.question)
+            Text(questionTitle)
                 .lineLimit(1, reservesSpace: true)
                 .fontWeight(.medium)
             HStack {
                 Text(model.createDate.formatted())
-                Text(LocalizedStringKey(model.answer))
+                Text(LocalizedStringKey(answerResult))
                     .lineLimit(1, reservesSpace: false)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .multilineTextAlignment(.leading)

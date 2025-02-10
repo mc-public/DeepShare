@@ -15,27 +15,28 @@ import Localization
 struct QARenderingView: QANavigationLeaf {
     
     @State var controller = MarkdownState()
+    @State var size: CGSize = .zero
     @Environment(QAViewModel.self) var viewModel: QAViewModel
     
+    var navigationTitleColor: Color {
+        controller.backgroundColor.luminance < 0.5 ? .white : .black
+    }
+    
     var content: some View {
-        GeometryReader { proxy in
-            ScrollView(.vertical) {
-                verticalStack()
-            }
-            .scrollIndicatorsStyle(.black)
-            .scrollIndicatorsFlash(onAppear: true)
-            .environment(\.colorScheme, .light)
-            .toolbar {
-                self.toolbarContent(width: proxy.size.width)
-            }
-            .safeAreaInset(edge: .bottom, alignment: .center, spacing: 0.0) {
-                QARenderingSettingsView(markdownController: $controller)
-                    .frame(maxWidth: .infinity, maxHeight: 0.4 * proxy.size.height)
-            }
+        ScrollView(.vertical) {
+            verticalStack()
         }
+        .scrollBackgroundColor(controller.backgroundColor)
+        .scrollEdgeColor(.top, .bottom, color: controller.backgroundColor)
+        .environment(\.colorScheme, .light)
+        .toolbar(content: toolbarContent)
+        .safeAreaInset(edge: .bottom, alignment: .center, spacing: 0.0) {
+            QARenderingSettingsView(markdownController: $controller)
+                .frame(maxWidth: .infinity, maxHeight: 0.4 * size.height)
+        }
+        .onGeometryChange(body: { size = $0 })
         .navigationTitle("Preview")
         .navigationBarTitleDisplayMode(.inline)
-        .interactiveDismissDisabled()
         .fileShareSheet(item: viewModel.binding(for: \.imageResult))
         .fileShareSheet(item: viewModel.binding(for: \.pdfResult))
         .onAppear(perform: onAppear)
@@ -44,25 +45,33 @@ struct QARenderingView: QANavigationLeaf {
     }
     
     @ViewBuilder
+    var titleCell: some View {
+        VStackLayout(alignment: .center) {
+            Text(viewModel.questionContent)
+                .lineLimit(nil)
+                .multilineTextAlignment(.center)
+                .font(.preferredFont(relativeMetric: controller.fontSize, style: .title1))
+                .fontWidth(.condensed)
+                .fontWeight(.bold)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+            ChatModelInfoCell(chatModel: viewModel.selectedChatAI)
+                .font(.preferredFont(relativeMetric: controller.fontSize, style: .footnote))
+                .frame(maxWidth: .infinity, alignment: .center)
+        }
+        .padding(.top, length: 10.0)
+        .padding(.bottom, 5.0)
+        .withCornerBackground(radius: 10.0, style: Material.ultraThinMaterial)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.horizontal, controller.horizontalPadding)
+        .padding(.vertical)
+        .background(controller.backgroundColor, ignoresSafeAreaEdges: .all)
+    }
+    
+    @ViewBuilder
     func verticalStack() -> some View {
         VStackLayout(alignment: .leading, spacing: 0.0) {
             if !viewModel.questionContent.isEmpty {
-                Group {
-                    Text(viewModel.questionContent)
-                        .lineLimit(nil)
-                        .multilineTextAlignment(.center)
-                        .font(.preferredFont(relativeMetric: controller.fontSize, style: .title1))
-                        .fontWidth(.condensed)
-                        .fontWeight(.bold)
-                        .padding(.horizontal, controller.horizontalPadding)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                        .padding(.top)
-                    ChatModelInfoCell(chatModel: viewModel.selectedChatAI)
-                        .font(.preferredFont(relativeMetric: controller.fontSize, style: .footnote))
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.vertical, 5.0)
-                }
-                .background(controller.backgroundColor, ignoresSafeAreaEdges: .all)
+                titleCell
             }
             Markdown(state: $controller)
                 .onRendered(SVProgressHUD.dismiss)
@@ -79,7 +88,7 @@ struct QARenderingView: QANavigationLeaf {
 
 extension QARenderingView {
     @ToolbarContentBuilder
-    func toolbarContent(width: CGFloat) -> some ToolbarContent {
+    func toolbarContent() -> some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
             Menu("Share") {
                 Button("Share as PDF") {
@@ -94,7 +103,7 @@ extension QARenderingView {
                 }
                 Button("按段落划分后分享", systemImage: "square.and.arrow.up") {
                     Task {
-                        //                        viewModel.imageResult = await fetchSplitedImage()
+                        await controller.container.splitToImages()
                     }
                 }
             }
@@ -155,10 +164,10 @@ fileprivate struct QARenderingSettingsView: View {
             Section("Style") {
                 themeLabel
                 fontSizeLabel
+                pageHorizontalPaddingLabel
                 if markdownController.theme.colorSupport == .dynamic {
                     backgroundColorLabel
                 }
-                pageHorizontalPaddingLabel
             }
             
         }
@@ -179,6 +188,7 @@ fileprivate struct QARenderingSettingsView: View {
     
     var backgroundColorLabel: some View {
         ColorPicker("Background Color", selection: markdownController.binding(for: \.backgroundColor), supportsOpacity: false)
+            .environment(\.dynamicTypeSize, .xSmall)
     }
     
     var themeLabel: some View {

@@ -41,7 +41,6 @@ final class QAViewModel {
     
     private var isSettingDataModelID: Bool = false
     /// Selected data model about the `QAInputView`.
-    
     private(set) var selectDataModelID: QADataModel.QAID? {
         didSet {
             if let selectDataModelID, let model = QADataManager.current[selectDataModelID] {
@@ -53,11 +52,15 @@ final class QAViewModel {
     
     /// The content about the QA-question.
     var questionContent = String() {
-        didSet { saveQAModel() }
+        didSet {
+            saveQAModel()
+        }
     }
     /// The content about the QA-answer.
     var answerContent = String() {
-        didSet { saveQAModel() }
+        didSet {
+            saveQAModel()
+        }
     }
     
     var selectedChatAI = QAChatAIModel.deepseek_R1 {

@@ -75,9 +75,9 @@ public class MarkdownState {
     
     /// The horizontal padding about the Markdown page.
     ///
-    /// The default value is `50.0`, which means left and right paddings are equal to `5.0`.
+    /// The default value is `50.0`, which means left and right paddings are equal to `25.0`.
     /// - Warning: The length must be within the range [0, 100].
-    public var horizontalPadding: CGFloat = 50.0 {
+    public var horizontalPadding: CGFloat = 25.0 {
         didSet {
             Task { await applyStyle() }
         }

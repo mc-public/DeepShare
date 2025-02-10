@@ -10,7 +10,6 @@ import SwiftUI
 
 extension View {
     
-    
     /// Set the color of the navigation title.
     ///
     /// - Parameter color: The color of the navigation title.
@@ -28,7 +27,8 @@ extension View {
             viewController.navigationBar.titleTextAttributes?[.foregroundColor] = UIColor(color ?? .dynamicBlack)
             viewController.navigationBar.largeTitleTextAttributes?[.foregroundColor] = UIColor(color ?? .dynamicBlack)
         }
-        self.modifier(NavigationControllerModifier(process: changeColor))
+        self.modifier(NavigationControllerModifier(trigger: color, process: changeColor))
+            .introspect(.navigationStack, on: .iOS(.v17...), customize: changeColor)
             
     }
     
@@ -52,7 +52,7 @@ extension View {
                 viewController.navigationBar.largeTitleTextAttributes?[.font] = UIFont(descriptor: descriptor, size: 0.0)
             }
         }
-        self.modifier(NavigationControllerModifier(process: changeDesign))
+        self.modifier(NavigationControllerModifier(trigger: design, process: changeDesign))
     }
     
     /// Set the font design style for the inline title of the navigation title.
@@ -75,45 +75,45 @@ extension View {
                 viewController.navigationBar.titleTextAttributes?[.font] = UIFont(descriptor: descriptor, size: 0.0)
             }
         }
-        self.modifier(NavigationControllerModifier(process: changeDesign))
+        self.modifier(NavigationControllerModifier(trigger: design, process: changeDesign))
     }
 }
 
 
-fileprivate struct NavigationControllerModifier: ViewModifier {
+fileprivate struct NavigationControllerModifier<Trigger: Equatable>: ViewModifier {
     fileprivate class ModifierModel: ObservableObject {
         weak var viewController: UINavigationController?
     }
     let process: (UINavigationController) -> ()
+    let trigger: Trigger
     @StateObject var state = ModifierModel()
     
-    init(process: @escaping (UINavigationController) -> Void) {
+    init(trigger: Trigger, process: @escaping (UINavigationController) -> Void) {
+        self.trigger = trigger
         self.process = process
     }
     
     func body(content: Content) -> some View {
         content
-            .onWillAppear {
-                if let viewController = state.viewController {
-                    self.process(viewController)
-                }
-            }
-            .onDidAppear {
-                if let viewController = state.viewController {
-                    self.process(viewController)
-                }
-            }
-            .onWillDisappear {
-                if let viewController = state.viewController {
-                    self.process(viewController)
-                }
-            }
+            .onChange(of: trigger, initial: true, { _, _ in
+                performAction()
+            })
+            .onAppear(perform: performAction)
+            .onWillAppear(performAction)
+            .onDidAppear(performAction)
+            .onWillDisappear(performAction)
             .introspect(.navigationStack, on: .iOS(.v17...), scope: .ancestor) { viewController in
                 if self.state.viewController == nil {
                     self.state.viewController = viewController
                     self.process(viewController)
                 }
             }
+    }
+    
+    func performAction() {
+        if let viewController = state.viewController {
+            self.process(viewController)
+        }
     }
 }
 

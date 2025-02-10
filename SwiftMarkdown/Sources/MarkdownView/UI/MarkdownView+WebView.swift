@@ -122,8 +122,8 @@ extension MarkdownView.WebView {
     func updateHorizontalPadding(_ length: CGFloat) async {
         _ = try? await self.evaluateJavaScript(
 """
-document.getElementById('markdown-rendered').style.paddingLeft = '\(length / 2)pt';
-document.getElementById('markdown-rendered').style.paddingRight = '\(length / 2)pt';
+document.getElementById('markdown-rendered').style.paddingLeft = '\(length)pt';
+document.getElementById('markdown-rendered').style.paddingRight = '\(length)pt';
 1;
 """
         )

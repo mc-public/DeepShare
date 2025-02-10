@@ -54,4 +54,8 @@ extension Color {
         }
         self.init(uiColor)
     }
+    
+    var luminance: CGFloat {
+        UIColor(self).luminance
+    }
 }
