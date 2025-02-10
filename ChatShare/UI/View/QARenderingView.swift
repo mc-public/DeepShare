@@ -207,7 +207,7 @@ fileprivate struct QARenderingSettingsView: View {
                 Text(String(format: "%.1f", markdownController.horizontalPadding) + " pt")
                     .foregroundStyle(.secondary)
             }
-            Slider(value: $markdownController.horizontalPadding, in: 0...100.0, step: 1.0, label: {  }, minimumValueLabel: { Image(systemName: "number").imageScale(.small) }, maximumValueLabel: { Image(systemName: "number").imageScale(.medium) })
+            Slider(value: $markdownController.horizontalPadding, in: 10.0...50.0, step: 1.0, label: {  }, minimumValueLabel: { Image(systemName: "number").imageScale(.small) }, maximumValueLabel: { Image(systemName: "number").imageScale(.medium) })
         }
     }
 }
