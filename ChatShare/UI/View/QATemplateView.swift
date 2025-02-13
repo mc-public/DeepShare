@@ -81,6 +81,7 @@ fileprivate class QATemplateContentView: UIPlainView {
     private var topImageView = UIPlainView()
     private var tileImageView = QATemplateTileView()
     private var bottomImageView = UIPlainView()
+    private var textRectView = UIPlainView()
     
     override var intrinsicContentSize: CGSize {
         guard let template else {
@@ -103,6 +104,7 @@ fileprivate class QATemplateContentView: UIPlainView {
             self.addSubview(self.topImageView)
             self.addSubview(self.tileImageView)
             self.addSubview(self.bottomImageView)
+            self.addSubview(self.textRectView)
         }
         self.backgroundColor = template.textBackgroundColor
         guard let renderingResult = QATemplateManager.current.renderingResult(for: template, preferredSize: preferredSize) else {
@@ -127,13 +129,12 @@ fileprivate class QATemplateContentView: UIPlainView {
         bottomImageView.frame = renderingResult.bottomRect
         addSubview(bottomImageView)
         bottomImageView.layer.contents = renderingResult.bottomImage.cgImage
-//        let layoutAreaView = UIView()
-//        layoutAreaView.backgroundColor = .clear
-//        layoutAreaView.layer.borderColor = UIColor.red.cgColor
-//        layoutAreaView.layer.borderWidth = 3.0
-//        self.addSubview(layoutAreaView)
-//        layoutAreaView.frame = renderingResult.textRect
-//        print(renderingResult.textRect)
+        
+        textRectView.backgroundColor = .clear
+        textRectView.layer.borderColor = UIColor.red.cgColor
+        textRectView.layer.borderWidth = 3.0
+        textRectView.frame = renderingResult.textRect
+        self.bringSubviewToFront(textRectView)
         self.invalidateIntrinsicContentSize()
     }
     

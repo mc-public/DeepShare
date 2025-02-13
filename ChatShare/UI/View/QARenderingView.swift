@@ -14,16 +14,9 @@ import Localization
 
 struct QARenderingView: QANavigationLeaf {
     
-    class Storage<Value> {
-        var value: Value
-        init(value: Value) {
-            self.value = value
-        }
-    }
     
     @State var controller = MarkdownState()
     @State var windowSize: CGSize = .zero
-    @State var textLayoutStorage: Storage<CGSize> = .init(value: .zero)
     @State var textLayoutSize = CGSize.zero
     @Environment(QAViewModel.self) var viewModel: QAViewModel
     
@@ -41,12 +34,13 @@ struct QARenderingView: QANavigationLeaf {
                 VStack(alignment: .center, spacing: 0.0) {
                     Rectangle()
                         .fill(.clear)
-                        .frame(height: containerLayout?.topRect.height ?? 0.0)
+                        .frame(height: containerLayout?.layoutRect.minY ?? 0.0)
                     Frame(width: max(0.0, layoutRect.width - viewModel.horizontalPagePadding), height: layoutRect.height, alignment: .top) {
                         VStackLayout(alignment: .center, spacing: 0.0) {
                             verticalStack()
                         }
                     }
+                    .border(.yellow, width: 5.0)
                 }
             }
             .background {
