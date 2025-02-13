@@ -545,6 +545,7 @@
 
 #markdown-rendered .code-block-wrapper {
     position: relative;
+    line-break: anywhere !important;
 }
 
 #markdown-rendered .copy-code-button {

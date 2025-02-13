@@ -10,6 +10,7 @@ import Localization
 import SwiftUI
 
 private let USING_TEST_DATA = true
+
 //MARK: - Data Model
 
 /// The question-answer model of current project.
@@ -98,12 +99,17 @@ class QADataManager {
             let filename: String
             let question: String
         }
-        let url = Bundle.main.url(forResource: "testFileDirectory", withExtension: "json")!
-        let data = (try? Data(contentsOf: url)) ?? .init()
+        guard let bundleURL = Bundle.main.url(forResource: "TestQASet", withExtension: "bundle") else {
+            fatalError()
+        }
+        let jsonURL = bundleURL.appending(components: "testFileDirectory.json")
+        let data = (try? Data(contentsOf: jsonURL)) ?? .init()
         let modelMap = (try? JSONDecoder().decode([JSONModel].self, from: data)) ?? []
         return modelMap.map { jsonModel in
-            let url = Bundle.main.url(forResource: jsonModel.filename, withExtension: "")!
-            let answer = (try? String(contentsOf: url, encoding: .utf8)) ?? "UNKNOWN"
+            let url = bundleURL.appending(components: jsonModel.filename)
+            guard let answer = (try? String(contentsOf: url, encoding: .utf8)) else {
+                fatalError("[\(QADataManager.self)\(#function)] Cannot read data file: `\(url.path(percentEncoded: false))`, please check data resource.")
+            }
             let model = QADataModel(question: jsonModel.question, answer: answer, chatAI: .deepseek_R1)
             return model
         }

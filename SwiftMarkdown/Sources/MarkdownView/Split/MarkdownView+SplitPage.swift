@@ -35,13 +35,13 @@ extension MarkdownView.WebView {
                     cont.resume(returning: nil)
                     return
                 }
-                assert(pdfDocument.pageCount == 1)
                 guard let page = pdfDocument.page(at: 0) else {
                     cont.resume(returning: nil)
                     return
                 }
                 let pageSize = page.bounds(for: .mediaBox).size
                 let targetHeight = (width / pageSize.width) * pageSize.height
+                
                 cont.resume(returning: page.thumbnail(of: CGSize(width: width, height: targetHeight), for: .mediaBox))
             }
         }
@@ -55,14 +55,6 @@ extension MarkdownView.WebView {
         let config = WKPDFConfiguration()
         config.allowTransparentBackground = false
         guard let pdfData = try? await self.pdf(configuration: config) else {
-            return nil
-        }
-        
-        guard let pdfDocument = PDFDocument(data: pdfData) else {
-            return nil
-        }
-        assert(pdfDocument.pageCount == 1)
-        guard let page = pdfDocument.page(at: 0) else {
             return nil
         }
         return pdfData
@@ -99,7 +91,7 @@ extension MarkdownView.WebView {
     public enum PageSplitAlgorithm {
         /// Use the greedy algorithm to partition the page from top to bottom.
         case greedy
-        /// Use the Knuth-Plass page-breaking (using in LaTeX) algorithm to divide pages.
+        /// Use the Knuth-Plass page-breaking (using in `LaTeX`) algorithm to divide pages.
         case latex
     }
     

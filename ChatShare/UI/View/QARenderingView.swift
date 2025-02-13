@@ -14,8 +14,17 @@ import Localization
 
 struct QARenderingView: QANavigationLeaf {
     
+    class Storage<Value> {
+        var value: Value
+        init(value: Value) {
+            self.value = value
+        }
+    }
+    
     @State var controller = MarkdownState()
-    @State var size: CGSize = .zero
+    @State var windowSize: CGSize = .zero
+    @State var textLayoutStorage: Storage<CGSize> = .init(value: .zero)
+    @State var textLayoutSize = CGSize.zero
     @Environment(QAViewModel.self) var viewModel: QAViewModel
     
     var navigationTitleColor: Color {
@@ -23,8 +32,26 @@ struct QARenderingView: QANavigationLeaf {
     }
     
     var content: some View {
+        let templatePreferredSize = QATemplateManager.current.preferredSize(for: viewModel.selectedTemplate, preferredWidth: windowSize.width, preferredTextHeight: textLayoutSize.height)
+        let containerLayout = QATemplateManager.current.pageRects(for: viewModel.selectedTemplate, preferredSize: templatePreferredSize)
+        let totalSize = containerLayout?.pageSize ?? .zero
+        let layoutRect = containerLayout?.layoutRect ?? .zero
         ScrollView(.vertical) {
-            verticalStack()
+            Frame(totalSize, alignment: .top) {
+                VStack(alignment: .center, spacing: 0.0) {
+                    Rectangle()
+                        .fill(.clear)
+                        .frame(height: containerLayout?.topRect.height ?? 0.0)
+                    Frame(width: max(0.0, layoutRect.width - viewModel.horizontalPagePadding), height: layoutRect.height, alignment: .top) {
+                        VStackLayout(alignment: .center, spacing: 0.0) {
+                            verticalStack()
+                        }
+                    }
+                }
+            }
+            .background {
+                QATemplateView(template: viewModel.selectedTemplate, size: totalSize)
+            }
         }
         .scrollBackgroundColor(controller.backgroundColor)
         .scrollEdgeColor(.top, .bottom, color: controller.backgroundColor)
@@ -32,9 +59,9 @@ struct QARenderingView: QANavigationLeaf {
         .toolbar(content: toolbarContent)
         .safeAreaInset(edge: .bottom, alignment: .center, spacing: 0.0) {
             QARenderingSettingsView(markdownController: $controller)
-                .frame(maxWidth: .infinity, maxHeight: 0.4 * size.height)
+                .frame(maxWidth: .infinity, maxHeight: 0.4 * windowSize.height)
         }
-        .onGeometryChange(body: { size = $0 })
+        .onGeometryChange(body: { windowSize = $0 })
         .navigationTitle("Preview")
         .navigationBarTitleDisplayMode(.inline)
         .fileShareSheet(item: viewModel.binding(for: \.imageResult))
@@ -42,6 +69,9 @@ struct QARenderingView: QANavigationLeaf {
         .onAppear(perform: onAppear)
         .onDisappear(perform: SVProgressHUD.dismiss)
         .environment(\.dynamicTypeSize, .medium)
+        .onChange(of: viewModel.selectedTemplate, initial: true) { _, newValue in
+            controller.backgroundColor = Color(newValue.textBackgroundColor)
+        }
     }
     
     @ViewBuilder
@@ -78,10 +108,15 @@ struct QARenderingView: QANavigationLeaf {
                 .frame(maxWidth: .infinity, alignment: .center)
         }
         .hidden(controller.isRenderingContent)
+        .onGeometryChange(body: {
+            textLayoutSize = $0
+        })
+        .fixedSize(horizontal: false, vertical: true)
     }
     
     func onAppear() {
         controller.text = viewModel.answerContent
+        controller.backgroundColor = .clear
         SVProgressHUD.show()
     }
 }
@@ -187,7 +222,7 @@ fileprivate struct QARenderingSettingsView: View {
     }
     
     var backgroundColorLabel: some View {
-        ColorPicker("Background Color", selection: markdownController.binding(for: \.backgroundColor), supportsOpacity: false)
+        ColorPicker("Background Color", selection: markdownController.binding(for: \.backgroundColor), supportsOpacity: true)
             .environment(\.dynamicTypeSize, .xSmall)
     }
     

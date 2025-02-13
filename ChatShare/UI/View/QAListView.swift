@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Localization
 
 struct QAListView: QANavigationRoot {
     
@@ -189,7 +190,7 @@ fileprivate struct QAListDateView: View {
                 searchingPlaceHolder
             } else { view }
         }
-        
+
     }
     
     var searchingPlaceHolder: some View {
@@ -203,9 +204,9 @@ fileprivate struct QAListDateView: View {
     
     @ViewBuilder
     func label(model: QADataModel) -> some View {
-        let questionTitle = model.question
-            .isEmpty ? "Untitled" : model.question
-            .trimmingCharacters(in: .whitespacesAndNewlines )
+        let trimQuestion = model.question
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let questionTitle = trimQuestion.isEmpty ? #localized("Untitled") : trimQuestion
         let answerResult = model.answer
             .trimmingCharacters(in: .whitespacesAndNewlines)
         VStack(alignment: .leading) {

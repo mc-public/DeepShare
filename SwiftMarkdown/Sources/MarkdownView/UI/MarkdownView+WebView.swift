@@ -155,7 +155,7 @@ document.body.appendChild(window.md_style);
             return
         }
         #else
-        guard let color = (color ?? .white).toHexString() else {
+        guard let color = (color ?? .white)?.toRGBComponents() else {
             assertionFailure()
             return
         }
@@ -164,7 +164,7 @@ document.body.appendChild(window.md_style);
 """
 color(srgb \(color.red) \(color.green) \(color.blue))
 """
-        _ = try? await self.evaluateJavaScript("document.getElementById('markdown-rendered').style.backgroundColor = '\(colorString)';0")
+        _ = try? await self.evaluateJavaScript("document.getElementById('markdown-rendered').style.backgroundColor = '#ffffff00';0")
         
     }
     

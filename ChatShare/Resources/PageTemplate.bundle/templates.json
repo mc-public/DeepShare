@@ -1,0 +1,70 @@
+[
+    {
+        "name": "nmzbxcyroiasdkj18723686.pdf",
+        "title": "Grey Word",
+        "clip_start": 60,
+        "clip_stop": 70,
+        "page_size": {
+            "width": 328.6,
+            "height": 439.2
+        },
+        "text_box": {
+            "x": 10,
+            "y": 50,
+            "width": 308.6,
+            "height": 389.2
+        },
+        "text_box_background": "#F9F9F9"
+    },
+    {
+        "name": "oiquwbmaderijsf123872.pdf",
+        "title": "Minimalist Blue & White Theme",
+        "clip_start": 0,
+        "clip_stop": 10,
+        "page_size": {
+            "width": 210.08,
+            "height": 297.13
+        },
+        "text_box": {
+            "x": 0,
+            "y": 0,
+            "width": 210.08,
+            "height": 251.53
+        },
+        "text_box_background": "#FFFFFA"
+    },
+    {
+        "name": "aowerhfdsaq71826387.pdf",
+        "title": "Minimalist Green",
+        "clip_start": 200,
+        "clip_stop": 210,
+        "page_size": {
+            "width": 328.6,
+            "height": 439.2
+        },
+        "text_box": {
+            "x": 10,
+            "y": 10,
+            "width": 318.6,
+            "height": 429.2
+        },
+        "text_box_background": "#92C498"
+    },
+    {
+        "name": "jkshrfiuw127391.pdf",
+        "title": "White Notes",
+        "clip_start": 40,
+        "clip_stop": 50,
+        "page_size": {
+           "width": 328.6,
+            "height": 440.2
+        },
+        "text_box": {
+            "x": 0,
+            "y": 40,
+            "width": 328.6,
+            "height": 354.2
+        },
+        "text_box_background": "#FFFFFF"
+    }
+]
