@@ -65,7 +65,9 @@ fileprivate class QATemplateContentView: UIPlainView {
     var preferredSize: CGSize {
         get { _preferredSize }
         set {
-            if _preferredSize == newValue { return }
+            if _preferredSize == newValue {
+                return
+            }
             if !_preferredSize.width.isAlmostEqual(to: newValue.width) {
                 cleanRenderingCache()
             }
@@ -77,7 +79,7 @@ fileprivate class QATemplateContentView: UIPlainView {
     private var renderingResult: QATemplateManager.TemplateRenderingResult?
     
     private var topImageView = UIPlainView()
-    private var tileImageViewReusePool = Set<UIPlainView>()
+    private var tileImageView = QATemplateTileView()
     private var bottomImageView = UIPlainView()
     
     override var intrinsicContentSize: CGSize {
@@ -89,38 +91,42 @@ fileprivate class QATemplateContentView: UIPlainView {
     }
     
     private func cleanRenderingCache() {
+        self.tileImageView.clean()
         self.subviews.forEach { $0.removeFromSuperview() }
-        self.tileImageViewReusePool = .init()
     }
     
     private func updateImages() {
-        
         guard let template else {
             return
+        }
+        if self.subviews.isEmpty {
+            self.addSubview(self.topImageView)
+            self.addSubview(self.tileImageView)
+            self.addSubview(self.bottomImageView)
         }
         self.backgroundColor = template.textBackgroundColor
         guard let renderingResult = QATemplateManager.current.renderingResult(for: template, preferredSize: preferredSize) else {
             return
         }
         self.renderingResult = renderingResult
-        /// Top View
-        let topImageView =  UIImageView(image: renderingResult.topImage)
-        self.addSubview(topImageView)
-        topImageView.frame = renderingResult.topRect
-        /// Tile Views
-        for tileIndex in 0..<renderingResult.tileCount {
-            let tileImageView = UIPlainView()
-            tileImageView.layer.allowsEdgeAntialiasing = false
-            tileImageView.layer.contents = renderingResult.tileImage.cgImage
-            //self.addSubview(tileImageView)
-            tileImageView.frame = renderingResult.tileRects[tileIndex].pixelAligned
-            tileImageView.layer.masksToBounds = true
-        }
+        
+        self.topImageView.frame = renderingResult.topRect
+        self.topImageView.layer.contents = renderingResult.topImage.cgImage
+        
+        /// Tile View
+        let tilesRect = CGRect(
+            origin: renderingResult.topRect.bottomLeading,
+            size: CGSize(
+                width: renderingResult.tileRects.first?.width ?? 0.0,
+                height: renderingResult.bottomRect.minY - renderingResult.topRect.maxY
+            )
+        )
+        self.tileImageView.applyTile(image: renderingResult.tileImage, frame: tilesRect)
+        
         /// Bottom View
-        let bottomImageView = UIView()
-        bottomImageView.layer.contents = renderingResult.bottomImage.cgImage
-        self.addSubview(bottomImageView)
         bottomImageView.frame = renderingResult.bottomRect
+        addSubview(bottomImageView)
+        bottomImageView.layer.contents = renderingResult.bottomImage.cgImage
 //        let layoutAreaView = UIView()
 //        layoutAreaView.backgroundColor = .clear
 //        layoutAreaView.layer.borderColor = UIColor.red.cgColor
@@ -143,7 +149,7 @@ fileprivate class QATemplateTileView: UIView {
     }
     
     override class var layerClass: AnyClass {
-        CATiledLayer.self
+        ZeroFadeTiledLayer.self
     }
     
     weak var tiledLayer: ZeroFadeTiledLayer?
@@ -161,13 +167,27 @@ fileprivate class QATemplateTileView: UIView {
     func applyTile(image: UIImage, frame: CGRect) {
         self.frame = frame
         self.image = image
-        self.tiledLayer?.tileSize = image.size
-        self.layer.contents = nil
-        self.setNeedsDisplay(layer.bounds)
+        self.tiledLayer?.tileSize = image.size.pixelAligned
+        self.tiledLayer?.levelsOfDetail = 0
+        self.tiledLayer?.levelsOfDetailBias = 0
+        self.clean()
     }
     
     override func draw(_ rect: CGRect) {
-        guard let image else { return }
-        image.draw(in: rect)
+        guard let image else {
+            return
+        }
+        guard let context = UIGraphicsGetCurrentContext() else {
+            return
+        }
+        let bounds = context.boundingBoxOfClipPath
+        UIGraphicsPushContext(context)
+        image.draw(in: bounds)
+        UIGraphicsPopContext()
+    }
+    
+    func clean() {
+        self.layer.contents = nil
+        self.setNeedsDisplay(layer.bounds)
     }
 }
