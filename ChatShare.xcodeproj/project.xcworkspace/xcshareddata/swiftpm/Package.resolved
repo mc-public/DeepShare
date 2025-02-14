@@ -1,5 +1,5 @@
 {
-  "originHash" : "51fc3a2459b9e48dbedb701ea23db6cc46ba2df1fa60ea0e63d9ee2332d2f711",
+  "originHash" : "8da5d13661f85024464617710e961c7770c9edfc0dfa572792911fb6f0725d46",
   "pins" : [
     {
       "identity" : "environmentoverrides",
@@ -11,12 +11,30 @@
       }
     },
     {
+      "identity" : "fpsmonitorlabel",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mc-public/FPSMonitorLabel",
+      "state" : {
+        "branch" : "main",
+        "revision" : "aa240522910c58c4732347369b89d4c6955b1439"
+      }
+    },
+    {
       "identity" : "observabledefaults",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mc-public/ObservableDefaults.git",
       "state" : {
         "branch" : "main",
         "revision" : "4740e2c39043b7daff946aa3bbec22e6a68850d3"
+      }
+    },
+    {
+      "identity" : "snapkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SnapKit/SnapKit.git",
+      "state" : {
+        "revision" : "2842e6e84e82eb9a8dac0100ca90d9444b0307f4",
+        "version" : "5.7.1"
       }
     },
     {

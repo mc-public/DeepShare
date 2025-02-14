@@ -14,7 +14,6 @@ import Localization
 
 struct QARenderingView: QANavigationLeaf {
     
-    
     @State var controller = MarkdownState()
     @State var windowSize: CGSize = .zero
     @State var textLayoutSize = CGSize.zero
@@ -25,47 +24,26 @@ struct QARenderingView: QANavigationLeaf {
     }
     
     var content: some View {
-        let templatePreferredSize = QATemplateManager.current.preferredSize(for: viewModel.selectedTemplate, preferredWidth: windowSize.width, preferredTextHeight: textLayoutSize.height)
-        let containerLayout = QATemplateManager.current.pageRects(for: viewModel.selectedTemplate, preferredSize: templatePreferredSize)
-        let totalSize = containerLayout?.pageSize ?? .zero
-        let layoutRect = containerLayout?.layoutRect ?? .zero
-        ScrollView(.vertical) {
-            Frame(totalSize, alignment: .top) {
-                VStack(alignment: .center, spacing: 0.0) {
-                    Rectangle()
-                        .fill(.clear)
-                        .frame(height: containerLayout?.layoutRect.minY ?? 0.0)
-                    Frame(width: max(0.0, layoutRect.width - viewModel.horizontalPagePadding), height: layoutRect.height, alignment: .top) {
-                        VStackLayout(alignment: .center, spacing: 0.0) {
-                            verticalStack()
-                        }
-                    }
-                    .border(.yellow, width: 5.0)
-                }
+        QATemplateScrollView(template: viewModel.selectedTemplate, horizontalPadding: viewModel.horizontalPagePadding, content: verticalStack)
+            .scrollBackgroundColor(controller.backgroundColor)
+            .scrollEdgeColor(.top, .bottom, color: controller.backgroundColor)
+            .environment(\.colorScheme, .light)
+            .toolbar(content: toolbarContent)
+            .safeAreaInset(edge: .bottom, alignment: .center, spacing: 0.0) {
+                QARenderingSettingsView(markdownController: $controller)
+                    .frame(maxWidth: .infinity, maxHeight: 0.4 * windowSize.height)
             }
-            .background {
-                QATemplateView(template: viewModel.selectedTemplate, size: totalSize)
+            .onGeometryChange(body: { windowSize = $0 })
+            .navigationTitle("Preview")
+            .navigationBarTitleDisplayMode(.inline)
+            .fileShareSheet(item: viewModel.binding(for: \.imageResult))
+            .fileShareSheet(item: viewModel.binding(for: \.pdfResult))
+            .onAppear(perform: onAppear)
+            .onDisappear(perform: SVProgressHUD.dismiss)
+            .environment(\.dynamicTypeSize, .medium)
+            .onChange(of: viewModel.selectedTemplate, initial: true) { _, newValue in
+                controller.backgroundColor = Color(newValue.textBackgroundColor).opacity(0)
             }
-        }
-        .scrollBackgroundColor(controller.backgroundColor)
-        .scrollEdgeColor(.top, .bottom, color: controller.backgroundColor)
-        .environment(\.colorScheme, .light)
-        .toolbar(content: toolbarContent)
-        .safeAreaInset(edge: .bottom, alignment: .center, spacing: 0.0) {
-            QARenderingSettingsView(markdownController: $controller)
-                .frame(maxWidth: .infinity, maxHeight: 0.4 * windowSize.height)
-        }
-        .onGeometryChange(body: { windowSize = $0 })
-        .navigationTitle("Preview")
-        .navigationBarTitleDisplayMode(.inline)
-        .fileShareSheet(item: viewModel.binding(for: \.imageResult))
-        .fileShareSheet(item: viewModel.binding(for: \.pdfResult))
-        .onAppear(perform: onAppear)
-        .onDisappear(perform: SVProgressHUD.dismiss)
-        .environment(\.dynamicTypeSize, .medium)
-        .onChange(of: viewModel.selectedTemplate, initial: true) { _, newValue in
-            controller.backgroundColor = Color(newValue.textBackgroundColor)
-        }
     }
     
     @ViewBuilder
@@ -102,10 +80,6 @@ struct QARenderingView: QANavigationLeaf {
                 .frame(maxWidth: .infinity, alignment: .center)
         }
         .hidden(controller.isRenderingContent)
-        .onGeometryChange(body: {
-            textLayoutSize = $0
-        })
-        .fixedSize(horizontal: false, vertical: true)
     }
     
     func onAppear() {
@@ -113,6 +87,7 @@ struct QARenderingView: QANavigationLeaf {
         controller.backgroundColor = .clear
         SVProgressHUD.show()
     }
+
 }
 
 extension QARenderingView {
@@ -179,6 +154,7 @@ extension QARenderingView {
 //MARK: - Chat Rendering Setting View
 fileprivate struct QARenderingSettingsView: View {
     @Binding var markdownController: MarkdownState
+    @Environment(QAViewModel.self) var viewModel
     var body: some View {
         VStack(alignment: .center, spacing: 0.0) {
             Divider()
@@ -191,6 +167,7 @@ fileprivate struct QARenderingSettingsView: View {
     var content: some View {
         List {
             Section("Style") {
+                templateLabel
                 themeLabel
                 fontSizeLabel
                 pageHorizontalPaddingLabel
@@ -201,6 +178,14 @@ fileprivate struct QARenderingSettingsView: View {
             
         }
         .scrollContentBackground(.hidden)
+    }
+    
+    var templateLabel: some View {
+        Picker("Template", selection: viewModel.binding(for: \.selectedTemplate)) {
+            ForEach(QATemplateManager.current.allTemplates) { template in
+                Text(template.title).tag(template)
+            }
+        }
     }
     
     var fontSizeLabel: some View {

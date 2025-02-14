@@ -12,6 +12,8 @@
 		E5418F7D2D51F26600A6655C /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = E5418F7C2D51F26600A6655C /* SwiftUIIntrospect */; };
 		E5418F802D51F2A400A6655C /* EnvironmentOverrides in Frameworks */ = {isa = PBXBuildFile; productRef = E5418F7F2D51F2A400A6655C /* EnvironmentOverrides */; };
 		E5418F832D51F42E00A6655C /* SVProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = E5418F822D51F42E00A6655C /* SVProgressHUD */; };
+		E57ADDC12D5F3429001BCED0 /* FPSMonitorLabel in Frameworks */ = {isa = PBXBuildFile; productRef = E57ADDC02D5F3429001BCED0 /* FPSMonitorLabel */; };
+		E57ADDC92D5F8A08001BCED0 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = E57ADDC82D5F8A08001BCED0 /* SnapKit */; };
 		E5C907BE2D57845000730092 /* Localization in Frameworks */ = {isa = PBXBuildFile; productRef = E5C907BD2D57845000730092 /* Localization */; };
 		E5E7AC9C2D5D0A580006EA13 /* UIColorHexSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E5E7AC9B2D5D0A580006EA13 /* UIColorHexSwift */; };
 /* End PBXBuildFile section */
@@ -46,11 +48,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E57ADDC12D5F3429001BCED0 /* FPSMonitorLabel in Frameworks */,
 				E5418F832D51F42E00A6655C /* SVProgressHUD in Frameworks */,
 				E51729572D59226C00A65085 /* ObservableDefaults in Frameworks */,
 				E5E7AC9C2D5D0A580006EA13 /* UIColorHexSwift in Frameworks */,
 				E5C907BE2D57845000730092 /* Localization in Frameworks */,
 				E5418F802D51F2A400A6655C /* EnvironmentOverrides in Frameworks */,
+				E57ADDC92D5F8A08001BCED0 /* SnapKit in Frameworks */,
 				E52146182D5253220055E0F7 /* MarkdownView in Frameworks */,
 				E5418F7D2D51F26600A6655C /* SwiftUIIntrospect in Frameworks */,
 			);
@@ -111,6 +115,8 @@
 				E5C907BD2D57845000730092 /* Localization */,
 				E51729562D59226C00A65085 /* ObservableDefaults */,
 				E5E7AC9B2D5D0A580006EA13 /* UIColorHexSwift */,
+				E57ADDC02D5F3429001BCED0 /* FPSMonitorLabel */,
+				E57ADDC82D5F8A08001BCED0 /* SnapKit */,
 			);
 			productName = ChatShare;
 			productReference = E5418EEC2D51F06F00A6655C /* ChatShare.app */;
@@ -150,6 +156,8 @@
 				E5C907BC2D57845000730092 /* XCLocalSwiftPackageReference "Localization" */,
 				E51729552D59226C00A65085 /* XCRemoteSwiftPackageReference "ObservableDefaults" */,
 				E5E7AC9A2D5D0A580006EA13 /* XCRemoteSwiftPackageReference "UIColor-Hex-Swift" */,
+				E57ADDBF2D5F3429001BCED0 /* XCRemoteSwiftPackageReference "FPSMonitorLabel" */,
+				E57ADDC72D5F8A08001BCED0 /* XCRemoteSwiftPackageReference "SnapKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E5418EED2D51F06F00A6655C /* Products */;
@@ -461,6 +469,22 @@
 				minimumVersion = 2.3.1;
 			};
 		};
+		E57ADDBF2D5F3429001BCED0 /* XCRemoteSwiftPackageReference "FPSMonitorLabel" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mc-public/FPSMonitorLabel";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		E57ADDC72D5F8A08001BCED0 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
 		E5E7AC9A2D5D0A580006EA13 /* XCRemoteSwiftPackageReference "UIColor-Hex-Swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/yeahdongcn/UIColor-Hex-Swift.git";
@@ -501,6 +525,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E5418F7A2D51F1F600A6655C /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
 			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+		E57ADDC02D5F3429001BCED0 /* FPSMonitorLabel */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E57ADDBF2D5F3429001BCED0 /* XCRemoteSwiftPackageReference "FPSMonitorLabel" */;
+			productName = FPSMonitorLabel;
+		};
+		E57ADDC82D5F8A08001BCED0 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E57ADDC72D5F8A08001BCED0 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
 		};
 		E5C907BD2D57845000730092 /* Localization */ = {
 			isa = XCSwiftPackageProductDependency;

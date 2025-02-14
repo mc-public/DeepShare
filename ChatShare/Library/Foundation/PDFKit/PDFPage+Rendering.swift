@@ -28,7 +28,8 @@ extension PDFPage {
         let uiImage = renderer.image { context in
             let ctx = context.cgContext
             let rect = CGRect(origin: .zero, size: imageSize)
-//            ctx.interpolationQuality = .low
+            ctx.interpolationQuality = .none
+            ctx.setShouldAntialias(false)
 //            ctx.setRenderingIntent(.defaultIntent)
             ctx.fill(rect)
             ctx.translateBy(x: 0.0, y: imageSize.height)

@@ -10,7 +10,7 @@ import UIColorHexSwift
 import PDFKit
 
 /// The data structure about the Question-Answer page template.
-struct QATemplateModel: Identifiable, Sendable, Equatable {
+struct QATemplateModel: Identifiable, Sendable, Equatable, Hashable {
     var id: String { title }
     /// The PDF file about the template.
     let pdfURL: URL

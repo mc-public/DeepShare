@@ -7,6 +7,49 @@
 
 import UIKit
 import SwiftUI
+import SnapKit
+
+struct QATemplateScrollView<Content>: View where Content: View {
+    let template: QATemplateModel
+    let horizontalPadding: CGFloat
+    let content: () -> Content
+    @State var textLayoutSize = CGSize.zero
+    var body: some View {
+        GeometryReader { proxy in
+            let templatePreferredSize = QATemplateManager.current.preferredSize(for: template, preferredWidth: proxy.size.width, preferredTextHeight: textLayoutSize.height)
+            let containerLayout = QATemplateManager.current.pageRects(for: template, preferredSize: templatePreferredSize)
+            let totalSize = containerLayout?.pageSize ?? .zero
+            let layoutRect = containerLayout?.layoutRect ?? .zero
+            ScrollView(.vertical) {
+                Frame(totalSize, alignment: .top) {
+                    VStack(alignment: .center, spacing: 0.0) {
+                        Rectangle()
+                            .fill(.clear)
+                            .frame(height: containerLayout?.layoutRect.minY ?? 0.0)
+                        Frame(width: max(0.0, layoutRect.width - horizontalPadding), height: layoutRect.height, alignment: .top) {
+                            textContent
+                        }
+//                        .border(.yellow, width: 5.0)
+                    }
+                }
+//                .border(.black, width: 10)
+                .background(alignment: .topLeading) {
+                    QATemplateView(template: template, size: totalSize)
+                }
+            }
+        }
+    }
+    
+    var textContent: some View {
+        VStackLayout(alignment: .center, spacing: 0.0) {
+            content()
+                .onGeometryChange(body: {
+                    textLayoutSize = $0
+                })
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
 
 struct QATemplateView: View {
     let template: QATemplateModel
@@ -76,119 +119,73 @@ fileprivate class QATemplateContentView: UIPlainView {
         }
     }
     
-    private var renderingResult: QATemplateManager.TemplateRenderingResult?
+    private var renderingResult: QATemplateManager.TemplateRenderingResult? {
+        didSet {
+            self.backgroundColor = renderingResult?.textBackground
+        }
+    }
     
     private var topImageView = UIPlainView()
-    private var tileImageView = QATemplateTileView()
+    private var tileImageView = UIImageView()
     private var bottomImageView = UIPlainView()
     private var textRectView = UIPlainView()
     
-    override var intrinsicContentSize: CGSize {
-        guard let template else {
-            return CGSize(width: super.intrinsicContentSize.width, height: 0.0)
-        }
-        let size = QATemplateManager.current.pageRects(for: template, preferredSize: preferredSize)?.pageSize ?? .zero
-        return size
-    }
-    
     private func cleanRenderingCache() {
-        self.tileImageView.clean()
+//        self.tileImageView.clean()
         self.subviews.forEach { $0.removeFromSuperview() }
     }
     
     private func updateImages() {
-        guard let template else {
-            return
-        }
+        guard let template else { return }
         if self.subviews.isEmpty {
             self.addSubview(self.topImageView)
             self.addSubview(self.tileImageView)
             self.addSubview(self.bottomImageView)
             self.addSubview(self.textRectView)
+            self.topImageView.layer.allowsEdgeAntialiasing = false
+            self.tileImageView.layer.allowsEdgeAntialiasing = false
+            self.bottomImageView.layer.allowsEdgeAntialiasing = false
         }
-        self.backgroundColor = template.textBackgroundColor
         guard let renderingResult = QATemplateManager.current.renderingResult(for: template, preferredSize: preferredSize) else {
             return
         }
+        let topImageViewHeight = renderingResult.topRect.height
+        let tileImageViewHeight = CGFloat(renderingResult.tileRects.count) * (renderingResult.tileImage.size.height)
+        let bottomImageViewHeight = renderingResult.bottomRect.height
+        print(topImageViewHeight + tileImageViewHeight + bottomImageViewHeight, renderingResult.size.height)
         self.renderingResult = renderingResult
-        
-        self.topImageView.frame = renderingResult.topRect
+        self.topImageView.snp.remakeConstraints { make in
+            make.top.equalTo(self)
+            make.width.equalTo(renderingResult.topRect.width)
+            make.height.equalTo(topImageViewHeight)
+        }
         self.topImageView.layer.contents = renderingResult.topImage.cgImage
-        
         /// Tile View
-        let tilesRect = CGRect(
-            origin: renderingResult.topRect.bottomLeading,
-            size: CGSize(
-                width: renderingResult.tileRects.first?.width ?? 0.0,
-                height: renderingResult.bottomRect.minY - renderingResult.topRect.maxY
-            )
-        )
-        self.tileImageView.applyTile(image: renderingResult.tileImage, frame: tilesRect)
-        
+        guard let topTileRect = renderingResult.tileRects.first else {
+            fatalError("[\(Self.self)][\(#function)] Cannot unwrap the first rectangle about the tiles.")
+        }
+        self.tileImageView.snp.remakeConstraints { make in
+            make.top.equalTo(self).offset(topImageViewHeight)
+            make.width.equalTo(topTileRect.width)
+            make.height.equalTo(tileImageViewHeight)
+        }
+        self.tileImageView.image = renderingResult.tileImage.resizableImage(withCapInsets: .zero, resizingMode: .tile)
         /// Bottom View
-        bottomImageView.frame = renderingResult.bottomRect
-        addSubview(bottomImageView)
-        bottomImageView.layer.contents = renderingResult.bottomImage.cgImage
+        self.bottomImageView.snp.remakeConstraints { make in
+            make.top.equalTo(self.tileImageView.snp.bottom)
+            make.height.equalTo(bottomImageViewHeight)
+            make.width.equalTo(renderingResult.bottomRect.width)
+
+        }
+        self.bottomImageView.layer.contents = renderingResult.bottomImage.cgImage
         
-        textRectView.backgroundColor = .clear
-        textRectView.layer.borderColor = UIColor.red.cgColor
-        textRectView.layer.borderWidth = 3.0
-        textRectView.frame = renderingResult.textRect
-        self.bringSubviewToFront(textRectView)
-        self.invalidateIntrinsicContentSize()
-    }
-    
-}
-
-
-fileprivate class QATemplateTileView: UIView {
-    
-    class ZeroFadeTiledLayer: CATiledLayer {
-        override class func fadeDuration() -> CFTimeInterval {
-            0.0
+//        textRectView.backgroundColor = .clear
+//        textRectView.layer.borderColor = UIColor.red.cgColor
+//        textRectView.layer.borderWidth = 3.0
+//        textRectView.frame = renderingResult.textRect
+//        self.bringSubviewToFront(textRectView)
+        self.snp.remakeConstraints { make in
+            make.height.lessThanOrEqualTo(renderingResult.size.height)
         }
-    }
-    
-    override class var layerClass: AnyClass {
-        ZeroFadeTiledLayer.self
-    }
-    
-    weak var tiledLayer: ZeroFadeTiledLayer?
-    var image: UIImage?
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        tiledLayer = (self.layer as? ZeroFadeTiledLayer)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    func applyTile(image: UIImage, frame: CGRect) {
-        self.frame = frame
-        self.image = image
-        self.tiledLayer?.tileSize = image.size.pixelAligned
-        self.tiledLayer?.levelsOfDetail = 0
-        self.tiledLayer?.levelsOfDetailBias = 0
-        self.clean()
-    }
-    
-    override func draw(_ rect: CGRect) {
-        guard let image else {
-            return
-        }
-        guard let context = UIGraphicsGetCurrentContext() else {
-            return
-        }
-        let bounds = context.boundingBoxOfClipPath
-        UIGraphicsPushContext(context)
-        image.draw(in: bounds)
-        UIGraphicsPopContext()
-    }
-    
-    func clean() {
-        self.layer.contents = nil
-        self.setNeedsDisplay(layer.bounds)
     }
 }

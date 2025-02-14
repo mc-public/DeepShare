@@ -47,7 +47,7 @@ extension QATemplateManager {
     }
     
     /// Get the rendering information of a certain template in the page coordinate system.
-    func pageRects(for template: QATemplateModel) -> (pageSize: CGSize, topRect: CGRect, tileRect: CGRect, bottomRect: CGRect, layoutRect: CGRect) {
+    private func pageRects(for template: QATemplateModel) -> (pageSize: CGSize, topRect: CGRect, tileRect: CGRect, bottomRect: CGRect, layoutRect: CGRect) {
         let page = self.page(for: template)
         let pageSize = page.bounds(for: .mediaBox).size
         let pdfScale = pageSize.height / template.pageSize.height
@@ -65,7 +65,6 @@ extension QATemplateManager {
     }
     
     func preferredSize(for template: QATemplateModel, preferredWidth: CGFloat, preferredTextHeight: CGFloat) -> CGSize {
-        
         if preferredWidth.isAlmostZero() || preferredWidth.isAlmostZero() { return .zero }
         let pageInfo = self.pageRects(for: template)
         let pageScale = preferredWidth / pageInfo.pageSize.width
@@ -79,29 +78,30 @@ extension QATemplateManager {
         let pageInfo = self.pageRects(for: template)
         let pageScale = preferredSize.width / pageInfo.pageSize.width
         let rescaledPreferredSize = preferredSize.rescale(pageScale)
-        if rescaledPreferredSize.height <= pageInfo.pageSize.height {
-            return (
-                scale: pageScale,
-                pageSize: pageInfo.pageSize.scale(pageScale),
-                topRect: pageInfo.topRect.scale(pageScale),
-                tileCount: 1,
-                tileHeight: pageInfo.tileRect.scale(pageScale).height,
-                tileRects: [pageInfo.tileRect.scale(pageScale)],
-                bottomRect: pageInfo.bottomRect.scale(pageScale),
-                layoutRect: pageInfo.layoutRect.scale(pageScale)
-            )
-        }
+//        if rescaledPreferredSize.height <= pageInfo.pageSize.height {
+//            return (
+//                scale: pageScale,
+//                pageSize: pageInfo.pageSize.scale(pageScale),
+//                topRect: pageInfo.topRect.scale(pageScale),
+//                tileCount: 1,
+//                tileHeight: pageInfo.tileRect.scale(pageScale).height,
+//                tileRects: [pageInfo.tileRect.scale(pageScale)],
+//                bottomRect: pageInfo.bottomRect.scale(pageScale),
+//                layoutRect: pageInfo.layoutRect.scale(pageScale)
+//            )
+//        }
         // Tile Count
-        let tileMinHeight = rescaledPreferredSize.height - pageInfo.topRect.height - pageInfo.bottomRect.height
-
-        let tileCount = Int(ceil(tileMinHeight / pageInfo.tileRect.height))
+        let tileMinHeight = max(0, rescaledPreferredSize.height - pageInfo.topRect.height - pageInfo.bottomRect.height)
+        let pixelAlignedTileHeight = ceil(pageInfo.tileRect.height * pageScale) / pageScale
+        let pixelAlignedTileSize = CGSize(width: pageInfo.tileRect.width, height: pixelAlignedTileHeight)
+        let tileCount = max(1, Int(ceil(tileMinHeight / pixelAlignedTileHeight)))
         let appendedTileCount = tileCount - 1
         let tileRects = (0..<tileCount).map {
-            CGRect(origin: CGPoint(x: 0, y: pageInfo.tileRect.origin.y + CGFloat($0) * pageInfo.tileRect.height), size: pageInfo.tileRect.size)
+            CGRect(origin: CGPoint(x: 0, y: pageInfo.tileRect.origin.y + CGFloat($0) * pixelAlignedTileHeight), size: pixelAlignedTileSize)
         }
-        let heightDelta = CGFloat(appendedTileCount) * pageInfo.tileRect.height
+        let heightDelta = CGFloat(appendedTileCount) * pixelAlignedTileHeight
         // Appended Frames
-        let pageSize = pageInfo.pageSize.offset(dw: 0, dh: heightDelta)
+        let pageSize = pageInfo.pageSize.offset(dh: heightDelta)
         let bottomRect = CGRect(
             origin: pageInfo.bottomRect.origin.offset(dy: heightDelta),
             size: pageInfo.bottomRect.size
@@ -112,7 +112,7 @@ extension QATemplateManager {
             pageSize: pageSize.scale(pageScale),
             topRect: pageInfo.topRect.scale(pageScale),
             tileCount: tileCount,
-            tileHeight: tileRects.first?.scale(pageScale).height ?? 0,
+            tileHeight: pixelAlignedTileHeight * pageScale,
             tileRects: tileRects.map { $0.scale(pageScale) },
             bottomRect: bottomRect.scale(pageScale),
             layoutRect: layoutRect.scale(pageScale)
@@ -124,11 +124,16 @@ extension QATemplateManager {
             return nil
         }
         let originInfo = self.pageRects(for: template)
+        guard let originAlignedTileRect = pageInfo.tileRects.first?.rescale(pageInfo.scale) else {
+            assertionFailure("[\(Self.self)][\(#function)] The return-tiles of `pageRects(for:preferred)` should contain at least one value.")
+            return nil
+        }
         let page = self.page(for: template)
         let cache = self.renderingCache(for: template, width: preferredSize.width) {
-            let topImage = page.image(contentFrame: originInfo.topRect, contentScale: 2.0, zoomScale: pageInfo.scale)
-            let tileImage = page.image(contentFrame: originInfo.tileRect, contentScale: 2.0, zoomScale: pageInfo.scale)
-            let bottomImage = page.image(contentFrame: originInfo.bottomRect, contentScale: 2.0, zoomScale: pageInfo.scale)
+            let topImage = page.image(contentFrame: originInfo.topRect, contentScale: 3.0, zoomScale: pageInfo.scale)
+            let tileImage = page.image(contentFrame: originAlignedTileRect, contentScale: 6.0, zoomScale: pageInfo.scale)
+            print(originAlignedTileRect.scale(pageInfo.scale).height)
+            let bottomImage = page.image(contentFrame: originInfo.bottomRect, contentScale: 3.0, zoomScale: pageInfo.scale)
             return .init(topImage: topImage, tileImage: tileImage, bottomImage: bottomImage)
         }
         return TemplateRenderingResult(

@@ -262,6 +262,9 @@
         }
       }
     },
+    "Template" : {
+
+    },
     "Text Size" : {
       "localizations" : {
         "zh-Hans" : {

@@ -121,7 +121,7 @@ extension CGSize {
     }
     
     /// Returns a size obtained by performing operations on the width and height of the current size.
-    func offset(dw: CGFloat, dh: CGFloat) -> Self {
+    func offset(dw: CGFloat = 0, dh: CGFloat = 0) -> Self {
         return .init(width: width + dw, height: height + dh)
     }
     
@@ -301,8 +301,6 @@ extension CGRect {
     
 }
 
-
-
 extension CGSize {
     var pixelAligned: CGSize {
 #if os(macOS)
@@ -310,5 +308,34 @@ extension CGSize {
 #else
         CGRect(origin: .zero, size: self).integral.pixelAligned.size // May be not aligned
 #endif
+    }
+}
+
+extension CGRect {
+    
+    ///
+    static func alignVerticalRects(_ rects: [CGRect], width: CGFloat, scale: CGFloat) -> [CGRect] {
+        guard !rects.isEmpty else { return [] }
+        let width = ceil(width * scale) / scale
+        
+        var previousMaxY: CGFloat = rects[0].minY
+        return rects.map { original in
+            // 横向对齐
+            let x = round(original.minX * scale) / scale
+            
+            // 纵向对齐
+            let minY: CGFloat
+            if previousMaxY.isZero {
+                minY = floor(original.minY * scale) / scale
+            } else {
+                minY = previousMaxY // 紧接前一个元素底部
+            }
+            
+            let height = ceil(original.height * scale) / scale
+            let newRect = CGRect(x: x, y: minY, width: width, height: height)
+            
+            previousMaxY = newRect.maxY
+            return newRect
+        }
     }
 }

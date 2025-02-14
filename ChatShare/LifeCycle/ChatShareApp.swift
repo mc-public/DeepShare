@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FPSMonitorLabel
 
 @main
 struct ChatShareApp: App {
@@ -13,6 +14,11 @@ struct ChatShareApp: App {
     var body: some Scene {
         WindowGroup {
             QANavigationView()
+#if DEBUG
+                .overlay(alignment: .topLeading) {
+                    FPSMonitorLabel()
+                }
+#endif
         }
     }
 }
