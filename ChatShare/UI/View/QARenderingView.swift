@@ -171,9 +171,9 @@ fileprivate struct QARenderingSettingsView: View {
                 themeLabel
                 fontSizeLabel
                 pageHorizontalPaddingLabel
-                if markdownController.theme.colorSupport == .dynamic {
-                    backgroundColorLabel
-                }
+//                if markdownController.theme.colorSupport == .dynamic {
+//                    backgroundColorLabel
+//                }
             }
             
         }

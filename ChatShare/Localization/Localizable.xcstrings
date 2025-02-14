@@ -263,7 +263,14 @@
       }
     },
     "Template" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "页面"
+          }
+        }
+      }
     },
     "Text Size" : {
       "localizations" : {

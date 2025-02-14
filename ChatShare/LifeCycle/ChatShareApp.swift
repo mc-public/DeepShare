@@ -14,11 +14,11 @@ struct ChatShareApp: App {
     var body: some Scene {
         WindowGroup {
             QANavigationView()
-#if DEBUG
-                .overlay(alignment: .topLeading) {
-                    FPSMonitorLabel()
-                }
-#endif
+//#if DEBUG
+//                .overlay(alignment: .top) {
+//                    FPSMonitorLabel()
+//                }
+//#endif
         }
     }
 }
