@@ -75,8 +75,8 @@ public final class DownTeX {
     private init() {
         self.state = .initializing
         self.navigationDelegate.downTeX = self
-        if !DownTeXResource.isResourcesReady {
-            let result = DownTeXResource.prepareResources()
+        if !Resources.isResourcesReady {
+            let result = Resources.prepareResources()
             if !result {
                 self.state = .initFailed
             }
@@ -102,7 +102,7 @@ public final class DownTeX {
         Self.pandocView.content.isInspectable = true
 #endif        
         Self.pandocView.content.navigationDelegate = self.navigationDelegate
-        Self.pandocView.content.loadFileURL(DownTeXResource.PandocHTMLResource, allowingReadAccessTo: DownTeXResource.PandocResource)
+        Self.pandocView.content.loadFileURL(Resources.PandocHTMLResource, allowingReadAccessTo: Resources.PandocResource)
         /// Checking load state.
         let startTime = Date.now
         var isFailured: Bool = false

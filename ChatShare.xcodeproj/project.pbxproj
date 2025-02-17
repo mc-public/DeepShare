@@ -17,6 +17,7 @@
 		E5C907BE2D57845000730092 /* Localization in Frameworks */ = {isa = PBXBuildFile; productRef = E5C907BD2D57845000730092 /* Localization */; };
 		E5E7AC9C2D5D0A580006EA13 /* UIColorHexSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E5E7AC9B2D5D0A580006EA13 /* UIColorHexSwift */; };
 		E5FCD05F2D632C1500C8DB4B /* Zip in Frameworks */ = {isa = PBXBuildFile; productRef = E5FCD05E2D632C1500C8DB4B /* Zip */; };
+		E5FCD06D2D6345AB00C8DB4B /* libxetex.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = E5FCD05A2D63278400C8DB4B /* libxetex.xcframework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +51,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E5FCD06D2D6345AB00C8DB4B /* libxetex.xcframework in Frameworks */,
 				E57ADDC12D5F3429001BCED0 /* FPSMonitorLabel in Frameworks */,
 				E5418F832D51F42E00A6655C /* SVProgressHUD in Frameworks */,
 				E51729572D59226C00A65085 /* ObservableDefaults in Frameworks */,
@@ -139,6 +141,7 @@
 				TargetAttributes = {
 					E5418EEB2D51F06E00A6655C = {
 						CreatedOnToolsVersion = 16.2;
+						LastSwiftMigration = 1620;
 					};
 				};
 			};
@@ -329,6 +332,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "$(SRCROOT)/ChatShare/Resources/Preview.xcassets";
@@ -357,6 +361,8 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "ChatShare/LifeCycle/ChatShare-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -367,6 +373,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "$(SRCROOT)/ChatShare/Resources/Preview.xcassets";
@@ -395,6 +402,7 @@
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "ChatShare/LifeCycle/ChatShare-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};

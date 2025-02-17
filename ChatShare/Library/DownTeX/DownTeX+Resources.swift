@@ -10,22 +10,22 @@ import Zip
 import SwiftUI
 
 extension DownTeX {
-    internal class DownTeXResource {
+    internal class Resources {
         /// The total `DownTeX` package `URL`.
         static var TotalBundle: URL {
-            guard let allBundle = Bundle.main.url(forResource: "DownTeX", withExtension: "bundle") else { fatalError("[\(DownTeXResource.self)][\(#function)] Cannot load Resource file.")}
+            guard let allBundle = Bundle.main.url(forResource: "DownTeX", withExtension: "bundle") else { fatalError("[\(Resources.self)][\(#function)] Cannot load Resource file.")}
             return allBundle
         }
         /// The Pandoc bundle `URL`.
         static var PandocResource: URL {
             let target = TotalBundle.appending(path: "Pandoc.bundle")
-            assert(FileManager.default.fileExists(at: target), "[\(DownTeXResource.self)][\(#function)] Cannot load Resource file.")
+            assert(FileManager.default.fileExists(at: target), "[\(Resources.self)][\(#function)] Cannot load Resource file.")
             return target
         }
         /// The `HTML` file about the Pandoc-JavaScript module.
         static var PandocHTMLResource: URL {
             let target = PandocResource.appending(path: "pandoc.html")
-            assert(FileManager.default.fileExists(at: target), "[\(DownTeXResource.self)][\(#function)] Cannot load Resource file.")
+            assert(FileManager.default.fileExists(at: target), "[\(Resources.self)][\(#function)] Cannot load Resource file.")
             return target
         }
         /// The `TeXMF` resources `URL`.
@@ -35,7 +35,7 @@ extension DownTeX {
         /// The `TeXMF` zip-package `URL`.
         private static var TeXBundleResource: URL {
             let target = TotalBundle.appending(path: "texmf.zip")
-            assert(FileManager.default.fileExists(at: target), "[\(DownTeXResource.self)][\(#function)] Cannot load Resource file.")
+            assert(FileManager.default.fileExists(at: target), "[\(Resources.self)][\(#function)] Cannot load Resource file.")
             return target
         }
         /// Indicates whether all resources are currently available.
