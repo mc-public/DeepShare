@@ -82,7 +82,7 @@ public final class DownTeX {
             }
         }
         Task {
-            await self.configurePandocView()
+            await self.unsafe_configurePandocView()
             self.state = .ready
         }
     }
@@ -90,13 +90,13 @@ public final class DownTeX {
     /// Configure the web page loading for `PandocView`.
     private func configurePandocView(onCompletion: @escaping () async throws -> ()) {
         Task {
-            await self.configurePandocView()
+            await self.unsafe_configurePandocView()
             try await onCompletion()
         }
     }
     
     /// Configure the web page loading for `PandocView`.
-    private func configurePandocView() async {
+    private func unsafe_configurePandocView() async {
         Self.pandocView.content = .init(frame: .zero, configuration: Self.PandocViewConfiguration)
 #if DEBUG
         Self.pandocView.content.isInspectable = true
@@ -113,7 +113,7 @@ public final class DownTeX {
             }
         }
         guard !isFailured else {
-            await configurePandocView()
+            await unsafe_configurePandocView()
             return
         }
         let checkPandocReady = {
@@ -122,7 +122,7 @@ public final class DownTeX {
         while true {
             let result = await checkPandocReady()
             guard let result else {
-                await configurePandocView()
+                await unsafe_configurePandocView()
                 return
             }
             if !result { break }
@@ -136,12 +136,20 @@ public final class DownTeX {
             try? await Task.sleep(for: .microseconds(10))
         }
         self.state = .running
+        defer { self.state = .ready }
+        return try await unsafe_convertToLaTeX(markdownString: markdownString)
+    }
+    
+    func unsafe_convertToLaTeX(markdownString: String) async throws(OperationError) -> String {
+        if markdownString.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            throw .illegalTextContent
+        }
         let safedString = markdownString.javaScriptString
         let fetchResult = {
             (try? await Self.pandocView.content.evaluateJavaScript("window.pandoc('-f markdown -t latex', \"\(safedString)\")")) as? String
         }
         guard let result = await fetchResult() else {
-            await configurePandocView()
+            await unsafe_configurePandocView()
             if let result = await fetchResult() {
                 return result
             } else {

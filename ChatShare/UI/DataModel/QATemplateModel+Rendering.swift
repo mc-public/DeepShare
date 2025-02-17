@@ -78,18 +78,6 @@ extension QATemplateManager {
         let pageInfo = self.pageRects(for: template)
         let pageScale = preferredSize.width / pageInfo.pageSize.width
         let rescaledPreferredSize = preferredSize.rescale(pageScale)
-//        if rescaledPreferredSize.height <= pageInfo.pageSize.height {
-//            return (
-//                scale: pageScale,
-//                pageSize: pageInfo.pageSize.scale(pageScale),
-//                topRect: pageInfo.topRect.scale(pageScale),
-//                tileCount: 1,
-//                tileHeight: pageInfo.tileRect.scale(pageScale).height,
-//                tileRects: [pageInfo.tileRect.scale(pageScale)],
-//                bottomRect: pageInfo.bottomRect.scale(pageScale),
-//                layoutRect: pageInfo.layoutRect.scale(pageScale)
-//            )
-//        }
         // Tile Count
         let tileMinHeight = max(0, rescaledPreferredSize.height - pageInfo.topRect.height - pageInfo.bottomRect.height)
         let pixelAlignedTileHeight = ceil(pageInfo.tileRect.height * pageScale) / pageScale
@@ -147,5 +135,30 @@ extension QATemplateManager {
             textRect: pageInfo.layoutRect,
             textBackground: template.textBackgroundColor
         )
+    }
+}
+
+extension QATemplateManager.TemplateRenderingResult {
+    var totalImage: UIImage {
+        let format = UIGraphicsImageRendererFormat()
+        format.opaque = false
+        format.scale = 3.0
+        let size = CGSize(width: tileImage.size.width, height: topImage.size.height + CGFloat(tileCount) * tileImage.size.height + bottomImage.size.height)
+        let renderer = UIGraphicsImageRenderer(size: size, format: format)
+        return renderer.image { context in
+            let cgContext = context.cgContext
+            cgContext.setShouldAntialias(false)
+            topImage.draw(in: CGRect(origin: .zero, size: topImage.size))
+            for i in 0..<tileCount {
+                let rect = CGRect(origin: CGPoint(x: 0, y: topImage.size.height + CGFloat(i) * tileImage.size.height), size: tileImage.size)
+                tileImage.draw(in: rect)
+            }
+            bottomImage.draw(in: CGRect(origin: CGPoint(x: 0, y: topImage.size.height + CGFloat(tileCount) * tileImage.size.height), size: bottomImage.size))
+        }
+    }
+    func totalImage() async -> UIImage {
+        await Task.detached {
+            self.totalImage
+        }
     }
 }
