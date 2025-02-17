@@ -14,11 +14,17 @@ struct ChatShareApp: App {
     var body: some Scene {
         WindowGroup {
             QANavigationView()
-//#if DEBUG
-//                .overlay(alignment: .top) {
-//                    FPSMonitorLabel()
-//                }
-//#endif
+                .background {
+                    DownTeX.placeHolder
+                        .ignoresSafeArea(.all, edges: .all)
+                }
+                .task {
+                    do {
+                        try await DownTeX.current.convertToLaTeX(markdownString: "你好世界")
+                    } catch {
+                        print(error)
+                    }
+                }
         }
     }
 }

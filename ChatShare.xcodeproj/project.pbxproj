@@ -16,10 +16,12 @@
 		E57ADDC92D5F8A08001BCED0 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = E57ADDC82D5F8A08001BCED0 /* SnapKit */; };
 		E5C907BE2D57845000730092 /* Localization in Frameworks */ = {isa = PBXBuildFile; productRef = E5C907BD2D57845000730092 /* Localization */; };
 		E5E7AC9C2D5D0A580006EA13 /* UIColorHexSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E5E7AC9B2D5D0A580006EA13 /* UIColorHexSwift */; };
+		E5FCD05F2D632C1500C8DB4B /* Zip in Frameworks */ = {isa = PBXBuildFile; productRef = E5FCD05E2D632C1500C8DB4B /* Zip */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		E5418EEC2D51F06F00A6655C /* ChatShare.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatShare.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E5FCD05A2D63278400C8DB4B /* libxetex.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libxetex.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -52,6 +54,7 @@
 				E5418F832D51F42E00A6655C /* SVProgressHUD in Frameworks */,
 				E51729572D59226C00A65085 /* ObservableDefaults in Frameworks */,
 				E5E7AC9C2D5D0A580006EA13 /* UIColorHexSwift in Frameworks */,
+				E5FCD05F2D632C1500C8DB4B /* Zip in Frameworks */,
 				E5C907BE2D57845000730092 /* Localization in Frameworks */,
 				E5418F802D51F2A400A6655C /* EnvironmentOverrides in Frameworks */,
 				E57ADDC92D5F8A08001BCED0 /* SnapKit in Frameworks */,
@@ -66,6 +69,7 @@
 		E52146162D5253220055E0F7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				E5FCD05A2D63278400C8DB4B /* libxetex.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -117,6 +121,7 @@
 				E5E7AC9B2D5D0A580006EA13 /* UIColorHexSwift */,
 				E57ADDC02D5F3429001BCED0 /* FPSMonitorLabel */,
 				E57ADDC82D5F8A08001BCED0 /* SnapKit */,
+				E5FCD05E2D632C1500C8DB4B /* Zip */,
 			);
 			productName = ChatShare;
 			productReference = E5418EEC2D51F06F00A6655C /* ChatShare.app */;
@@ -158,6 +163,7 @@
 				E5E7AC9A2D5D0A580006EA13 /* XCRemoteSwiftPackageReference "UIColor-Hex-Swift" */,
 				E57ADDBF2D5F3429001BCED0 /* XCRemoteSwiftPackageReference "FPSMonitorLabel" */,
 				E57ADDC72D5F8A08001BCED0 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				E5FCD05D2D632C1500C8DB4B /* XCRemoteSwiftPackageReference "Zip" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E5418EED2D51F06F00A6655C /* Products */;
@@ -493,6 +499,14 @@
 				minimumVersion = 5.1.9;
 			};
 		};
+		E5FCD05D2D632C1500C8DB4B /* XCRemoteSwiftPackageReference "Zip" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/marmelroy/Zip.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -544,6 +558,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E5E7AC9A2D5D0A580006EA13 /* XCRemoteSwiftPackageReference "UIColor-Hex-Swift" */;
 			productName = UIColorHexSwift;
+		};
+		E5FCD05E2D632C1500C8DB4B /* Zip */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E5FCD05D2D632C1500C8DB4B /* XCRemoteSwiftPackageReference "Zip" */;
+			productName = Zip;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
