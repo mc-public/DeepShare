@@ -1,0 +1,111 @@
+PROJECT_NAME	:=	pdftex.js
+
+CC          	= 	emcc
+CXX          	= 	em++
+CFLAGS       	= 	-O3 \
+					-s USE_ZLIB=1 -s USE_LIBPNG=1 \
+					-Wno-parentheses-equality -Wno-pointer-sign \
+					-fno-rtti -fno-exceptions \
+					-DWEBASSEMBLY_BUILD \
+					-DWEBASSEMBLY_DEBUG
+
+CXX_LINK     	= 	$(CXX) -o $@ $(CFLAGS)
+
+TEXSOURCES   	= 	pdftex/bibtex/bibtex.c \
+					pdftex/tex/pdftex0.c \
+					pdftex/tex/pdftexini.c \
+					pdftex/tex/pdftex-pool.c \
+					pdftex/main.c \
+					pdftex/libmd5/md5.c \
+					pdftex/kpathsea/xmemory.c \
+					pdftex/kpathsea/texfile.c \
+					pdftex/kpathsea/kpseemu.c \
+					pdftex/kpathsea/texmfmp.c \
+					pdftex/kpathsea/magstep.c \
+					pdftex/kpathsea/tex-glyph.c \
+					pdftex/synctexdir/synctex.c
+
+
+PDFSOURCES   	= 	pdftex/pdftexdir/avl.c \
+					pdftex/pdftexdir/utils.c \
+					pdftex/pdftexdir/writejbig2.c \
+					pdftex/pdftexdir/writettf.c \
+					pdftex/pdftexdir/avlstuff.c \
+					pdftex/pdftexdir/pkin.c \
+					pdftex/pdftexdir/vfpacket.c \
+					pdftex/pdftexdir/writejpg.c \
+					pdftex/pdftexdir/writezip.c \
+					pdftex/pdftexdir/epdf.c \
+					pdftex/pdftexdir/subfont.c \
+					pdftex/pdftexdir/writeenc.c \
+					pdftex/pdftexdir/writepng.c \
+					pdftex/pdftexdir/tounicode.c \
+					pdftex/pdftexdir/writefont.c \
+					pdftex/pdftexdir/writet1.c \
+					pdftex/pdftexdir/mapfile.c \
+					pdftex/pdftexdir/writeimg.c \
+					pdftex/pdftexdir/writet3.c 
+
+EPDFSOURCES  	= 	pdftex/pdftexdir/pdftoepdf.cc
+
+BUILD_DIR    	=	pdftex/build
+
+TEXOBJECTS   	= 	$(TEXSOURCES:%.c=$(BUILD_DIR)/%.o)
+
+PDFOBJECTS   	= 	$(PDFSOURCES:%.c=$(BUILD_DIR)/%.o)
+
+EPDFOBJECTS  	= 	$(EPDFSOURCES:%.cc=$(BUILD_DIR)/%.o)
+
+
+
+all: $(PROJECT_NAME)
+
+$(PROJECT_NAME): $(HEADERS) $(TEXOBJECTS) $(PDFOBJECTS) $(EPDFOBJECTS)
+	@$(CXX_LINK) $(TEXOBJECTS) $(PDFOBJECTS) $(EPDFOBJECTS) pdftex/xpdf/xpdf.a \
+	--js-library ./wasm/LibraryMerge.js \
+	--pre-js ./wasm/Variable.js \
+	--pre-js ./wasm/LifeCycle.js \
+	--pre-js ./wasm/Compile.js \
+	--pre-js ./wasm/Utility.js \
+	--pre-js ./wasm/FileQuery.js \
+	-s EXPORTED_FUNCTIONS='["_main","_engine_compile_tex","_engine_compile_bibtex","_engine_compile_tex_fmt"]' \
+	-s EXPORTED_RUNTIME_METHODS='["cwrap","ccall","allocate"]' \
+	-s WASM=1 \
+	-s NO_EXIT_RUNTIME=1 \
+	-s ALLOW_MEMORY_GROWTH=1 \
+ 	-s MAXIMUM_MEMORY=4GB \
+	-s LLD_REPORT_UNDEFINED \
+	-s ASSERTIONS && \
+	echo -e "\033[32m[DONE]\033[0m $(PROJECT_NAME)" || \
+	echo -e "\033[31m[ERROR]\033[0m $(PROJECT_NAME)"
+
+$(TEXOBJECTS): $(BUILD_DIR)/%.o : %.c
+	@mkdir -p $(dir $@)
+	@$(CC) -c $(CFLAGS) -I pdftex/ -I pdftex/tex/ -I pdftex/kpathsea/ -I pdftex/libmd5 -I pdftex/bibtex/ $< -o $@ && \
+	echo -e "\033[32m[OK]\033[0m $@" || \
+	echo -e "\033[31m[ERROR]\033[0m $@"
+
+$(PDFOBJECTS): $(BUILD_DIR)/%.o : %.c
+	@mkdir -p $(dir $@)
+	@$(CC) -c $(CFLAGS) -I pdftex/ -I pdftex/tex/ -I pdftex/pdftexdir/ -I pdftex/kpathsea/ -I pdftex/libmd5/ -I pdftex/xpdf/xpdf/ -I pdftex/xpdf/ $< -o $@ && \
+	echo -e "\033[32m[OK]\033[0m $@" || \
+	echo -e "\033[31m[ERROR]\033[0m $@"
+
+$(EPDFOBJECTS): $(BUILD_DIR)/%.o : %.cc
+	@mkdir -p $(dir $@)
+	@$(CXX) -c $(CFLAGS) -I pdftex/ -I pdftex/tex/ -I pdftex/pdftexdir/ -I pdftex/xpdf/xpdf/ -I pdftex/xpdf/goo/ -I pdftex/xpdf/ -I pdftex/kpathsea/ $< -o $@ && \
+	echo -e "\033[32m[OK]\033[0m $@" || \
+	echo -e "\033[31m[ERROR]\033[0m $@"
+
+clean:
+	@rm -rf $(BUILD_DIR)
+	@echo -e "\033[32m[CLEANED]\033[0m $(PROJECT_NAME)"
+
+fclean: clean
+	@rm -f $(PROJECT_NAME)
+	@echo -e "\033[32m[FCLEAN]\033[0m $(PROJECT_NAME)"
+
+re: fclean _default
+
+.PHONY: all clean fclean re
+.SILENT: all clean fclean re

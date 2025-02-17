@@ -14,10 +14,10 @@
 		E5418F832D51F42E00A6655C /* SVProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = E5418F822D51F42E00A6655C /* SVProgressHUD */; };
 		E57ADDC12D5F3429001BCED0 /* FPSMonitorLabel in Frameworks */ = {isa = PBXBuildFile; productRef = E57ADDC02D5F3429001BCED0 /* FPSMonitorLabel */; };
 		E57ADDC92D5F8A08001BCED0 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = E57ADDC82D5F8A08001BCED0 /* SnapKit */; };
+		E59D9C7B2D63C3CA009A53F6 /* TeXEngine in Frameworks */ = {isa = PBXBuildFile; productRef = E59D9C7A2D63C3CA009A53F6 /* TeXEngine */; };
 		E5C907BE2D57845000730092 /* Localization in Frameworks */ = {isa = PBXBuildFile; productRef = E5C907BD2D57845000730092 /* Localization */; };
 		E5E7AC9C2D5D0A580006EA13 /* UIColorHexSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E5E7AC9B2D5D0A580006EA13 /* UIColorHexSwift */; };
 		E5FCD05F2D632C1500C8DB4B /* Zip in Frameworks */ = {isa = PBXBuildFile; productRef = E5FCD05E2D632C1500C8DB4B /* Zip */; };
-		E5FCD06F2D63733D00C8DB4B /* libxetex.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E5FCD05A2D63278400C8DB4B /* libxetex.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -27,7 +27,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				E5FCD06F2D63733D00C8DB4B /* libxetex.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -36,7 +35,6 @@
 
 /* Begin PBXFileReference section */
 		E5418EEC2D51F06F00A6655C /* ChatShare.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatShare.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		E5FCD05A2D63278400C8DB4B /* libxetex.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = libxetex.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -70,6 +68,7 @@
 				E51729572D59226C00A65085 /* ObservableDefaults in Frameworks */,
 				E5E7AC9C2D5D0A580006EA13 /* UIColorHexSwift in Frameworks */,
 				E5FCD05F2D632C1500C8DB4B /* Zip in Frameworks */,
+				E59D9C7B2D63C3CA009A53F6 /* TeXEngine in Frameworks */,
 				E5C907BE2D57845000730092 /* Localization in Frameworks */,
 				E5418F802D51F2A400A6655C /* EnvironmentOverrides in Frameworks */,
 				E57ADDC92D5F8A08001BCED0 /* SnapKit in Frameworks */,
@@ -84,7 +83,6 @@
 		E52146162D5253220055E0F7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				E5FCD05A2D63278400C8DB4B /* libxetex.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -138,6 +136,7 @@
 				E57ADDC02D5F3429001BCED0 /* FPSMonitorLabel */,
 				E57ADDC82D5F8A08001BCED0 /* SnapKit */,
 				E5FCD05E2D632C1500C8DB4B /* Zip */,
+				E59D9C7A2D63C3CA009A53F6 /* TeXEngine */,
 			);
 			productName = ChatShare;
 			productReference = E5418EEC2D51F06F00A6655C /* ChatShare.app */;
@@ -181,6 +180,7 @@
 				E57ADDBF2D5F3429001BCED0 /* XCRemoteSwiftPackageReference "FPSMonitorLabel" */,
 				E57ADDC72D5F8A08001BCED0 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				E5FCD05D2D632C1500C8DB4B /* XCRemoteSwiftPackageReference "Zip" */,
+				E59D9C792D63C3CA009A53F6 /* XCLocalSwiftPackageReference "TeXEngine" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E5418EED2D51F06F00A6655C /* Products */;
@@ -446,6 +446,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
+		E59D9C792D63C3CA009A53F6 /* XCLocalSwiftPackageReference "TeXEngine" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = TeXEngine;
+		};
 		E5C907BC2D57845000730092 /* XCLocalSwiftPackageReference "Localization" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Localization;
@@ -571,6 +575,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E57ADDC72D5F8A08001BCED0 /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
+		};
+		E59D9C7A2D63C3CA009A53F6 /* TeXEngine */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TeXEngine;
 		};
 		E5C907BD2D57845000730092 /* Localization */ = {
 			isa = XCSwiftPackageProductDependency;

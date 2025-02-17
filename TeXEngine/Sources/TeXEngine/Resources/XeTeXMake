@@ -1,0 +1,105 @@
+CC=emcc
+CXX=em++
+DEBUGFLAGS = -O3
+
+CFLAGS = $(DEBUGFLAGS) -Wno-parentheses-equality \
+-Wno-pointer-sign \
+ -DWEBASSEMBLY_BUILD\
+  -D__SyncTeX__ \
+  -DHAVE_CONFIG_H \
+  -DHAVE_STDBOOL_H \
+  -DHAVE_ZLIB \
+  -DWEBASSEMBLY_DEBUG \
+ -s USE_FREETYPE=1 \
+ -s USE_ICU=1 \
+ -s USE_LIBPNG=1 \
+ -s USE_ZLIB=1 \
+ -fno-rtti \
+ -fno-exceptions
+
+LDFLAGS =  $(DEBUGFLAGS) \
+ --js-library ./wasm/LibraryMerge.js \
+ -s USE_FREETYPE=1 \
+ -s USE_ICU=1 \
+ -s USE_ZLIB=1 \
+ -s USE_LIBPNG=1 \
+ --pre-js ./wasm/Variable.js \
+ --pre-js ./wasm/LifeCycle.js \
+ --pre-js ./wasm/Compile.js \
+ --pre-js ./wasm/Utility.js \
+ --pre-js ./wasm/FileQuery.js \
+ -s EXPORTED_FUNCTIONS='["_engine_compile_bibtex", "_engine_compile_tex", "_engine_compile_tex_fmt", "_engine_compile_tex_to_xdv", "_main", "_dpx_convert_xdv_to_pdf"]' \
+ -s NO_EXIT_RUNTIME=1 \
+ -s EXPORTED_RUNTIME_METHODS='["ccall", "cwrap","allocate"]' \
+ -s WASM=1 \
+ -s ALLOW_MEMORY_GROWTH=1 \
+ -s LLD_REPORT_UNDEFINED \
+ -s ASSERTIONS 
+
+LINKFLAG = $(CXX) -o $@ $(LDFLAGS) 
+
+texsources = xetex/tex/xetex0.c \
+xetex/tex/xetexini.c \
+xetex/tex/xetex-pool.c  \
+xetex/libmd5/md5.c \
+xetex/kpathsea/xmemory.c \
+xetex/kpathsea/texfile.c  \
+xetex/kpathsea/kpseemu.c \
+xetex/kpathsea/texmfmp.c \
+xetex/main.c \
+xetex/bibtex/bibtex.c \
+xetex/synctexdir/synctex.c \
+xetex/xetexdir/XeTeX_ext.c \
+xetex/xetexdir/XeTeX_pic.c \
+xetex/xetexdir/image/bmpimage.c \
+xetex/xetexdir/image/jpegimage.c \
+xetex/xetexdir/image/pngimage.c \
+xetex/xetexdir/image/mfileio.c \
+xetex/xetexdir/image/numbers.c \
+xetex/xetexdir/trans.c \
+xetex/xetexdir/font/XeTeXFontMgr_js_font.c \
+xetex/libparson/parson.c
+			
+xetexsources = xetex/xetexdir/XeTeXOTMath.cpp \
+xetex/xetexdir/XeTeXLayoutInterface.cpp \
+xetex/xetexdir/XeTeXFontMgr.cpp \
+xetex/xetexdir/XeTeXFontInst.cpp \
+xetex/xetexdir/font/XeTeXFontMgr_js.cpp \
+xetex/xetexdir/hz.cpp \
+xetex/xetexdir/pdfimage.cpp
+
+teckitsources = xetex/teckit/teckit-Engine.cpp 
+
+jssources = $(wildcard wasm/*.js)
+
+libdpxsources =  $(wildcard xetex/libdpx/*.c)
+
+texobjects = $(texsources:.c=.o)
+
+xetexobjects = $(xetexsources:.cpp=.o)
+
+teckitobjects = $(teckitsources:.cpp=.o)
+
+libdpxobjects = $(libdpxsources:.c=.o)
+
+xetex.js: $(texobjects) $(libdpxobjects) $(xetexobjects) $(teckitobjects) $(jssources) 
+	$(LINKFLAG) $(texobjects) $(xetexobjects) $(teckitobjects) xetex/graphite2/libgraphite2.a xetex/harfbuzz/libharfbuzz.a xetex/pplib/pplib.a $(libdpxobjects) 
+
+$(texobjects): %.o: %.c
+	$(CC) -c $(CFLAGS) -I ./xetex/ -I xetex/tex/ -I xetex/kpathsea/ -I xetex/harfbuzz/ -I xetex/pplib/src -I xetex/libmd5/ -I xetex/bibtex/ $< -o $@
+
+$(libdpxobjects): %.o: %.c  
+	$(CC) -c $(CFLAGS) -I ./xetex/ -I xetex/libmd5/ $< -o $@
+
+$(xetexobjects): %.o: %.cpp
+	$(CXX) -c $(CFLAGS) -I ./xetex/ -I xetex/tex/ -I xetex/kpathsea/ -I xetex/libmd5/ -I xetex/xetexdir/ -I xetex/pplib/src -I xetex/harfbuzz/ -I xetex/bibtex/ $< -o $@
+
+$(teckitobjects): %.o: %.cpp
+	$(CXX) -c $(CFLAGS) -I ./xetex/ -I xetex/kpathsea/ -I xetex/libmd5/ -I xetex/teckit/  $< -o $@
+
+clean:
+	rm -f xetex/*.o xetex/tex/*.o xetex/xetexdir/*.o xetex/xetexdir/image/*.o xetex/xetexdir/font/*.o xetex/teckit/*.o xetex/bibtex/*.o xetex/libdpx/*.o xetex/libmd5/*.o xetex/kpathsea/*.o xetex/synctexdir/*.o
+
+cleanAll:
+	rm -f xetex/*.o xetex/tex/*.o xetex/xetexdir/*.o xetex/xetexdir/image/*.o xetex/xetexdir/font/*.o xetex/teckit/*.o xetex/bibtex/*.o xetex/libdpx/*.o xetex/libmd5/*.o xetex/kpathsea/*.o xetex/synctexdir/*.o XeTeX.wasm XeTeX.js
+	

@@ -140,6 +140,7 @@ public final class DownTeX {
         return try await unsafe_convertToLaTeX(markdownString: markdownString)
     }
     
+    
     func unsafe_convertToLaTeX(markdownString: String) async throws(OperationError) -> String {
         if markdownString.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             throw .illegalTextContent

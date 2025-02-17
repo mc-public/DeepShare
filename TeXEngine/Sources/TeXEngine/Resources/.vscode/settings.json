@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "uexit.h": "c",
+        "xetexd.h": "c",
+        "dvipdfmx-wasm.h": "c",
+        "stdbool.h": "c"
+    }
+}

@@ -18,11 +18,11 @@ struct ChatShareApp: App {
                     DownTeX.placeHolder
                         .ignoresSafeArea(.all, edges: .all)
                 }
-                .task {
-                    do {
-                        try await DownTeX.current.convertToLaTeX(markdownString: "你好世界")
-                    } catch {
-                        print(error)
+                .onAppear {
+                    Task {
+                        for model in QADataManager.current.allModels {
+                            //try await DownTeX.current.convertToPDFData(markdown: model.answer, template: QATemplateManager.current.defaultTemplate, config: .init(fontSize: .pt14, preferredPageSize: .init(width: 375, height: 500), preferredLayoutRect: .init(x: 0, y: 0, width: 375, height: 500)))
+                        }
                     }
                 }
         }

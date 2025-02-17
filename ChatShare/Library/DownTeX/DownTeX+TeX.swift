@@ -5,7 +5,8 @@
 //  Created by 孟超 on 2025/2/17.
 //
 
-import libxetex
+//import libxetex
+import Foundation
 
 extension DownTeX {
     /// Available font sizes.
@@ -64,6 +65,17 @@ extension DownTeX {
         }
     }
     
+    func convertToPDFData(markdown: String, template: QATemplateModel, config: ConvertConfiguration) async throws(OperationError) -> Data {
+        
+        if self.state == .initFailed { throw .resourceFailured }
+        while self.state != .ready {
+            try? await Task.sleep(for: .microseconds(10))
+        }
+        self.state = .running
+        defer { self.state = .ready }
+        return try await unsafe_convertToPDFData(markdown: markdown, template: template, config: config)
+    }
+    
     func unsafe_convertToPDFData(markdown: String, template: QATemplateModel, config: ConvertConfiguration) async throws(OperationError) -> Data {
         let latexContent = try await self.unsafe_convertToLaTeX(markdownString: markdown)
         guard let templateResult = QATemplateManager.current.renderingResult(for: template, preferredSize: config.preferredPageSize) else {
@@ -88,9 +100,10 @@ extension DownTeX {
         if FileManager.default.createFile(atPath: texURL.path(percentEncoded: false), contents: self.template(markdownContent: latexContent, config: newConfig).data(using: .utf8)) == false {
             throw .fileOperationFailured
         }
-        XeTeXEngine.setUsingPDFCompression(false)
-        await XeTeXEngine.setTeXLiveResourceWithDirectoryURL(Resources.TeXResources)
-        await XeTeXEngine.typesetting(texURL, format: .latex)
+        //TODO: Binding TeXEngine Package.
+        //XeTeXEngine.setUsingPDFCompression(false)
+//        await XeTeXEngine.setTeXLiveResourceWithDirectoryURL(Resources.TeXResources)
+        //await XeTeXEngine.typesetting(texURL, format: .latex)
         guard FileManager.default.fileExists(at: pdfURL) else {
             throw .illegalTextContent
         }
@@ -126,14 +139,14 @@ extension DownTeX {
 }
 \\xeCJKsetup{CheckSingle,CJKmath=true}
 
-\\setmathrm{Latin Modern Math}
-\\setmainfont{SFPro-Regular}
+\\setmathrm{LatinModernMath-Regular}
+\\setmainfont{SFProDisplay-Regular}
 % \\setsansfont{SFPro-Regular}
 \\setmonofont{SFMono-Regular}
-\\setCJKmainfont[AutoFakeSlant=true,BoldFont=PingFangSC-Medium]{PingFangSC-Regular}
-\\setCJKfamilyfont{songti}{PingFangSC-Regular}
-\\setCJKfamilyfont{heiti}{PingFangSC-Regular}
-\\setCJKfamilyfont{kaishu}{PingFangSC-Regular}
+\\setCJKmainfont[AutoFakeSlant=true,BoldFont=.PingFang-SC-Semibold]{PingFang-SC-Regular}
+\\setCJKfamilyfont{songti}{PingFang-SC-Regular}
+\\setCJKfamilyfont{heiti}{PingFang-SC-Regular}
+\\setCJKfamilyfont{kaishu}{PingFang-SC-Regular}
 \\newcommand{\\songti}{\\CJKfamily{songti}}
 \\newcommand{\\heiti}{\\CJKfamily{heiti}}
 \\newcommand{\\kaishu}{\\CJKfamily{kaishu}}
