@@ -86,7 +86,7 @@ public class TeXEngine: TeXEngineProvider, ObservableObject {
     }
     
     /// 当前供其它视图展示的视图
-    var webViewHolder: UIViewHolder
+    fileprivate var webViewHolder: UIViewHolder
     
     /// 当前的网络视图
     var webView: WKWebView? {
@@ -182,7 +182,7 @@ public class TeXEngine: TeXEngineProvider, ObservableObject {
     /// - Parameter querier: 注入到该网络视图的文件查询器。
     /// - Parameter scheme: 注入到该网络视图的 `URL` 域名。
     /// - Returns: 返回设置的结果，`true` 表示设置时成功，`false` 表示设置时出现错误。
-    private func setWebView<T: FileQueryProvider>(fileQuerier: T, scheme: String = "texengine") throws  {
+    private func setWebView<T: FileQueryProvider>(fileQuerier: T, scheme: String = "texengine") throws(EngineError)  {
         let userContentController = WKUserContentController()
         userContentController.add(self.outputDelegate, name: self.outputDelegate.contentID)
         let config = WKWebViewConfiguration()

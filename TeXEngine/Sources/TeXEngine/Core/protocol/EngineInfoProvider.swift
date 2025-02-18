@@ -12,14 +12,15 @@ import SwiftUI
 public struct EngineType: Equatable, Sendable {
     let rawValue: String
     public static let xetex = Self(rawValue: "xetex")
+    @available(*, unavailable)
     public static let pdftex = Self(rawValue: "pdftex")
     
     func createEngineInfo() -> EngineInfoProvider {
         switch self {
         case .xetex:
             return XeTeXEngineInfo()
-        case .pdftex:
-            return PDFTeXEngineInfo()
+        //case .pdftex:
+        //    return PDFTeXEngineInfo()
         default:
             fatalError("[TeXEngine][Internal]此情形不应出现，请联系框架开发者邮箱：3100489505@qq.com 或者在 Github 上报告此问题。")
         }

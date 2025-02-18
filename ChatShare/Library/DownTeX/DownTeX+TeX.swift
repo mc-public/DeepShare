@@ -89,28 +89,7 @@ extension DownTeX {
                 CGRect(origin: .zero, size: pageImage.size)
             )
         )
-        let newFolder = URL.documentsDirectory.appendingPathComponent(UUID().uuidString, conformingTo: .folder)
-        let texURL = newFolder.appending(path: UUID().uuidString + ".tex")
-        let pdfURL = texURL.deletingPathExtension().appendingPathExtension("pdf")
-        do {
-            try FileManager.default.createDirectory(at: newFolder, withIntermediateDirectories: true)
-        } catch {
-            throw .fileOperationFailured
-        }
-        if FileManager.default.createFile(atPath: texURL.path(percentEncoded: false), contents: self.template(markdownContent: latexContent, config: newConfig).data(using: .utf8)) == false {
-            throw .fileOperationFailured
-        }
-        //TODO: Binding TeXEngine Package.
-        //XeTeXEngine.setUsingPDFCompression(false)
-//        await XeTeXEngine.setTeXLiveResourceWithDirectoryURL(Resources.TeXResources)
-        //await XeTeXEngine.typesetting(texURL, format: .latex)
-        guard FileManager.default.fileExists(at: pdfURL) else {
-            throw .illegalTextContent
-        }
-        guard let data = try? Data(contentsOf: pdfURL) else {
-            throw .illegalTextContent
-        }
-        return data
+        return try await self.unsafe_compileToPDF(latexString: self.template(markdownContent: latexContent, config: newConfig))
     }
     
     //MARK: - Template Content

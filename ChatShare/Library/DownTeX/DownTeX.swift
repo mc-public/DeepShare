@@ -8,6 +8,7 @@
 import SwiftUI
 import UIKit
 import WebKit
+import TeXEngine
 
 /// A class for executing Markdown to LaTeX and PDF conversion.
 @Observable @MainActor
@@ -23,12 +24,19 @@ public final class DownTeX {
     //MARK: Pandoc View Configuration
     public typealias PandocView = UIDynamicView<WKWebView>
     
-    private struct PlaceHolder: UIViewRepresentable {
+    private struct PandocPlaceHolder: UIViewRepresentable {
         func makeUIView(context: Context) -> DownTeX.PandocView { DownTeX.pandocView }
         func updateUIView(_ uiView: DownTeX.PandocView, context: Context) {}
     }
     
-    static var placeHolder: some View { PlaceHolder() }
+    private struct TeXPlaceHolder: UIViewRepresentable {
+        func makeUIView(context: Context) -> UIView { DownTeX.LaTeXEngine.view }
+        func updateUIView(_ uiView: UIView, context: Context) {}
+    }
+    /// The place holder view for current controller.
+    static var placeHolder: some View {
+        VStack { PandocPlaceHolder(); TeXPlaceHolder() }
+    }
     
     /// An enumeration representing the state of the current class.
     public enum State {
@@ -72,6 +80,8 @@ public final class DownTeX {
         WKWebView(frame: .zero, configuration: DownTeX.PandocViewConfiguration)
     }
     
+    private static let LaTeXEngine = TeXEngine(engineType: .xetex)
+    
     private init() {
         self.state = .initializing
         self.navigationDelegate.downTeX = self
@@ -83,12 +93,33 @@ public final class DownTeX {
         }
         Task {
             await self.unsafe_configurePandocView()
+            await self.unsafe_configureTeXEngine()
             self.state = .ready
         }
     }
     
+    private func unsafe_configureTeXEngine(onCompletion: @escaping () async throws -> ()) {
+        Task {
+            await self.unsafe_configureTeXEngine()
+            try await onCompletion()
+        }
+    }
+    
+    private func unsafe_configureTeXEngine() async {
+        do {
+            try await Self.LaTeXEngine.loadEngine(texlive: Resources.TeXResources)
+        } catch {
+            if Self.LaTeXEngine.state == .crashed {
+                await unsafe_configureTeXEngine()
+                return
+            } else {
+                fatalError("[\(Self.self)][\(#function)] Fatal unknown error occurred about the `TeX-Resource-Files`.")
+            }
+        }
+    }
+    
     /// Configure the web page loading for `PandocView`.
-    private func configurePandocView(onCompletion: @escaping () async throws -> ()) {
+    private func unsafe_configurePandocView(onCompletion: @escaping () async throws -> ()) {
         Task {
             await self.unsafe_configurePandocView()
             try await onCompletion()
@@ -130,6 +161,9 @@ public final class DownTeX {
         }
     }
     
+    /// Convert specific Markdown string to LaTeX string.
+    ///
+    /// - Parameter markdownString: The markdown string.
     public func convertToLaTeX(markdownString: String) async throws(OperationError) -> String {
         if self.state == .initFailed { throw .resourceFailured }
         while self.state != .ready {
@@ -140,6 +174,29 @@ public final class DownTeX {
         return try await unsafe_convertToLaTeX(markdownString: markdownString)
     }
     
+    func unsafe_compileToPDF(latexString: String) async throws(OperationError) -> Data {
+        let latexString = latexString.trimmingCharacters(in: .whitespacesAndNewlines)
+        if latexString.isEmpty {
+            throw .illegalTextContent
+        }
+        let texURL = URL.temporaryDirectory.appending(path: UUID().uuidString + ".tex")
+        if !FileManager.default.createFile(atPath: texURL.path(percentEncoded: false), contents: latexString.data(using: .utf8)) {
+            throw .fileOperationFailured
+        }
+        let result: CompileResult?
+        do {
+            result = try await Self.LaTeXEngine.compileTeX(by: .latex, tex: texURL)
+        } catch {
+            print(error)
+            try? await Self.LaTeXEngine.reloadEngineCore()
+            return try await self.unsafe_compileToPDF(latexString: latexString)
+        }
+        if let data = result?.pdf {
+            return data
+        } else {
+            throw OperationError.illegalTextContent
+        }
+    }
     
     func unsafe_convertToLaTeX(markdownString: String) async throws(OperationError) -> String {
         if markdownString.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -163,7 +220,7 @@ public final class DownTeX {
 
 
 extension DownTeX {
-    class NavigationDelegate: NSObject, WKNavigationDelegate {
+    private class NavigationDelegate: NSObject, WKNavigationDelegate {
         weak var downTeX: DownTeX?
     }
 }
