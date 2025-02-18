@@ -153,6 +153,9 @@
         }
       }
     },
+    "OK" : {
+
+    },
     "Oldest First" : {
       "localizations" : {
         "zh-Hans" : {
@@ -245,10 +248,7 @@
         }
       }
     },
-    "Share as Long Image" : {
-
-    },
-    "Share as PDF" : {
+    "Share Failured" : {
 
     },
     "Sorted By" : {
@@ -313,9 +313,6 @@
           }
         }
       }
-    },
-    "按段落划分后分享" : {
-
     },
     "请输入Markdown格式的回答" : {
 

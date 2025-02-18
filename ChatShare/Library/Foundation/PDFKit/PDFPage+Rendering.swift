@@ -8,7 +8,29 @@
 import PDFKit
 import UIKit
 
+extension PDFDocument {
+    func pageRects(width: CGFloat, minY: CGFloat) -> [CGRect] {
+        if self.pageCount == 0 { return [] }
+        var result = [CGRect]()
+        for i in 0..<self.pageCount {
+            guard let page = self.page(at: i) else { fatalError() }
+            let previousHeight: CGFloat = (i == 0) ? 0.0 : result[0..<i].reduce(0) { partialResult, new in
+                partialResult + new.height
+            }
+            let size = page.pageSize(width: width)
+            result.append(CGRect(x: 0, y: minY + previousHeight, width: size.width, height: size.height))
+        }
+        return result
+    }
+}
+
 extension PDFPage {
+    
+    func pageSize(width: CGFloat) -> CGSize {
+        let pageSize = self.bounds(for: .mediaBox).size
+        let scale = width / pageSize.width
+        return CGSize(width: width, height: pageSize.height * scale)
+    }
     /// Draw entire-page (from the page's MediaBox) as a `UIImage`.
     func image(width: CGFloat, contentScale: CGFloat) -> UIImage {
         let pageSize = self.bounds(for: .mediaBox).size
@@ -33,10 +55,10 @@ extension PDFPage {
         let renderer = UIGraphicsImageRenderer(size: imageSize, format: renderingFormat)
         let uiImage = renderer.image { context in
             let ctx = context.cgContext
-            let rect = CGRect(origin: .zero, size: imageSize)
+            //let rect = CGRect(origin: .zero, size: imageSize)
             ctx.interpolationQuality = .none
             ctx.setShouldAntialias(false)
-            ctx.fill(rect)
+            //ctx.fill(rect)
             ctx.translateBy(x: 0.0, y: imageSize.height)
             ctx.scaleBy(x: zoomScale, y: -zoomScale)
             ctx.translateBy(x: -contentFrameAtBottomLeading.origin.x, y: -contentFrameAtBottomLeading.origin.y)
