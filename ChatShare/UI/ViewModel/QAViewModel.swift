@@ -107,6 +107,7 @@ final class QAViewModel {
     //MARK: - QARenderingView
     var selectedTemplate: QATemplateModel = QATemplateManager.current.defaultTemplate
     var usingWaterMark = true
+    var usingTitleBorder = true
     var horizontalPagePadding: CGFloat = 20.0
     var pdfResult: ShareFileURL?
     var imageResult: ShareFileURL?

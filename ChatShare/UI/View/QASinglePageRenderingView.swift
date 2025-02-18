@@ -9,41 +9,48 @@ import SwiftUI
 import MarkdownView
 import SVProgressHUD
 import Localization
+import PDFKit
 
 //MARK: - QA Result Display (Rendering) View
 
-struct QARenderingView: QANavigationLeaf {
+struct QASinglePageRenderingView: QANavigationLeaf {
     
     @State var controller = MarkdownState()
     @State var windowSize: CGSize = .zero
     @State var textLayoutSize = CGSize.zero
+    @State var titleCellSize = CGSize.zero
+    @State var scrollViewFrameSize = CGSize.zero
     @Environment(QAViewModel.self) var viewModel: QAViewModel
     
-    var navigationTitleColor: Color {
-        controller.backgroundColor.luminance < 0.5 ? .white : .black
-    }
+    var navigationTitleColor: Color { .dynamicBlack }
     
     var content: some View {
-        QATemplateScrollView(template: viewModel.selectedTemplate, horizontalPadding: viewModel.horizontalPagePadding, content: verticalStack)
-            .scrollBackgroundColor(controller.backgroundColor)
-            .scrollEdgeColor(.top, .bottom, color: controller.backgroundColor)
-            .environment(\.colorScheme, .light)
-            .toolbar(content: toolbarContent)
-            .safeAreaInset(edge: .bottom, alignment: .center, spacing: 0.0) {
-                QARenderingSettingsView(markdownController: $controller)
-                    .frame(maxWidth: .infinity, maxHeight: 0.4 * windowSize.height)
-            }
-            .onGeometryChange(body: { windowSize = $0 })
-            .navigationTitle("Preview")
-            .navigationBarTitleDisplayMode(.inline)
-            .fileShareSheet(item: viewModel.binding(for: \.imageResult))
-            .fileShareSheet(item: viewModel.binding(for: \.pdfResult))
-            .onAppear(perform: onAppear)
-            .onDisappear(perform: SVProgressHUD.dismiss)
-            .environment(\.dynamicTypeSize, .medium)
-            .onChange(of: viewModel.selectedTemplate, initial: true) { _, newValue in
-                controller.backgroundColor = Color(newValue.textBackgroundColor).opacity(0)
-            }
+        QATemplateScrollView(
+            template: viewModel.selectedTemplate,
+            horizontalPadding: viewModel.horizontalPagePadding,
+            textLayoutSize: $textLayoutSize,
+            content: verticalStack
+        )
+        .onGeometryChange(body: { scrollViewFrameSize = $0 })
+        .scrollBackgroundColor(controller.backgroundColor)
+        .scrollEdgeColor(.top, .bottom, color: controller.backgroundColor)
+        .environment(\.colorScheme, .light)
+        .toolbar(content: toolbarContent)
+        .safeAreaInset(edge: .bottom, alignment: .center, spacing: 0.0) {
+            QARenderingSettingsView(markdownController: $controller)
+                .frame(maxWidth: .infinity, maxHeight: 0.4 * windowSize.height)
+        }
+        .onGeometryChange(body: { windowSize = $0 })
+        .navigationTitle("Preview")
+        .navigationBarTitleDisplayMode(.inline)
+        .fileShareSheet(item: viewModel.binding(for: \.imageResult))
+        .fileShareSheet(item: viewModel.binding(for: \.pdfResult))
+        .onAppear(perform: onAppear)
+        .onDisappear(perform: SVProgressHUD.dismiss)
+        .environment(\.dynamicTypeSize, .medium)
+        .onChange(of: viewModel.selectedTemplate, initial: true) { _, newValue in
+            controller.backgroundColor = Color(newValue.textBackgroundColor).opacity(0)
+        }
     }
     
     @ViewBuilder
@@ -56,13 +63,19 @@ struct QARenderingView: QANavigationLeaf {
                 .fontWidth(.condensed)
                 .fontWeight(.bold)
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-            ChatModelInfoCell(chatModel: viewModel.selectedChatAI)
-                .font(.preferredFont(relativeMetric: controller.fontSize, style: .footnote))
-                .frame(maxWidth: .infinity, alignment: .center)
+            if viewModel.usingWaterMark {
+                ChatModelInfoCell(chatModel: viewModel.selectedChatAI)
+                    .font(.preferredFont(relativeMetric: controller.fontSize, style: .footnote))
+                    .frame(maxWidth: .infinity, alignment: .center)
+            }
         }
         .padding(.top, length: 10.0)
-        .padding(.bottom, 5.0)
-        .withCornerBackground(radius: 10.0, style: Material.ultraThinMaterial)
+        .padding(.bottom, viewModel.usingWaterMark ? 5.0 : 10.0)
+        .withCondition(body: { view in
+            if viewModel.usingTitleBorder {
+                view.withCornerBackground(radius: 10.0, style: Material.ultraThinMaterial)
+            } else { view }
+        })
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.horizontal, controller.horizontalPadding)
         .padding(.vertical)
@@ -74,6 +87,7 @@ struct QARenderingView: QANavigationLeaf {
         VStackLayout(alignment: .leading, spacing: 0.0) {
             if !viewModel.questionContent.isEmpty {
                 titleCell
+                    .onGeometryChange(body: { titleCellSize = $0 })
             }
             Markdown(state: $controller)
                 .onRendered(SVProgressHUD.dismiss)
@@ -87,10 +101,10 @@ struct QARenderingView: QANavigationLeaf {
         controller.backgroundColor = .clear
         SVProgressHUD.show()
     }
-
+    
 }
 
-extension QARenderingView {
+extension QASinglePageRenderingView {
     @ToolbarContentBuilder
     func toolbarContent() -> some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
@@ -120,17 +134,41 @@ extension QARenderingView {
     }
     
     func fetchLongImageResult() async -> URL? {
-        guard let image = await controller.container.contentImage(width: nil) else {
+        let templatePreferredSize = QATemplateManager.current.preferredSize(for: viewModel.selectedTemplate, preferredWidth: scrollViewFrameSize.width, preferredTextHeight: textLayoutSize.height)
+        guard let layoutResult = QATemplateManager.current.renderingResult(for: viewModel.selectedTemplate, preferredSize: templatePreferredSize) else {
+            fatalError()
+        }
+        guard let titleCellImage = ImageRenderer(content: self.titleCell.frame(width: titleCellSize.width, height: titleCellSize.height)).uiImage else {
+            fatalError()
+        }
+        let titleCellImageRect = CGRect.init(x: 0.5 * (windowSize.width - titleCellSize.width), y: layoutResult.textRect.minY, width: titleCellSize.width, height: titleCellSize.height)
+        let totalBackgroundImage = await layoutResult.totalImage()
+        guard let contentPDFData = await controller.container.pdfData(), let document = PDFDocument(data: contentPDFData) else {
             return nil
         }
-        guard let pngData = image.pngData() else {
-            return nil
+        
+        //let markdownContentImage
+        let renderFormat = UIGraphicsImageRendererFormat()
+        renderFormat.opaque = true
+        renderFormat.scale = 3.0
+        let renderer = UIGraphicsImageRenderer(size: totalBackgroundImage.size)
+        renderer.image { context in
+            let cgContext = context.cgContext
+            cgContext.setShouldAntialias(false)
+            totalBackgroundImage.draw(in: CGRect(origin: .zero, size: totalBackgroundImage.size))
+            titleCellImage.draw(in: titleCellImageRect)
         }
-        let fileName = viewModel.questionContent.sanitizedFileName(empty: #localized("Untitled"))
-        guard let url = await URL.temporaryFileURL(data: pngData, fileName: fileName, conformTo: .png) else {
-            return nil
-        }
-        return url
+        
+        fatalError()
+//        guard let pngData = image.pngData() else {
+//            return nil
+//        }
+//        
+//        let fileName = viewModel.questionContent.sanitizedFileName(empty: #localized("Untitled"))
+//        guard let url = await URL.temporaryFileURL(data: pngData, fileName: fileName, conformTo: .png) else {
+//            return nil
+//        }
+//        return url
     }
     
     func fetchSplitedImage() async -> UIImage? {
@@ -167,13 +205,12 @@ fileprivate struct QARenderingSettingsView: View {
     var content: some View {
         List {
             Section("Style") {
+                usingWaterMarkLabel
+                usingTitleBorder
                 templateLabel
                 themeLabel
                 fontSizeLabel
                 pageHorizontalPaddingLabel
-//                if markdownController.theme.colorSupport == .dynamic {
-//                    backgroundColorLabel
-//                }
             }
             
         }
@@ -223,6 +260,14 @@ fileprivate struct QARenderingSettingsView: View {
             }
             Slider(value: $markdownController.horizontalPadding, in: 10.0...50.0, step: 1.0, label: {  }, minimumValueLabel: { Image(systemName: "number").imageScale(.small) }, maximumValueLabel: { Image(systemName: "number").imageScale(.medium) })
         }
+    }
+    
+    var usingWaterMarkLabel: some View {
+        Toggle("Display Author", isOn: viewModel.binding(for: \.usingWaterMark))
+    }
+    
+    var usingTitleBorder: some View {
+        Toggle("Title Background", isOn: viewModel.binding(for: \.usingTitleBorder))
     }
 }
 

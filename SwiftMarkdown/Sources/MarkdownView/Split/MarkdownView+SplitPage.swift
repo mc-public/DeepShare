@@ -24,7 +24,7 @@ extension MarkdownView.WebView {
     @available(macOS 14.0, iOS 17.0, *)
     public func contentImage(width: CGFloat?) async -> PlatformImage? {
         let config = WKPDFConfiguration()
-        config.allowTransparentBackground = false
+        config.allowTransparentBackground = true
         guard let pdfData = try? await self.pdf(configuration: config) else {
             return nil
         }
@@ -53,7 +53,7 @@ extension MarkdownView.WebView {
     @available(macOS 14.0, iOS 17.0, *)
     public func contentPDFData(width: CGFloat?) async -> Data? {
         let config = WKPDFConfiguration()
-        config.allowTransparentBackground = false
+        config.allowTransparentBackground = true
         guard let pdfData = try? await self.pdf(configuration: config) else {
             return nil
         }

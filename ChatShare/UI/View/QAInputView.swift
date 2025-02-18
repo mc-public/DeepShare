@@ -119,7 +119,14 @@ extension QAInputView {
                 .foregroundStyle(Color.deepOrange)
         }
         ToolbarItem(placement: .topBarTrailing) {
-            QANavigationLink(QARenderingView.self) {
+            Menu {
+                QANavigationLink(QASinglePageRenderingView.self) {
+                    Text("Convert to Single Picture")
+                }
+                QANavigationLink(QASinglePageRenderingView.self) {
+                    Text("Convert to Splited Pictures")
+                }
+            } label: {
                 Text("Convert")
             }
             .disabled(model.isContentEmpty)

@@ -10,10 +10,12 @@ import SwiftUI
 import SnapKit
 
 struct QATemplateScrollView<Content>: View where Content: View {
+
     let template: QATemplateModel
     let horizontalPadding: CGFloat
+    @Binding var textLayoutSize: CGSize
     let content: () -> Content
-    @State var textLayoutSize = CGSize.zero
+   
     var body: some View {
         GeometryReader { proxy in
             let templatePreferredSize = QATemplateManager.current.preferredSize(for: template, preferredWidth: proxy.size.width, preferredTextHeight: textLayoutSize.height)

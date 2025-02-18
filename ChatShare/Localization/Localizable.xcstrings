@@ -64,6 +64,12 @@
         }
       }
     },
+    "Convert to Single Picture" : {
+
+    },
+    "Convert to Splited Pictures" : {
+
+    },
     "Date Created" : {
       "localizations" : {
         "zh-Hans" : {
@@ -93,6 +99,9 @@
           }
         }
       }
+    },
+    "Display Author" : {
+
     },
     "History" : {
       "localizations" : {
@@ -291,6 +300,9 @@
           }
         }
       }
+    },
+    "Title Background" : {
+
     },
     "Untitled" : {
       "localizations" : {

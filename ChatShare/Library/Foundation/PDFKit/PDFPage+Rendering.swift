@@ -9,6 +9,12 @@ import PDFKit
 import UIKit
 
 extension PDFPage {
+    /// Draw entire-page (from the page's MediaBox) as a `UIImage`.
+    func image(width: CGFloat, contentScale: CGFloat) -> UIImage {
+        let pageSize = self.bounds(for: .mediaBox).size
+        let scale = width / pageSize.width
+        return self.image(contentFrame: CGRect(origin: .zero, size: pageSize), contentScale: contentScale, zoomScale: scale)
+    }
     
     /// Draw a rectangle from the page's MediaBox as a `UIImage`.
     ///
@@ -30,7 +36,6 @@ extension PDFPage {
             let rect = CGRect(origin: .zero, size: imageSize)
             ctx.interpolationQuality = .none
             ctx.setShouldAntialias(false)
-//            ctx.setRenderingIntent(.defaultIntent)
             ctx.fill(rect)
             ctx.translateBy(x: 0.0, y: imageSize.height)
             ctx.scaleBy(x: zoomScale, y: -zoomScale)
