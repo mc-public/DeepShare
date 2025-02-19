@@ -296,6 +296,11 @@
             window.webkit.messageHandlers.sizeChangeHandler.postMessage(rect.height)
         });
         resizeObserver.observe(markdownRenderedElement);
+        
+        window.send_window_size_message = () => {
+            let rect = document.getElementById(`markdown-rendered`).getBoundingClientRect();
+            window.webkit.messageHandlers.sizeChangeHandler.postMessage(rect.height)
+        };
     </script>
 </body>
 

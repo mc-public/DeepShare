@@ -158,6 +158,12 @@ fileprivate struct QARenderingSettingsView: View {
                 .dynamicTypeSize(.small)
         }
         .background(Material.ultraThick, ignoresSafeAreaEdges: .all)
+        .onChange(of: viewModel.verticalPagePadding, initial: true, { _, newValue in
+            markdownController.bottomPadding = newValue
+        })
+        .onChange(of: viewModel.horizontalPagePadding, initial: true, { _, newValue in
+            markdownController.horizontalPadding = newValue
+        })
     }
     
     var content: some View {
@@ -168,7 +174,8 @@ fileprivate struct QARenderingSettingsView: View {
                 QAPageSettingLabel.templateLabel(viewModel: viewModel)
                 themeLabel
                 fontSizeLabel
-                QAPageSettingLabel.pageHorizontalPaddingLabel(markdownController: markdownController)
+                QAPageSettingLabel.pageHorizontalPaddingLabel(viewModel: viewModel, markdownState: markdownController)
+                QAPageSettingLabel.pageVerticalPaddingLabel(viewModel: viewModel)
             }
         }
         .scrollContentBackground(.hidden)

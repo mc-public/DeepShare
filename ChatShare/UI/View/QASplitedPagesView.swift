@@ -131,6 +131,12 @@ struct QASplitedPagesSettingsView: View {
         .onChange(of: selectedFontSize, initial: true) { _, newValue in
             markdownState.fontSize = newValue.pointSize
         }
+        .onChange(of: viewModel.verticalPagePadding, initial: true, { _, newValue in
+            markdownState.bottomPadding = newValue
+        })
+        .onChange(of: viewModel.horizontalPagePadding, initial: true, { _, newValue in
+            markdownState.horizontalPadding = newValue
+        })
     }
     
     var content: some View {
@@ -139,7 +145,8 @@ struct QASplitedPagesSettingsView: View {
                 QAPageSettingLabel.usingWaterMarkLabel(viewModel: viewModel)
                 QAPageSettingLabel.usingTitleBorder(viewModel: viewModel)
                 QAPageSettingLabel.templateLabel(viewModel: viewModel)
-                QAPageSettingLabel.pageHorizontalPaddingLabel(markdownController: markdownState)
+                QAPageSettingLabel.pageHorizontalPaddingLabel(viewModel: viewModel, markdownState: markdownState)
+                QAPageSettingLabel.pageVerticalPaddingLabel(viewModel: viewModel)
                 rotationLabel
                 fontSizeLabel
             }

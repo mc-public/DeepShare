@@ -369,6 +369,16 @@
         }
       }
     },
+    "Vertical Page Margins" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "垂直页边距"
+          }
+        }
+      }
+    },
     "请输入Markdown格式的回答" : {
 
     },

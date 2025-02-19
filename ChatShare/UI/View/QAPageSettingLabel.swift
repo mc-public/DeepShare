@@ -11,16 +11,30 @@ import MarkdownView
 struct QAPageSettingLabel {
     private init() {}
     @MainActor
-    static func pageHorizontalPaddingLabel(markdownController: MarkdownState) -> some View {
+    static func pageHorizontalPaddingLabel(viewModel: QAViewModel, markdownState: MarkdownState) -> some View {
         VStack {
             HStack {
                 Text("Horizontal Page Margins")
                 Spacer()
-                Text(String(format: "%.1f", markdownController.horizontalPadding) + " pt")
+                Text(String(format: "%.1f", viewModel.horizontalPagePadding) + " pt")
                     .foregroundStyle(.secondary)
             }
-            @Bindable var state = markdownController
-            Slider(value: $state.horizontalPadding, in: markdownController.horizontalPaddingRange, step: 1.0, label: {  }, minimumValueLabel: { Image(systemName: "number").imageScale(.small) }, maximumValueLabel: { Image(systemName: "number").imageScale(.medium) })
+            @Bindable var state = viewModel
+            Slider(value: $state.horizontalPagePadding, in: markdownState.horizontalPaddingRange, step: 1.0, label: {  }, minimumValueLabel: { Image(systemName: "number").imageScale(.small) }, maximumValueLabel: { Image(systemName: "number").imageScale(.medium) })
+        }
+    }
+    
+    @MainActor
+    static func pageVerticalPaddingLabel(viewModel: QAViewModel) -> some View {
+        VStack {
+            HStack {
+                Text("Vertical Page Margins")
+                Spacer()
+                Text(String(format: "%.1f", viewModel.verticalPagePadding) + " pt")
+                    .foregroundStyle(.secondary)
+            }
+            @Bindable var state = viewModel
+            Slider(value: $state.verticalPagePadding, in: 0...100.0, step: 1.0, label: {  }, minimumValueLabel: { Image(systemName: "number").imageScale(.small) }, maximumValueLabel: { Image(systemName: "number").imageScale(.medium) })
         }
     }
     

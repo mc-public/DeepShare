@@ -129,6 +129,17 @@ document.getElementById('markdown-rendered').style.paddingRight = '\(length)pt';
         )
     }
     
+    func updateVerticalPadding(top: CGFloat, bottom: CGFloat) async {
+        _ = try? await self.evaluateJavaScript(
+"""
+document.getElementById('markdown-rendered').style.paddingTop = '\(top)pt';
+document.getElementById('markdown-rendered').style.paddingBottom = '\(bottom)pt';
+window.send_window_size_message();
+1;
+"""
+        )
+    }
+    
     @available(macOS 14.0, iOS 17.0, *)
     func updateTheme(for theme: MarkdownView.Theme) async {
         _ = try? await self.evaluateJavaScript(

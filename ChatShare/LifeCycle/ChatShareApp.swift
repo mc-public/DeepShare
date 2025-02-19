@@ -14,13 +14,13 @@ struct ChatShareApp: App {
     var body: some Scene {
         WindowGroup {
             QANavigationView()
-                .background {
-                    DownTeX.placeHolder
-                        .ignoresSafeArea(.all, edges: .all)
-                }
-                .onAppear {
-                    Task {
-                        _ = DownTeX.current
+//                .background {
+//                    DownTeX.placeHolder
+//                        .ignoresSafeArea(.all, edges: .all)
+//                }
+//                .onAppear {
+//                    Task {
+//                        _ = DownTeX.current
 //                        for model in QADataManager.current.allModels {
 //                            let data = try? await DownTeX.current.convertToPDFData(markdown: model.answer, template: QATemplateManager.current.defaultTemplate, config: .init(fontSize: .pt14, preferredPageSize: .init(width: 375, height: 500), preferredLayoutRect: .init(x: 0, y: 0, width: 375, height: 500), allowTextOverflow: true))
 //                            if let data {
@@ -28,8 +28,8 @@ struct ChatShareApp: App {
 //                            }
 //                            
 //                        }
-                    }
-                }
+//                    }
+//                }
         }
     }
 }

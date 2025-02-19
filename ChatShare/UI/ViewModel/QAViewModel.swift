@@ -109,7 +109,8 @@ final class QAViewModel {
     var usingWaterMark = true
     var usingTitleBorder = true
     var isShowingShareFailuredAlert = false
-    var horizontalPagePadding: CGFloat = 20.0
+    var horizontalPagePadding: CGFloat = 0.0
+    var verticalPagePadding: CGFloat = 10.0
     var pdfResult: ShareFileURL?
     var imageResult: ShareFileURL?
     var pageRotation: QAPageRotation = .rotation4To3

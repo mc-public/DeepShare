@@ -89,6 +89,25 @@ public class MarkdownState {
         }
     }
     
+    
+    /// The bottom padding about the Markdown page.
+    ///
+    /// The default value is `0.0`.
+    public var bottomPadding: CGFloat = 0.0 {
+        didSet {
+            Task { await applyStyle() }
+        }
+    }
+    
+    /// The top padding about the Markdown page.
+    ///
+    /// The default value is `0.0`.
+    public var topPadding: CGFloat = 0.0 {
+        didSet {
+            Task { await applyStyle() }
+        }
+    }
+    
     /// The background color about the Markdown content.
     ///
     /// The default color is `.white`.
@@ -128,6 +147,7 @@ public class MarkdownState {
         await container.updateTheme(for: theme)
         await container.updateFontSize(fontSize)
         await container.updateHorizontalPadding(horizontalPadding)
+        await container.updateVerticalPadding(top: topPadding, bottom: bottomPadding)
     }
     
     /// Create a `Markdown` state.

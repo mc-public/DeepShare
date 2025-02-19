@@ -65,7 +65,8 @@ struct QARenderingContentView: View {
             }
         })
         .padding(.horizontal, controller.horizontalPadding)
-        .padding(.vertical)
+        .padding(.bottom)
+        .padding(.top, viewModel.verticalPagePadding)
     }
 }
 
