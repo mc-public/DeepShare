@@ -9,6 +9,31 @@ import UIKit
 import SwiftUI
 import SnapKit
 
+struct QATemplateRotationView<Content>: View where Content: View {
+    let template: QATemplateModel
+    let pageRotation: QAPageRotation
+    let horizontalPadding: CGFloat
+    let content: () -> Content
+    
+    var body: some View {
+        GeometryReader { proxy in
+            let size = pageRotation.size(width: proxy.size.width)
+            let templatePreferredSize = QATemplateManager.current.preferredSize(for: template, preferredWidth: proxy.size.width, preferredTextHeight: size.height)
+            let containerLayout = QATemplateManager.current.pageRects(for: template, preferredSize: templatePreferredSize)
+            QATemplateView(template: template, horizontalPadding: horizontalPadding, preferredSize: templatePreferredSize) {
+                textContent
+                    .frame(maxHeight: containerLayout?.layoutRect.height ?? 0.0)
+            }
+        }
+    }
+    
+    var textContent: some View {
+        VStackLayout(alignment: .center, spacing: 0.0) {
+            content()
+        }
+    }
+}
+
 struct QATemplateScrollView<Content>: View where Content: View {
 
     let template: QATemplateModel
@@ -19,25 +44,8 @@ struct QATemplateScrollView<Content>: View where Content: View {
     var body: some View {
         GeometryReader { proxy in
             let templatePreferredSize = QATemplateManager.current.preferredSize(for: template, preferredWidth: proxy.size.width, preferredTextHeight: textLayoutSize.height)
-            let containerLayout = QATemplateManager.current.pageRects(for: template, preferredSize: templatePreferredSize)
-            let totalSize = containerLayout?.pageSize ?? .zero
-            let layoutRect = containerLayout?.layoutRect ?? .zero
-            ScrollView(.vertical) {
-                Frame(totalSize, alignment: .top) {
-                    VStack(alignment: .center, spacing: 0.0) {
-                        Rectangle()
-                            .fill(.clear)
-                            .frame(height: containerLayout?.layoutRect.minY ?? 0.0)
-                        Frame(width: max(0.0, layoutRect.width - horizontalPadding), height: layoutRect.height, alignment: .top) {
-                            textContent
-                        }
-//                        .border(.yellow, width: 5.0)
-                    }
-                }
-//                .border(.black, width: 10)
-                .background(alignment: .topLeading) {
-                    QATemplateView(template: template, size: totalSize)
-                }
+            QATemplateView(template: template, horizontalPadding: horizontalPadding, preferredSize: templatePreferredSize) {
+                textContent
             }
         }
     }
@@ -53,11 +61,32 @@ struct QATemplateScrollView<Content>: View where Content: View {
     }
 }
 
-struct QATemplateView: View {
+fileprivate struct QATemplateView<Content>: View where Content: View {
     let template: QATemplateModel
-    let size: CGSize
+    let horizontalPadding: CGFloat
+    let preferredSize: CGSize
+    let content: () -> Content
     var body: some View {
-        QATemplateDisplayView(template: template, size: size)
+        let containerLayout = QATemplateManager.current.pageRects(for: template, preferredSize: preferredSize)
+        let totalSize = containerLayout?.pageSize ?? .zero
+        let layoutRect = containerLayout?.layoutRect ?? .zero
+        ScrollView(.vertical) {
+            Frame(totalSize, alignment: .top) {
+                VStack(alignment: .center, spacing: 0.0) {
+                    Rectangle()
+                        .fill(.clear)
+                        .frame(height: containerLayout?.layoutRect.minY ?? 0.0)
+                    Frame(width: max(0.0, layoutRect.width - horizontalPadding), height: layoutRect.height, alignment: .top) {
+                        content()
+                    }
+//                        .border(.yellow, width: 5.0)
+                }
+            }
+//                .border(.black, width: 10)
+            .background(alignment: .topLeading) {
+                QATemplateDisplayView(template: template, size: totalSize)
+            }
+        }
     }
 }
 

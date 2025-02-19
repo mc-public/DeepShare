@@ -21,11 +21,6 @@ struct QAInputView: QANavigationLeaf {
             VStackLayout(spacing: 0.0) {
                 textInputStack(height: proxy.size.height)
             }
-//            .sheet(isPresented: model.binding(for: \.isShowingPreviewer)) {
-//                QARenderingView()
-//                    .environment(navigation)
-//                    .environment(model)
-//            }
         }
         .navigationBarTitleDisplayMode(.inline)
         .background(Color.listBackgroundColor, ignoresSafeAreaEdges: .all)
@@ -121,10 +116,10 @@ extension QAInputView {
         ToolbarItem(placement: .topBarTrailing) {
             Menu {
                 QANavigationLink(QASinglePageRenderingView.self) {
-                    Text("Convert to Single Picture")
+                    Text("Convert To Long Image")
                 }
-                QANavigationLink(QASinglePageRenderingView.self) {
-                    Text("Convert to Splited Pictures")
+                QANavigationLink(QASplitedPagesView.self) {
+                    Text("Convert to Short Image Slices")
                 }
             } label: {
                 Text("Convert")

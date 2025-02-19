@@ -245,6 +245,7 @@ public class TeXEngine: TeXEngineProvider, ObservableObject {
             self.setState(.crashed)
             throw EngineError.engineCoreLoadingFailured
         } else {
+            try? await Task.sleep(for: .seconds(1.0))
             self.setState(.ready)
         }
     }

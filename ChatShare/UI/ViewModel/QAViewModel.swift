@@ -104,7 +104,7 @@ final class QAViewModel {
         }
     }
     
-    //MARK: - QARenderingView
+    //MARK: - QARenderingOptions
     var selectedTemplate: QATemplateModel = QATemplateManager.current.defaultTemplate
     var usingWaterMark = true
     var usingTitleBorder = true
@@ -112,5 +112,5 @@ final class QAViewModel {
     var horizontalPagePadding: CGFloat = 20.0
     var pdfResult: ShareFileURL?
     var imageResult: ShareFileURL?
-    
+    var pageRotation: QAPageRotation = .rotationThreeFour
 }

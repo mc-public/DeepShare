@@ -272,17 +272,3 @@ fileprivate struct QARenderingSettingsView: View {
 }
 
 
-//MARK: - Chat Robot Display Cell
-fileprivate struct ChatModelInfoCell: View {
-    let chatModel: QAChatAIModel
-    var body: some View {
-        HStackLayout(alignment: .firstTextBaseline) {
-            Image(systemName: "checkmark.icloud.fill")
-                .foregroundStyle(.green)
-            Text(chatModel.rawValue)
-                .foregroundStyle(.secondary)
-                .fontDesign(.monospaced)
-                .fontWeight(.semibold)
-        }
-    }
-}

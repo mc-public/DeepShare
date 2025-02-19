@@ -30,12 +30,14 @@ extension DownTeX {
         let pageSize: CGSize
         /// Rectangles available for layout on the page.
         let layoutRect: CGRect
+        let allowTextOverflow: Bool
         
-        fileprivate init(fontSize: FontSize, pageSize: CGSize, layoutRect: CGRect) {
+        fileprivate init(fontSize: FontSize, pageSize: CGSize, layoutRect: CGRect, allowTextOverflow: Bool) {
             assert(CGRect(origin: .zero, size: pageSize).contains(layoutRect), "[\(Self.self)][\(#function)] The page rectangle must contain text-layout rectangle.")
             self.fontSize = fontSize
             self.pageSize = pageSize
             self.layoutRect = layoutRect
+            self.allowTextOverflow = allowTextOverflow
         }
     }
     
@@ -52,16 +54,19 @@ extension DownTeX {
         ///
         /// This value is just a suggestion, and the final page size will be based on the output PDF file.
         public let preferredLayoutRect: CGRect
+        /// Indicates whether the text area is allowed to overflow the layout area.
+        public let allowTextOverflow: Bool
         /// Create a layout configuration.
         ///
         /// - Parameter fontSize: The font size used for the main text when typesetting.
         /// - Parameter preferredPageSize: The currently preferred page size (in units of `pt`).
         /// - Parameter preferredLayoutRect: The area for layoutable text, based on the page rectangle (unit is `pt`).
-        public init(fontSize: FontSize, preferredPageSize: CGSize, preferredLayoutRect: CGRect) {
+        public init(fontSize: FontSize, preferredPageSize: CGSize, preferredLayoutRect: CGRect, allowTextOverflow: Bool) {
             assert(CGRect(origin: .zero, size: preferredPageSize).contains(preferredLayoutRect), "[\(Self.self)][\(#function)] The page rectangle must contain text-layout rectangle.")
             self.fontSize = fontSize
             self.preferredPageSize = preferredPageSize
             self.preferredLayoutRect = preferredLayoutRect
+            self.allowTextOverflow = allowTextOverflow
         }
     }
     
@@ -87,7 +92,8 @@ extension DownTeX {
             pageSize: pageImage.size,
             layoutRect: templateResult.textRect.intersection(
                 CGRect(origin: .zero, size: pageImage.size)
-            )
+            ),
+            allowTextOverflow: config.allowTextOverflow
         )
         return try await self.unsafe_compileToPDF(latexString: self.template(markdownContent: latexContent, config: newConfig))
     }
@@ -104,7 +110,7 @@ extension DownTeX {
 % Options for packages loaded elsewhere
 \\PassOptionsToPackage{unicode}{hyperref}
 \\PassOptionsToPackage{hyphens}{url}
-\\documentclass[\(config.fontSize.pointSize)pt]{extarticle}
+\\documentclass[\(Int(config.fontSize.pointSize))pt]{extarticle}
 \\usepackage[fontset=none]{ctex}
 \\usepackage{xcolor, extsizes}
 \\usepackage{amsmath,amssymb, mathrsfs}
@@ -112,26 +118,22 @@ extension DownTeX {
 \\usepackage{microtype}
 \\usepackage{enumitem}
 \\geometry{
-    paperwidth=\(config.pageSize.width)pt,   % Page width
-    paperheight=\(config.pageSize.height)pt,  % Page height
-    left=\(left)pt, right=\(right)pt, top=\(top)pt, bottom=\(bottom)pt % Page Margin
+    paperwidth=\(Int(config.pageSize.width))pt,   % Page width
+    paperheight=\(Int(config.pageSize.height))pt,  % Page height
+    left=\(Int(left))pt, right=\(Int(right))pt, top=\(Int(top))pt, bottom=\(Int(bottom))pt % Page Margin
 }
 \\xeCJKsetup{CheckSingle,CJKmath=true}
-
 \\setmathrm{LatinModernMath-Regular}
-\\setmainfont{SFProDisplay-Regular}
-% \\setsansfont{SFPro-Regular}
+\\setmainfont{SFProText-Regular}
 \\setmonofont{SFMono-Regular}
-\\setCJKmainfont[AutoFakeSlant=true,BoldFont=.PingFang-SC-Semibold]{PingFang-SC-Regular}
-\\setCJKfamilyfont{songti}{PingFang-SC-Regular}
-\\setCJKfamilyfont{heiti}{PingFang-SC-Regular}
-\\setCJKfamilyfont{kaishu}{PingFang-SC-Regular}
+\\setCJKmainfont[AutoFakeSlant=true,AutoFakeBold=true]{PingFangSC-Regular}
+\\setCJKfamilyfont{songti}{PingFangSC-Regular}
+\\setCJKfamilyfont{heiti}{PingFangSC-Semibold}
+\\setCJKfamilyfont{kaishu}{PingFangSC-Regular}
 \\newcommand{\\songti}{\\CJKfamily{songti}}
 \\newcommand{\\heiti}{\\CJKfamily{heiti}}
 \\newcommand{\\kaishu}{\\CJKfamily{kaishu}}
-
 \\tolerance=10000
-
 \\setcounter{secnumdepth}{0} % remove section numbering
 \\usepackage{iftex}
 \\ifPDFTeX

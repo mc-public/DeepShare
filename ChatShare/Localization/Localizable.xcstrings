@@ -34,6 +34,16 @@
         }
       }
     },
+    "Author" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "展示作者"
+          }
+        }
+      }
+    },
     "Background Color" : {
       "localizations" : {
         "zh-Hans" : {
@@ -59,16 +69,30 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "转换为图片"
+            "value" : "转换"
           }
         }
       }
     },
-    "Convert to Single Picture" : {
-
+    "Convert To Long Image" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "转换为长图"
+          }
+        }
+      }
     },
-    "Convert to Splited Pictures" : {
-
+    "Convert to Short Image Slices" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "转换为短图合集"
+          }
+        }
+      }
     },
     "Date Created" : {
       "localizations" : {
@@ -99,9 +123,6 @@
           }
         }
       }
-    },
-    "Display Author" : {
-
     },
     "History" : {
       "localizations" : {
@@ -154,7 +175,14 @@
       }
     },
     "OK" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "确定"
+          }
+        }
+      }
     },
     "Oldest First" : {
       "localizations" : {
@@ -249,7 +277,14 @@
       }
     },
     "Share Failured" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分享失败"
+          }
+        }
+      }
     },
     "Sorted By" : {
       "localizations" : {
@@ -302,7 +337,14 @@
       }
     },
     "Title Background" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "标题背景"
+          }
+        }
+      }
     },
     "Untitled" : {
       "localizations" : {
