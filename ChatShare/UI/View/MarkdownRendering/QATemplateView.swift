@@ -9,6 +9,8 @@ import UIKit
 import SwiftUI
 import SnapKit
 
+//MARK: - QATemplateRotationView
+
 struct QATemplateRotationView<Content>: View where Content: View {
     let template: QATemplateModel
     let pageRotation: QAPageRotation
@@ -17,12 +19,23 @@ struct QATemplateRotationView<Content>: View where Content: View {
     
     var body: some View {
         GeometryReader { proxy in
-            let size = pageRotation.size(width: proxy.size.width)
-            let templatePreferredSize = QATemplateManager.current.preferredSize(for: template, preferredWidth: proxy.size.width, preferredTextHeight: size.height)
-            let containerLayout = QATemplateManager.current.pageRects(for: template, preferredSize: templatePreferredSize)
-            QATemplateView(template: template, horizontalPadding: horizontalPadding, preferredSize: templatePreferredSize) {
-                textContent
-                    .frame(maxHeight: containerLayout?.layoutRect.height ?? 0.0)
+            let preferredSize = pageRotation.size(width: proxy.size.width)
+            let containerLayout = QATemplateManager.current.pageRects(for: template, preferredSize: preferredSize)
+            let totalSize = containerLayout?.pageSize ?? .zero
+            let layoutRect = containerLayout?.layoutRect ?? .zero
+            Frame(totalSize, alignment: .top) {
+                VStack(alignment: .center, spacing: 0.0) {
+                    Rectangle()
+                        .fill(.clear)
+                        .frame(height: containerLayout?.layoutRect.minY ?? 0.0)
+                    Frame(width: max(0.0, layoutRect.width - horizontalPadding), height: layoutRect.height, alignment: .top) {
+                        ScrollView(.vertical) {
+                            content()
+                        }
+                    }
+                }
+            }.background(alignment: .topLeading) {
+                QATemplateDisplayView(template: template, size: totalSize)
             }
         }
     }
@@ -34,6 +47,8 @@ struct QATemplateRotationView<Content>: View where Content: View {
     }
 }
 
+//MARK: - QATemplateScrollView
+
 struct QATemplateScrollView<Content>: View where Content: View {
 
     let template: QATemplateModel
@@ -44,7 +59,7 @@ struct QATemplateScrollView<Content>: View where Content: View {
     var body: some View {
         GeometryReader { proxy in
             let templatePreferredSize = QATemplateManager.current.preferredSize(for: template, preferredWidth: proxy.size.width, preferredTextHeight: textLayoutSize.height)
-            QATemplateView(template: template, horizontalPadding: horizontalPadding, preferredSize: templatePreferredSize) {
+            QAScrollTemplateContainer(template: template, horizontalPadding: horizontalPadding, preferredSize: templatePreferredSize) {
                 textContent
             }
         }
@@ -61,7 +76,7 @@ struct QATemplateScrollView<Content>: View where Content: View {
     }
 }
 
-fileprivate struct QATemplateView<Content>: View where Content: View {
+fileprivate struct QAScrollTemplateContainer<Content>: View where Content: View {
     let template: QATemplateModel
     let horizontalPadding: CGFloat
     let preferredSize: CGSize

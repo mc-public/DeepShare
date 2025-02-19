@@ -20,18 +20,24 @@ struct QATemplateModel: Identifiable, Sendable, Equatable, Hashable {
     let pageSize: CGSize
     /// The text-layoutable rectangle in the template page.
     let textRect: CGRect
+    /// The suggest layout rectangle in the template page.
+    let suggestedRect: CGRect
     /// The background color about the text-layoutable rectangle.
     let textBackgroundColor: UIColor
     /// The height slice rectangle about the template image.
     let heightSliceRect: CGRect
     
-    fileprivate init(pdfURL: URL, title: String, pageSize: CGSize, textRect: CGRect, textBackgroundColor: UIColor, heightSliceRect: CGRect) {
+    fileprivate init(pdfURL: URL, title: String, pageSize: CGSize, textRect: CGRect, suggestedRect: CGRect, textBackgroundColor: UIColor, heightSliceRect: CGRect) {
         self.pdfURL = pdfURL
         self.title = title
         self.pageSize = pageSize
         self.textRect = textRect
         self.textBackgroundColor = textBackgroundColor
         self.heightSliceRect = heightSliceRect
+        self.suggestedRect = suggestedRect
+        if !CGRect(origin: .zero, size: pageSize).contains(textRect) || !textRect.contains(suggestedRect) {
+            assertionFailure("[\(Self.self)][\(#function)] The data of the model titled `\(title)` is not standardized.")
+        }
     }
     
     
@@ -113,6 +119,7 @@ final class QATemplateManager {
             let clip_start: CGFloat; let clip_stop: CGFloat
             let page_size: PageSize
             let text_box: PageRect
+            let suggestTextRect: PageRect
             let text_box_background: String
         }
         guard let jsonData = try? Data(contentsOf: jsonURL) else {
@@ -129,6 +136,7 @@ final class QATemplateManager {
                 title: $0.title,
                 pageSize: $0.page_size.size,
                 textRect: $0.text_box.rect,
+                suggestedRect: $0.suggestTextRect.rect,
                 textBackgroundColor: UIColor($0.text_box_background),
                 heightSliceRect: .init(x: 0, y: $0.clip_start, width: $0.page_size.width, height: $0.clip_stop - $0.clip_start)
             )

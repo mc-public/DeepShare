@@ -24,6 +24,9 @@
         }
       }
     },
+    "%lld pt" : {
+
+    },
     "Ascending" : {
       "localizations" : {
         "zh-Hans" : {
@@ -40,16 +43,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "展示作者"
-          }
-        }
-      }
-    },
-    "Background Color" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "背景颜色"
           }
         }
       }
@@ -120,6 +113,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Z优先"
+          }
+        }
+      }
+    },
+    "Generate" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "生成"
           }
         }
       }
@@ -200,6 +203,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "排序方式"
+          }
+        }
+      }
+    },
+    "Page Aspect Ratio" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "页面比例"
           }
         }
       }

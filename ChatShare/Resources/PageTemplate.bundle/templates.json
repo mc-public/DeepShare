@@ -1,70 +1,140 @@
 [
     {
-        "name": "nmzbxcyroiasdkj18723686.pdf",
-        "title": "Grey Word",
+        "name": "khstjnopdwqtb2234234udhsui.pdf",
+        "title": "isabelline",
+        "clip_start": 100,
+        "clip_stop": 110,
+        "page_size": {
+            "width": 375,
+            "height": 375
+        },
+        "text_box": {
+            "x": 31,
+            "y": 23,
+            "width": 303.5,
+            "height": 323.5
+        },
+        "suggestTextRect": {
+            "x": 32.5,
+            "y": 40,
+            "width": 300.5,
+            "height": 289.5
+        },
+        "text_box_background": "#F7F0E7"
+    },
+    {
+        "name": "nmzuxf172863kbsah34b4bm3.pdf",
+        "title": "Olive green sticky notes",
         "clip_start": 60,
         "clip_stop": 70,
         "page_size": {
-            "width": 328.6,
-            "height": 439.2
+            "width": 375,
+            "height": 375
         },
         "text_box": {
-            "x": 10,
-            "y": 50,
-            "width": 308.6,
-            "height": 389.2
+            "x": 25.5,
+            "y": 37.5,
+            "width": 328,
+            "height": 314
         },
-        "text_box_background": "#F9F9F9"
+        "suggestTextRect": {
+            "x": 40.5,
+            "y": 52.5,
+            "width": 298,
+            "height": 284
+        },
+        "text_box_background": "#FFFFFF"
     },
     {
-        "name": "oiquwbmaderijsf123872.pdf",
-        "title": "Minimalist Blue & White Theme",
-        "clip_start": 0,
-        "clip_stop": 10,
+        "name": "z6x5cnkqn123msz78dsfz.pdf",
+        "title": "Blue and white icebergs",
+        "clip_start": 20,
+        "clip_stop": 30,
         "page_size": {
-            "width": 210.08,
-            "height": 297.13
+            "width": 375,
+            "height": 375
         },
         "text_box": {
             "x": 0,
             "y": 0,
-            "width": 210.08,
-            "height": 251.53
+            "width": 375,
+            "height": 375
         },
-        "text_box_background": "#FFFFFA"
+        "suggestTextRect": {
+            "x": 15,
+            "y": 15,
+            "width": 345,
+            "height": 345
+        },
+        "text_box_background": "#8DC2F4"
     },
     {
-        "name": "aowerhfdsaq71826387.pdf",
-        "title": "Minimalist Green",
-        "clip_start": 200,
-        "clip_stop": 210,
+        "name": "3bnv71920isa90vcnqjabsp3c.pdf",
+        "title": "Gray white text",
+        "clip_start": 70,
+        "clip_stop": 80,
         "page_size": {
-            "width": 328.6,
-            "height": 439.2
+            "width": 375,
+            "height": 375
         },
         "text_box": {
-            "x": 10,
-            "y": 10,
-            "width": 318.6,
-            "height": 429.2
+            "x": 11,
+            "y": 55,
+            "width": 353,
+            "height": 320
         },
-        "text_box_background": "#92C498"
+        "suggestTextRect": {
+            "x": 26,
+            "y": 70,
+            "width": 323,
+            "height": 290
+        },
+        "text_box_background": "#F9F9F9"
     },
     {
-        "name": "jkshrfiuw127391.pdf",
-        "title": "White Notes",
-        "clip_start": 40,
-        "clip_stop": 50,
+        "name": "123bmn7asd9f12b3asdf79872n.pdf",
+        "title": "Grey brown minimalist ",
+        "clip_start": 50,
+        "clip_stop": 60,
         "page_size": {
-           "width": 328.6,
-            "height": 440.2
+            "width": 375,
+            "height": 375
         },
         "text_box": {
             "x": 0,
-            "y": 40,
-            "width": 328.6,
-            "height": 354.2
+            "y": 30,
+            "width": 375,
+            "height": 240
         },
-        "text_box_background": "#FFFFFF"
+        "suggestTextRect": {
+            "x": 15,
+            "y": 30,
+            "width": 345,
+            "height": 240
+        },
+        "text_box_background": "#E6E4DE"
+    },
+    {
+        "name": "sd6a71hj2389asdb43as7djc7.pdf",
+        "title": "Green ink wash",
+        "clip_start": 200,
+        "clip_stop": 210,
+        "page_size": {
+            "width": 375,
+            "height": 375
+        },
+        "text_box": {
+            "x": 0,
+            "y": 0,
+            "width": 375,
+            "height": 375
+        },
+        "suggestTextRect": {
+            "x": 15,
+            "y": 15,
+            "width": 345,
+            "height": 345
+        },
+        "text_box_background": "#F8FBFF"
     }
 ]

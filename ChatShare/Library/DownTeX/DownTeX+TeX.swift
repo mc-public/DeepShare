@@ -5,12 +5,14 @@
 //  Created by 孟超 on 2025/2/17.
 //
 
-//import libxetex
+
 import Foundation
+import UIKit
 
 extension DownTeX {
     /// Available font sizes.
-    public enum FontSize {
+    public enum FontSize: Hashable, Identifiable, CaseIterable {
+        public var id: Self { self }
         case pt8, pt9, pt10, pt11, pt12, pt14, pt17
         /// The PointSize corresponding to the current font size.
         var pointSize: CGFloat {
@@ -30,14 +32,20 @@ extension DownTeX {
         let pageSize: CGSize
         /// Rectangles available for layout on the page.
         let layoutRect: CGRect
+        /// Indicates whether the text area is allowed to overflow the layout area.
         let allowTextOverflow: Bool
+        /// The background image.
+        let image: UIImage
+        /// The file name of the image.
+        static let ImageFileName: String = "image.png"
         
-        fileprivate init(fontSize: FontSize, pageSize: CGSize, layoutRect: CGRect, allowTextOverflow: Bool) {
+        fileprivate init(fontSize: FontSize, pageSize: CGSize, layoutRect: CGRect, allowTextOverflow: Bool, image: UIImage) {
             assert(CGRect(origin: .zero, size: pageSize).contains(layoutRect), "[\(Self.self)][\(#function)] The page rectangle must contain text-layout rectangle.")
             self.fontSize = fontSize
             self.pageSize = pageSize
             self.layoutRect = layoutRect
             self.allowTextOverflow = allowTextOverflow
+            self.image = image
         }
     }
     
@@ -61,6 +69,7 @@ extension DownTeX {
         /// - Parameter fontSize: The font size used for the main text when typesetting.
         /// - Parameter preferredPageSize: The currently preferred page size (in units of `pt`).
         /// - Parameter preferredLayoutRect: The area for layoutable text, based on the page rectangle (unit is `pt`).
+        /// - Parameter allowTextOverflow: Indicates whether the text area is allowed to overflow the layout area.
         public init(fontSize: FontSize, preferredPageSize: CGSize, preferredLayoutRect: CGRect, allowTextOverflow: Bool) {
             assert(CGRect(origin: .zero, size: preferredPageSize).contains(preferredLayoutRect), "[\(Self.self)][\(#function)] The page rectangle must contain text-layout rectangle.")
             self.fontSize = fontSize
@@ -93,14 +102,21 @@ extension DownTeX {
             layoutRect: templateResult.textRect.intersection(
                 CGRect(origin: .zero, size: pageImage.size)
             ),
-            allowTextOverflow: config.allowTextOverflow
+            allowTextOverflow: config.allowTextOverflow,
+            image: pageImage
         )
-        return try await self.unsafe_compileToPDF(latexString: self.template(markdownContent: latexContent, config: newConfig))
+        return try await self.unsafe_compileToPDF(
+            latexString: self.template(latexContent: latexContent, config: newConfig),
+            image: pageImage,
+            imageFileName: TypesettingConfiguration.ImageFileName
+        )
     }
     
     //MARK: - Template Content
     
-    private func template(markdownContent: String, config: TypesettingConfiguration) -> String {
+    private func template(latexContent: String, config: TypesettingConfiguration) -> String {
+        let latexContent = latexContent
+            .replacingOccurrences(of: "//includegraphics", with: "//fakeincludegraphics")
         let top = config.layoutRect.minY
         let bottom = config.pageSize.height - config.layoutRect.maxY
         let left = config.layoutRect.minX
@@ -113,7 +129,7 @@ extension DownTeX {
 \\documentclass[\(Int(config.fontSize.pointSize))pt]{extarticle}
 \\usepackage[fontset=none]{ctex}
 \\usepackage{xcolor, extsizes}
-\\usepackage{amsmath,amssymb, mathrsfs}
+\\usepackage{amsmath,amssymb, mathrsfs, graphicx}
 \\usepackage{geometry, fontspec}
 \\usepackage{microtype}
 \\usepackage{enumitem}
@@ -121,6 +137,9 @@ extension DownTeX {
     paperwidth=\(Int(config.pageSize.width))pt,   % Page width
     paperheight=\(Int(config.pageSize.height))pt,  % Page height
     left=\(Int(left))pt, right=\(Int(right))pt, top=\(Int(top))pt, bottom=\(Int(bottom))pt % Page Margin
+}
+\\AddToHook{shipout/background}{%
+    \\put (0in,-\\paperheight){\\includegraphics[width=\\paperwidth,height=\\paperheight]{\(TypesettingConfiguration.ImageFileName)}}%
 }
 \\xeCJKsetup{CheckSingle,CJKmath=true}
 \\setmathrm{LatinModernMath-Regular}
@@ -217,10 +236,16 @@ extension DownTeX {
 \\urlstyle{same}
 \\hypersetup{
   hidelinks,
-  pdfcreator={SwiftMarkdown}
+  pdfcreator={\(ChatShareApp.Name) PDF Converter},
+  pdfinfo={
+        Title={},
+        Author={\(ChatShareApp.Name)},
+        Keywords={}
+  },
+  pdfsubject={}
 }
 \\renewcommand{\\hyperref}[2][]{#2}
-\\newcommand{\\includegraphics}[2][]{
+\\newcommand{\\fakeincludegraphics}[2][]{
 \\begin{center}
     \\url{#2}  
 \\end{center}
@@ -228,8 +253,9 @@ extension DownTeX {
 \\renewcommand{\\text}[1]{\\mathrm{#1}}
 \\author{}
 \\date{}
+\\pagestyle{empty}
 \\begin{document}
-\(markdownContent)
+\(latexContent)
 \\end{document}
 """
     }

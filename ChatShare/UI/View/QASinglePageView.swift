@@ -13,7 +13,7 @@ import PDFKit
 
 //MARK: - QA Result Display (Rendering) View
 
-struct QASinglePageRenderingView: QANavigationLeaf {
+struct QASinglePageView: QANavigationLeaf {
     
     @State var controller = MarkdownState()
     @State var windowSize: CGSize = .zero
@@ -30,7 +30,7 @@ struct QASinglePageRenderingView: QANavigationLeaf {
             template: viewModel.selectedTemplate,
             horizontalPadding: viewModel.horizontalPagePadding,
             textLayoutSize: $textLayoutSize,
-            content: verticalStack
+            content: { markdownContent }
         )
         .onGeometryChange(body: { scrollViewFrameSize = $0 })
         .scrollBackgroundColor(controller.backgroundColor)
@@ -50,7 +50,6 @@ struct QASinglePageRenderingView: QANavigationLeaf {
         .navigationBarTitleDisplayMode(.inline)
         .fileShareSheet(item: viewModel.binding(for: \.imageResult))
         .fileShareSheet(item: viewModel.binding(for: \.pdfResult))
-        .onAppear(perform: onAppear)
         .onDisappear(perform: SVProgressHUD.dismiss)
         .environment(\.dynamicTypeSize, .medium)
         .onChange(of: viewModel.selectedTemplate, initial: true) { _, newValue in
@@ -58,61 +57,15 @@ struct QASinglePageRenderingView: QANavigationLeaf {
         }
     }
     
-    @ViewBuilder
-    var titleCell: some View {
-        VStackLayout(alignment: .center) {
-            Text(viewModel.questionContent)
-                .lineLimit(nil)
-                .multilineTextAlignment(.center)
-                .font(.preferredFont(relativeMetric: controller.fontSize, style: .title1))
-                .fontWidth(.condensed)
-                .fontWeight(.bold)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-            if viewModel.usingWaterMark {
-                ChatModelInfoCell(chatModel: viewModel.selectedChatAI)
-                    .font(.preferredFont(relativeMetric: controller.fontSize, style: .footnote))
-                    .frame(maxWidth: .infinity, alignment: .center)
-            }
-        }
-        .padding(.top, length: 10.0)
-        .padding(.bottom, viewModel.usingWaterMark ? 5.0 : 10.0)
-        .withCondition(body: { view in
-            if viewModel.usingTitleBorder {
-                view.withCornerBackground(radius: 10.0, style: Material.ultraThinMaterial)
-            } else { view }
-        })
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(.horizontal, controller.horizontalPadding)
-        .padding(.vertical)
-        .background(controller.backgroundColor, ignoresSafeAreaEdges: .all)
-    }
     
     @ViewBuilder
-    func verticalStack() -> some View {
-        VStackLayout(alignment: .leading, spacing: 0.0) {
-            if !viewModel.questionContent.isEmpty {
-                titleCell
-                    .onGeometryChange(body: { titleCellSize = $0 })
-            }
-            Markdown(state: $controller)
-                .onRendered({
-                    SVProgressHUD.dismiss()
-                    self.isDisable = false
-                })
-                .frame(maxWidth: .infinity, alignment: .center)
-        }
-        .hidden(controller.isRenderingContent)
-    }
-    
-    func onAppear() {
-        controller.text = viewModel.answerContent
-        controller.backgroundColor = .clear
-        SVProgressHUD.show()
+    var markdownContent: QARenderingContentView {
+        QARenderingContentView(viewModel: self.viewModel, controller: $controller, titleCellSize: $titleCellSize, isDisabled: $isDisable)
     }
     
 }
 
-extension QASinglePageRenderingView {
+extension QASinglePageView {
     @ToolbarContentBuilder
     func toolbarContent() -> some ToolbarContent {
         ToolbarItem(placement: .topBarTrailing) {
@@ -149,7 +102,12 @@ extension QASinglePageRenderingView {
         guard let layoutResult = QATemplateManager.current.renderingResult(for: viewModel.selectedTemplate, preferredSize: templatePreferredSize) else {
             return nil
         }
-        let titleRenderer = ImageRenderer(content: self.titleCell.frame(width: titleCellSize.width, height: titleCellSize.height))
+        let titleRenderer = ImageRenderer(
+            content: self.markdownContent
+                .titleCell
+                .frame(width: titleCellSize.width, height: titleCellSize.height)
+                .environment(\.colorScheme, .light)
+        )
         titleRenderer.scale = 3.0
         titleRenderer.proposedSize = .init(titleCellSize)
         guard let titleCellImage = titleRenderer.uiImage else {
@@ -205,25 +163,17 @@ fileprivate struct QARenderingSettingsView: View {
     var content: some View {
         List {
             Section("Style") {
-                usingWaterMarkLabel
-                usingTitleBorder
-                templateLabel
+                QAPageSettingLabel.usingWaterMarkLabel(viewModel: viewModel)
+                QAPageSettingLabel.usingTitleBorder(viewModel: viewModel)
+                QAPageSettingLabel.templateLabel(viewModel: viewModel)
                 themeLabel
                 fontSizeLabel
-                pageHorizontalPaddingLabel
+                QAPageSettingLabel.pageHorizontalPaddingLabel(markdownController: markdownController)
             }
-            
         }
         .scrollContentBackground(.hidden)
     }
     
-    var templateLabel: some View {
-        Picker("Template", selection: viewModel.binding(for: \.selectedTemplate)) {
-            ForEach(QATemplateManager.current.allTemplates) { template in
-                Text(template.title).tag(template)
-            }
-        }
-    }
     
     var fontSizeLabel: some View {
         VStack {
@@ -237,37 +187,12 @@ fileprivate struct QARenderingSettingsView: View {
         }
     }
     
-    var backgroundColorLabel: some View {
-        ColorPicker("Background Color", selection: markdownController.binding(for: \.backgroundColor), supportsOpacity: true)
-            .environment(\.dynamicTypeSize, .xSmall)
-    }
-    
     var themeLabel: some View {
         Picker("Markdown Theme", selection: markdownController.binding(for: \.theme)) {
             ForEach(MarkdownView.Theme.allCases) { theme in
                 Text(theme.name).tag(theme)
             }
         }
-    }
-    
-    var pageHorizontalPaddingLabel: some View {
-        VStack {
-            HStack {
-                Text("Horizontal Page Margins")
-                Spacer()
-                Text(String(format: "%.1f", markdownController.horizontalPadding) + " pt")
-                    .foregroundStyle(.secondary)
-            }
-            Slider(value: $markdownController.horizontalPadding, in: 10.0...50.0, step: 1.0, label: {  }, minimumValueLabel: { Image(systemName: "number").imageScale(.small) }, maximumValueLabel: { Image(systemName: "number").imageScale(.medium) })
-        }
-    }
-    
-    var usingWaterMarkLabel: some View {
-        Toggle("Author", isOn: viewModel.binding(for: \.usingWaterMark))
-    }
-    
-    var usingTitleBorder: some View {
-        Toggle("Title Background", isOn: viewModel.binding(for: \.usingTitleBorder))
     }
 }
 

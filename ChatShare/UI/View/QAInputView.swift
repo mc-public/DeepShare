@@ -115,7 +115,7 @@ extension QAInputView {
         }
         ToolbarItem(placement: .topBarTrailing) {
             Menu {
-                QANavigationLink(QASinglePageRenderingView.self) {
+                QANavigationLink(QASinglePageView.self) {
                     Text("Convert To Long Image")
                 }
                 QANavigationLink(QASplitedPagesView.self) {

@@ -120,7 +120,6 @@ extension QATemplateManager {
         let cache = self.renderingCache(for: template, width: preferredSize.width) {
             let topImage = page.image(contentFrame: originInfo.topRect, contentScale: 3.0, zoomScale: pageInfo.scale)
             let tileImage = page.image(contentFrame: originAlignedTileRect, contentScale: 6.0, zoomScale: pageInfo.scale)
-            print(originAlignedTileRect.scale(pageInfo.scale).height)
             let bottomImage = page.image(contentFrame: originInfo.bottomRect, contentScale: 3.0, zoomScale: pageInfo.scale)
             return .init(topImage: topImage, tileImage: tileImage, bottomImage: bottomImage)
         }

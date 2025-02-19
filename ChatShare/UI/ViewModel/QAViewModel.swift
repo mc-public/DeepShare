@@ -112,5 +112,5 @@ final class QAViewModel {
     var horizontalPagePadding: CGFloat = 20.0
     var pdfResult: ShareFileURL?
     var imageResult: ShareFileURL?
-    var pageRotation: QAPageRotation = .rotationThreeFour
+    var pageRotation: QAPageRotation = .rotation4To3
 }

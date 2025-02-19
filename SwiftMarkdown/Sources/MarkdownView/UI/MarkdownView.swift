@@ -73,10 +73,16 @@ public class MarkdownState {
         }
     }
     
+    /// The available range for horizontal padding.
+    public var horizontalPaddingRange: ClosedRange<CGFloat> {
+        let maximumWidth = max(0.2 * container.bounds.width, 10.0)
+        return 0.0...maximumWidth
+    }
+    
     /// The horizontal padding about the Markdown page.
     ///
     /// The default value is `0.0`, which means left and right paddings are equal to `0.0`.
-    /// - Warning: The length must be within the range [0, 100].
+    /// - Warning: The length must be within the `horizontalPaddingRange`.
     public var horizontalPadding: CGFloat = 0.0 {
         didSet {
             Task { await applyStyle() }

@@ -11,7 +11,7 @@ import SVProgressHUD
 
 struct QARenderingContentView: View {
     
-    @Environment(QAViewModel.self) var viewModel
+    var viewModel: QAViewModel
     @Binding var controller: MarkdownState
     @Binding var titleCellSize: CGSize
     @Binding var isDisabled: Bool
@@ -31,6 +31,10 @@ struct QARenderingContentView: View {
                 .frame(maxWidth: .infinity, alignment: .center)
         }
         .hidden(controller.isRenderingContent)
+        .onAppear {
+            controller.text = viewModel.answerContent
+            SVProgressHUD.show()
+        }
     }
     
     @ViewBuilder
@@ -54,12 +58,14 @@ struct QARenderingContentView: View {
         .withCondition(body: { view in
             if viewModel.usingTitleBorder {
                 view.withCornerBackground(radius: 10.0, style: Material.ultraThinMaterial)
-            } else { view }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color(viewModel.selectedTemplate.textBackgroundColor), ignoresSafeAreaEdges: .all)
+            } else {
+                view.frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
         })
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.horizontal, controller.horizontalPadding)
         .padding(.vertical)
-        .background(controller.backgroundColor, ignoresSafeAreaEdges: .all)
     }
 }
 
