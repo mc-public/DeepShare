@@ -33,7 +33,7 @@ final class QANavigationModel {
     
     /// Create an empty navigation model.
     private init() {
-        navigationPath = []//[QAInputView.NavigationTarget]
+        navigationPath = [QAInputView.NavigationTarget]
     }
     
     /// Remove the last view from the current navigation stack.

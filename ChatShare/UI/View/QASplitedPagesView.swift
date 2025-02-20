@@ -222,6 +222,7 @@ struct QASplitedPagesResultView: View {
     @State private var selectedImagesURL: ShareFileURL?
     @State private var isShowingShareFailuredAlert = false
     @State private var windowSize = CGSize.zero
+    @Environment(\.dismiss) var dismiss
     
     init(pdfURL: URL, pdfData: Data) {
         self.pdfURL = pdfURL
@@ -253,6 +254,17 @@ struct QASplitedPagesResultView: View {
     
     @ToolbarContentBuilder
     func toolbarContent() -> some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            Button.init {
+                dismiss()
+            } label: {
+                HStack {
+                    Image(systemName: "xmark").fontWeight(.medium)
+                    Text("Close")
+                }
+            }
+            .padding(.leading, length: -4.0)
+        }
         ToolbarItem(placement: .topBarTrailing) {
             Menu("Share") {
                 Button("Share as PDF", systemImage: "document", action: shareAsPDF)
@@ -275,7 +287,7 @@ struct QASplitedPagesResultView: View {
     private func shareImages() async {
         defer { SVProgressHUD.dismiss() }
         SVProgressHUD.show()
-        var urls: [URL] = await Task.detached(priority: .userInitiated) {
+        let urls: [URL] = await Task.detached(priority: .userInitiated) {
             guard let document = PDFDocument(data: pdfData) else {
                 return []
             }

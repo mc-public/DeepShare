@@ -1,7 +1,7 @@
 [
     {
         "name": "khstjnopdwqtb2234234udhsui.pdf",
-        "title": "isabelline",
+        "title": "Soft Beige Border",
         "clip_start": 100,
         "clip_stop": 110,
         "page_size": {
@@ -24,7 +24,7 @@
     },
     {
         "name": "nmzuxf172863kbsah34b4bm3.pdf",
-        "title": "Olive green sticky notes",
+        "title": "Fresh Green Note",
         "clip_start": 60,
         "clip_stop": 70,
         "page_size": {
@@ -47,9 +47,9 @@
     },
     {
         "name": "z6x5cnkqn123msz78dsfz.pdf",
-        "title": "Blue and white icebergs",
-        "clip_start": 20,
-        "clip_stop": 30,
+        "title": "Serene Snow Mountain",
+        "clip_start": 90,
+        "clip_stop": 100,
         "page_size": {
             "width": 375,
             "height": 375
@@ -70,7 +70,7 @@
     },
     {
         "name": "3bnv71920isa90vcnqjabsp3c.pdf",
-        "title": "Gray white text",
+        "title": "Minimalist Document Interface",
         "clip_start": 70,
         "clip_stop": 80,
         "page_size": {
@@ -93,7 +93,7 @@
     },
     {
         "name": "123bmn7asd9f12b3asdf79872n.pdf",
-        "title": "Grey brown minimalist ",
+        "title": "Clouded Mountains Ink Charm",
         "clip_start": 50,
         "clip_stop": 60,
         "page_size": {
@@ -116,7 +116,7 @@
     },
     {
         "name": "sd6a71hj2389asdb43as7djc7.pdf",
-        "title": "Green ink wash",
+        "title": "Bamboo Simplicity",
         "clip_start": 200,
         "clip_stop": 210,
         "page_size": {
@@ -136,5 +136,51 @@
             "height": 345
         },
         "text_box_background": "#F8FBFF"
+    },
+    {
+        "name": "A98S7F123BL876SFAOWPIRPZCNM7.pdf",
+        "title": "Minimalist Black Frame",
+        "clip_start": 100,
+        "clip_stop": 110,
+        "page_size": {
+            "width": 375,
+            "height": 375
+        },
+        "text_box": {
+            "x": 24.5,
+            "y": 24.5,
+            "width": 326,
+            "height": 326
+        },
+        "suggestTextRect": {
+            "x": 35,
+            "y": 35,
+            "width": 305,
+            "height": 305
+        },
+        "text_box_background": "#FFFFFF"
+    },
+    {
+        "name": "b39s8dkjw34mnbdsagd876432rjebfs7zd78.pdf",
+        "title": "Basic",
+        "clip_start": 10,
+        "clip_stop": 20,
+        "page_size": {
+            "width": 375,
+            "height": 375
+        },
+        "text_box": {
+            "x": 0,
+            "y": 0,
+            "width": 375,
+            "height": 375
+        },
+        "suggestTextRect": {
+            "x": 15,
+            "y": 15,
+            "width": 345,
+            "height": 345
+        },
+        "text_box_background": "#FFFFFF"
     }
 ]

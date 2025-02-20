@@ -17,16 +17,16 @@ extension View {
                 view.backgroundColor = .clear
             }
             .background {
-//                if text.isEmpty {
-//                    TextEditor(text: .constant(prompt))
-//                        .introspect(.textEditor, on: .iOS(.v17...)) { view in
-//                            view.backgroundColor = .clear
-//                        }
-//                        .foregroundStyle(style)
-//                        .disabled(true)
-//                }
+                if text.isEmpty {
+                    TextEditor(text: .constant(prompt))
+                        .introspect(.textEditor, on: .iOS(.v17...)) { view in
+                            view.backgroundColor = .clear
+                        }
+                        .foregroundStyle(style)
+                        .disabled(true)
+                }
             }
-            //.animation(nil, value: text)
+            .animation(nil, value: text)
     }
 }
 

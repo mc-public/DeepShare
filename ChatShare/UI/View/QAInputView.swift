@@ -32,11 +32,6 @@ struct QAInputView: QANavigationLeaf {
         .background(Color.listBackgroundColor, ignoresSafeAreaEdges: .all)
         .toolbar(content: toolbarContent)
         .navigationBarBackButtonHidden()
-//        .onAppear {
-//            if model.questionContent.isEmpty {
-//                blockFocusState = .questionBlock
-//            } else { blockFocusState = nil }
-//        }
     }
     
     
@@ -46,9 +41,6 @@ struct QAInputView: QANavigationLeaf {
             circleImage(image: Image(systemName: "person.fill.questionmark").foregroundStyle(HierarchicalShapeStyle.secondary), backgroundStyle: Color.listCellBackgroundColor, width: 40.0)
                 .padding(.horizontal)
             TextEditor(text: model.binding(for: \.questionContent))
-                .submitLabel(.done)
-                
-                .onSubmit({ blockFocusState = nil })
                 .focused($blockFocusState, equals: BlockFocusState.questionBlock)
                 .textEditorPrompt(text: model.questionContent, #localized("Enter the question content here"), style: Color.gray.opacity(0.3))
                 .font(.title2)
@@ -133,25 +125,31 @@ extension QAInputView {
                 .foregroundStyle(Color.deepOrange)
         }
         ToolbarItemGroup(placement: .topBarTrailing) {
-            Menu {
-                QANavigationLink(QASinglePageView.self) {
-                    Text("Convert To Long Image")
+            HStack(alignment: .firstTextBaseline) {
+                Menu {
+                    QANavigationLink(QASinglePageView.self) {
+                        Label("Convert To Long Image", systemImage: "photo")
+                    }
+                    QANavigationLink(QASplitedPagesView.self) {
+                        Label("Convert to Short Image Slices", systemImage: "photo.stack")
+                    }
+                } label: {
+                    Text("Convert")
+                        .bold()
+                        .foregroundStyle(model.isContentEmpty ? Color.deepOrange.opacity(0.6) : Color.deepOrange)
                 }
-                QANavigationLink(QASplitedPagesView.self) {
-                    Text("Convert to Short Image Slices")
+                .menuStyle(.button)
+                .disabled(model.isContentEmpty)
+                .padding(.trailing, length: 5)
+                
+                if blockFocusState != nil {
+                    Button("Done") { self.blockFocusState = nil }
+                        .foregroundStyle(Color.deepOrange)
+                        .bold()
+                        .padding(.trailing, length: 5)
                 }
-            } label: {
-                Text("Convert")
             }
-            .disabled(model.isContentEmpty)
-            .buttonStyle(.plain)
-            .foregroundStyle(Color.deepOrange)
-            .padding(5)
-            
-            if blockFocusState != nil {
-                Button("Done") { self.blockFocusState = nil }
-                    .foregroundStyle(Color.deepOrange)
-            }
+            .animation(nil, value: blockFocusState)
         }
     }
 }

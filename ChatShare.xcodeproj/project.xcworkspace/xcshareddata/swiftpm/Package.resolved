@@ -33,8 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mc-public/PDFPreviewer.git",
       "state" : {
-        "revision" : "924db52a097b29b15664ef1aa0ac948ee1d2756c",
-        "version" : "0.1.1"
+        "revision" : "207faf8f5a89b025bbcf4f39d10904d2380b7030",
+        "version" : "0.1.2"
       }
     },
     {

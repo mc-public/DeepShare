@@ -30,7 +30,7 @@ extension DownTeX {
         }
         /// The `TeXMF` resources `URL`.
         static var TeXResources: URL {
-            URL.documentsDirectory.appending(path: "texmf")
+            URL.libraryDirectory.appending(path: "texmf")
         }
         /// The `TeXMF` zip-package `URL`.
         private static var TeXBundleResource: URL {
@@ -41,7 +41,7 @@ extension DownTeX {
         /// Indicates whether all resources are currently available.
         ///
         /// Default is `false`. You need to call `prepareResources()` before using all resources.
-        @AppStorage("\(DownTeX.self)_TeXResources_Unzip_State")
+        @AppStorage("\(DownTeX.self)_TeXMF_State")
         static private(set) var isResourcesReady: Bool = false
         /// Load all resources.
         ///

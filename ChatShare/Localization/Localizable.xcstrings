@@ -57,6 +57,16 @@
         }
       }
     },
+    "Close" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关闭"
+          }
+        }
+      }
+    },
     "Convert" : {
       "localizations" : {
         "zh-Hans" : {
@@ -178,7 +188,14 @@
       }
     },
     "Image" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "图片"
+          }
+        }
+      }
     },
     "Markdown Theme" : {
       "localizations" : {
@@ -323,10 +340,24 @@
       }
     },
     "Share as Images" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "以图片格式分享"
+          }
+        }
+      }
     },
     "Share as PDF" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "以PDF格式分享"
+          }
+        }
+      }
     },
     "Share Failured" : {
       "localizations" : {
