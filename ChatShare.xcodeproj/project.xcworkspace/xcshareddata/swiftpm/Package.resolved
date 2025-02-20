@@ -1,5 +1,5 @@
 {
-  "originHash" : "1da5a4f3988c7995d81f2273658d7bfe3614afc139fa36d2a7da4f983abbf549",
+  "originHash" : "cd3978c0bf13d729fac582d48056a3f573ea664e56096179b4bae6e401400c12",
   "pins" : [
     {
       "identity" : "environmentoverrides",
@@ -26,6 +26,15 @@
       "state" : {
         "branch" : "main",
         "revision" : "4740e2c39043b7daff946aa3bbec22e6a68850d3"
+      }
+    },
+    {
+      "identity" : "pdfpreviewer",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mc-public/PDFPreviewer.git",
+      "state" : {
+        "revision" : "924db52a097b29b15664ef1aa0ac948ee1d2756c",
+        "version" : "0.1.1"
       }
     },
     {

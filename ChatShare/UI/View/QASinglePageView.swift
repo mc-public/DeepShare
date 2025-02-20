@@ -53,6 +53,7 @@ struct QASinglePageView: QANavigationLeaf {
         .onDisappear(perform: SVProgressHUD.dismiss)
         .environment(\.dynamicTypeSize, .medium)
         .onChange(of: viewModel.selectedTemplate, initial: true) { _, newValue in
+            viewModel.updateSuggestedPagePadding(pageWidth: scrollViewFrameSize.width)
             controller.backgroundColor = Color(newValue.textBackgroundColor).opacity(0)
         }
     }
@@ -113,7 +114,7 @@ extension QASinglePageView {
         guard let titleCellImage = titleRenderer.uiImage else {
             return nil
         }
-        let textRectMinX = 0.5 * (windowSize.width - titleCellSize.width)
+        let textRectMinX = layoutResult.textRect.minX + viewModel.horizontalPagePadding
         let titleCellImageRect = CGRect.init(x: textRectMinX, y: layoutResult.textRect.minY, width: titleCellSize.width, height: titleCellSize.height)
         let totalBackgroundImage = await layoutResult.totalImage()
         guard let contentPDFData = await controller.container.pdfData(),

@@ -174,7 +174,7 @@ public final class DownTeX {
         return try await unsafe_convertToLaTeX(markdownString: markdownString)
     }
     
-    func unsafe_compileToPDF(latexString: String, image: UIImage?, imageFileName: String) async throws(OperationError) -> Data {
+    func unsafe_compileToPDF(latexString: String, images: [String: UIImage]) async throws(OperationError) -> Data {
         let latexString = latexString.trimmingCharacters(in: .whitespacesAndNewlines)
         if latexString.isEmpty {
             throw .illegalTextContent
@@ -188,8 +188,8 @@ public final class DownTeX {
         if !FileManager.default.createFile(atPath: texURL.path(percentEncoded: false), contents: latexString.data(using: .utf8)) {
             throw .fileOperationFailured
         }
-        if let image {
-            let imageURL = texDirURL.appending(path: imageFileName)
+        for (fileName, image) in images {
+            let imageURL = texDirURL.appending(path: fileName)
             if !FileManager.default.createFile(atPath: imageURL.path(percentEncoded: false), contents: image.pngData()) {
                 throw .fileOperationFailured
             }
@@ -198,9 +198,9 @@ public final class DownTeX {
         do {
             result = try await Self.LaTeXEngine.compileTeX(by: .latex, tex: texURL)
         } catch {
-            print(error)
+            debugPrint(error)
             try? await Self.LaTeXEngine.reloadEngineCore()
-            return try await self.unsafe_compileToPDF(latexString: latexString, image: image, imageFileName: imageFileName)
+            return try await self.unsafe_compileToPDF(latexString: latexString, images: images)
         }
         if let data = result?.pdf {
             return data

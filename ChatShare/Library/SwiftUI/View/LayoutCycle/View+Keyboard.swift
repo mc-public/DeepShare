@@ -31,4 +31,9 @@ extension View {
             textField.autocapitalizationType = .none
         })
     }
+    
+    @MainActor
+    func resignKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
 }

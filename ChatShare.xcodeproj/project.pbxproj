@@ -12,6 +12,7 @@
 		E5418F7D2D51F26600A6655C /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = E5418F7C2D51F26600A6655C /* SwiftUIIntrospect */; };
 		E5418F802D51F2A400A6655C /* EnvironmentOverrides in Frameworks */ = {isa = PBXBuildFile; productRef = E5418F7F2D51F2A400A6655C /* EnvironmentOverrides */; };
 		E5418F832D51F42E00A6655C /* SVProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = E5418F822D51F42E00A6655C /* SVProgressHUD */; };
+		E54760C82D674DE800C9EB0E /* PDFPreviewer in Frameworks */ = {isa = PBXBuildFile; productRef = E54760C72D674DE800C9EB0E /* PDFPreviewer */; };
 		E57ADDC12D5F3429001BCED0 /* FPSMonitorLabel in Frameworks */ = {isa = PBXBuildFile; productRef = E57ADDC02D5F3429001BCED0 /* FPSMonitorLabel */; };
 		E57ADDC92D5F8A08001BCED0 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = E57ADDC82D5F8A08001BCED0 /* SnapKit */; };
 		E59D9C7B2D63C3CA009A53F6 /* TeXEngine in Frameworks */ = {isa = PBXBuildFile; productRef = E59D9C7A2D63C3CA009A53F6 /* TeXEngine */; };
@@ -74,6 +75,7 @@
 				E57ADDC92D5F8A08001BCED0 /* SnapKit in Frameworks */,
 				E52146182D5253220055E0F7 /* MarkdownView in Frameworks */,
 				E5418F7D2D51F26600A6655C /* SwiftUIIntrospect in Frameworks */,
+				E54760C82D674DE800C9EB0E /* PDFPreviewer in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -137,6 +139,7 @@
 				E57ADDC82D5F8A08001BCED0 /* SnapKit */,
 				E5FCD05E2D632C1500C8DB4B /* Zip */,
 				E59D9C7A2D63C3CA009A53F6 /* TeXEngine */,
+				E54760C72D674DE800C9EB0E /* PDFPreviewer */,
 			);
 			productName = ChatShare;
 			productReference = E5418EEC2D51F06F00A6655C /* ChatShare.app */;
@@ -181,6 +184,7 @@
 				E57ADDC72D5F8A08001BCED0 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				E5FCD05D2D632C1500C8DB4B /* XCRemoteSwiftPackageReference "Zip" */,
 				E59D9C792D63C3CA009A53F6 /* XCLocalSwiftPackageReference "TeXEngine" */,
+				E54760C62D674DE800C9EB0E /* XCRemoteSwiftPackageReference "PDFPreviewer" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E5418EED2D51F06F00A6655C /* Products */;
@@ -503,6 +507,14 @@
 				minimumVersion = 2.3.1;
 			};
 		};
+		E54760C62D674DE800C9EB0E /* XCRemoteSwiftPackageReference "PDFPreviewer" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mc-public/PDFPreviewer.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.1;
+			};
+		};
 		E57ADDBF2D5F3429001BCED0 /* XCRemoteSwiftPackageReference "FPSMonitorLabel" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/mc-public/FPSMonitorLabel";
@@ -567,6 +579,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E5418F7A2D51F1F600A6655C /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */;
 			productName = "plugin:SwiftLintBuildToolPlugin";
+		};
+		E54760C72D674DE800C9EB0E /* PDFPreviewer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E54760C62D674DE800C9EB0E /* XCRemoteSwiftPackageReference "PDFPreviewer" */;
+			productName = PDFPreviewer;
 		};
 		E57ADDC02D5F3429001BCED0 /* FPSMonitorLabel */ = {
 			isa = XCSwiftPackageProductDependency;

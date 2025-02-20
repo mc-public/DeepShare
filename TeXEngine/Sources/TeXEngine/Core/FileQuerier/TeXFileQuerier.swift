@@ -145,6 +145,7 @@ public class TeXFileQuerier: NSObject, FileQueryProvider {
         if (fileName as NSString).isAbsolutePath {
             let url = URL(path: fileName).standardizedFileURL
             if FileManager.default.fileExists(atPath: url.versionPath) {
+                self.restoreResource(url: url)
                 return .texlive(url: url)
             }
         }
@@ -159,9 +160,22 @@ public class TeXFileQuerier: NSObject, FileQueryProvider {
             return .dynamic(url: dynamicQueryResult)
         }
         if let texResourceQueryResult = await self.searchTeXResources(for: fileName, with: type) {
+            let url = texResourceQueryResult.standardizedFileURL
+            self.restoreResource(url: url)
             return .texlive(url: texResourceQueryResult)
         }
         return .notFound
+    }
+    
+    private func restoreResource(url: URL) {
+        let newPath = url.path(percentEncoded: false).replacingOccurrences(of: "Documents/texmf", with: "Documents/texmf-copied")
+        let targetURL = URL(filePath: newPath)
+        do {
+            try FileManager.default.createDirectory(at: targetURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+        } catch {}
+        do {
+            try FileManager.default.copyItem(at: url, to: targetURL)
+        } catch {}
     }
     
     

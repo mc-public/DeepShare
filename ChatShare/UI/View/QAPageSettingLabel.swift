@@ -25,7 +25,7 @@ struct QAPageSettingLabel {
     }
     
     @MainActor
-    static func pageVerticalPaddingLabel(viewModel: QAViewModel) -> some View {
+    static func pageVerticalPaddingLabel(viewModel: QAViewModel, maximumHeight: CGFloat? = nil) -> some View {
         VStack {
             HStack {
                 Text("Vertical Page Margins")
@@ -34,7 +34,7 @@ struct QAPageSettingLabel {
                     .foregroundStyle(.secondary)
             }
             @Bindable var state = viewModel
-            Slider(value: $state.verticalPagePadding, in: 0...100.0, step: 1.0, label: {  }, minimumValueLabel: { Image(systemName: "number").imageScale(.small) }, maximumValueLabel: { Image(systemName: "number").imageScale(.medium) })
+            Slider(value: $state.verticalPagePadding, in: 0...max(maximumHeight ?? 100.0, 10.0), step: 1.0, label: {  }, minimumValueLabel: { Image(systemName: "number").imageScale(.small) }, maximumValueLabel: { Image(systemName: "number").imageScale(.medium) })
         }
     }
     

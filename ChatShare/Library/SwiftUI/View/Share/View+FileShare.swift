@@ -12,10 +12,14 @@ import SwiftUI
 struct ShareFileURL: Identifiable, Equatable, Hashable {
     let id = UUID()
     /// The file url about the item.
-    let url: URL
+    let url: [URL]
     
     init(url: URL) {
-        self.url = url
+        self.url = [url]
+    }
+    
+    init(urls: [URL]) {
+        self.url = urls
     }
     
     init?(url: URL?) {
@@ -30,7 +34,7 @@ extension View {
     func fileShareSheet(item: Binding<ShareFileURL?>) -> some View {
         self.sheet(item: item) { item in
             NavigationStack {
-                FileShareSheet(url: item.url)
+                FileShareSheet(urls: item.url)
             }
         }
     }
@@ -40,15 +44,20 @@ extension View {
 ///  A view for sharing a file.
 fileprivate struct FileShareSheet: UIViewControllerRepresentable {
     /// The images to share
-    private let fileURL: URL
+    private let fileURLs: [URL]
     
     /// Create a `FileShareSheet` instance.
     init(url: URL) {
-        fileURL = url
+        fileURLs = [url]
+    }
+    
+    /// Create a `FileShareSheet` instance.
+    init(urls: [URL]) {
+        fileURLs = urls
     }
     
     func makeUIViewController(context: Context) -> some UIViewController {
-        let activityViewController = UIActivityViewController(activityItems: [fileURL], applicationActivities: nil)
+        let activityViewController = UIActivityViewController(activityItems: fileURLs, applicationActivities: nil)
         return activityViewController
     }
     

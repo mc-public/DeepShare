@@ -16,7 +16,7 @@ extension ColorScheme {
 #if DEBUG
             fatalError()
 #else
-            return .blue
+            .blue
 #endif
         }
     }
@@ -29,7 +29,7 @@ extension ColorScheme {
 #if DEBUG
             fatalError()
 #else
-            Color.blue
+            .blue
 #endif
         }
     }

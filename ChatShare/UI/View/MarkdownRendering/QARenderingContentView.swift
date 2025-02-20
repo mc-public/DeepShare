@@ -53,13 +53,14 @@ struct QARenderingContentView: View {
                     .frame(maxWidth: .infinity, alignment: .center)
             }
         }
+        .fixedSize(horizontal: false, vertical: true)
         .padding(.top, length: 10.0)
         .padding(.bottom, viewModel.usingWaterMark ? 5.0 : 10.0)
         .withCondition(body: { view in
             if viewModel.usingTitleBorder {
                 view.withCornerBackground(radius: 10.0, style: Material.ultraThinMaterial)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color(viewModel.selectedTemplate.textBackgroundColor), ignoresSafeAreaEdges: .all)
+                    .withCornerBackground(radius: 10.0, style: Color(viewModel.selectedTemplate.textBackgroundColor))
             } else {
                 view.frame(maxWidth: .infinity, maxHeight: .infinity)
             }

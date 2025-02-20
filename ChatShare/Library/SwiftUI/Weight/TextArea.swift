@@ -8,41 +8,25 @@
 import SwiftUI
 @_spi(Advanced) import SwiftUIIntrospect
 
-struct TextArea: View {
-    @Binding private var text: String
-    private let prompt: String?
-    private let promptColor: Color
-    private let initalFocused: Bool
-    @FocusState private var focusState: Bool
+extension View {
     
-    init(text: Binding<String>, prompt: String? = nil, promptColor: Color = .gray, initalFocused: Bool = false) {
-        self._text = text
-        self.prompt = prompt
-        self.promptColor = promptColor
-        self.initalFocused = initalFocused
-    }
-    
-    var body: some View {
-        TextEditor(text: $text)
-            .focused($focusState)
+    @ViewBuilder
+    func textEditorPrompt<T>(text: String, _ prompt: String, style: T) -> some View where T: ShapeStyle {
+        self
             .introspect(.textEditor, on: .iOS(.v17...)) { view in
                 view.backgroundColor = .clear
             }
             .background {
-                if self.text.isEmpty {
-                    TextEditor(text: .constant(prompt ?? String()))
-                        .introspect(.textEditor, on: .iOS(.v17...)) { view in
-                            view.backgroundColor = .clear
-                        }
-                        .foregroundStyle(promptColor)
-                        .disabled(true)
-                }
+//                if text.isEmpty {
+//                    TextEditor(text: .constant(prompt))
+//                        .introspect(.textEditor, on: .iOS(.v17...)) { view in
+//                            view.backgroundColor = .clear
+//                        }
+//                        .foregroundStyle(style)
+//                        .disabled(true)
+//                }
             }
-            .animation(nil, value: self.text)
-            .onAppear {
-                if self.text.isEmpty && self.initalFocused {
-                    self.focusState = true
-                }
-            }
+            //.animation(nil, value: text)
     }
 }
+

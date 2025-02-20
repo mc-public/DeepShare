@@ -16,6 +16,12 @@ struct QAInputView: QANavigationLeaf {
     @Environment(QANavigationModel.self) var navigation: QANavigationModel
     @Environment(\.dismiss) var dismiss
     
+    enum BlockFocusState: Hashable {
+        case questionBlock, answerBlock
+    }
+    
+    @FocusState private var blockFocusState: BlockFocusState?
+    
     var content: some View {
         GeometryReader { proxy in
             VStackLayout(spacing: 0.0) {
@@ -26,14 +32,25 @@ struct QAInputView: QANavigationLeaf {
         .background(Color.listBackgroundColor, ignoresSafeAreaEdges: .all)
         .toolbar(content: toolbarContent)
         .navigationBarBackButtonHidden()
+//        .onAppear {
+//            if model.questionContent.isEmpty {
+//                blockFocusState = .questionBlock
+//            } else { blockFocusState = nil }
+//        }
     }
+    
     
     
     var questionBlock: some View {
         HStack(alignment: .top, spacing: 0.0) {
             circleImage(image: Image(systemName: "person.fill.questionmark").foregroundStyle(HierarchicalShapeStyle.secondary), backgroundStyle: Color.listCellBackgroundColor, width: 40.0)
                 .padding(.horizontal)
-            TextArea(text: model.binding(for: \.questionContent), prompt: #localized("请输入问题内容"), promptColor: Color.gray.opacity(0.3), initalFocused: true)
+            TextEditor(text: model.binding(for: \.questionContent))
+                .submitLabel(.done)
+                
+                .onSubmit({ blockFocusState = nil })
+                .focused($blockFocusState, equals: BlockFocusState.questionBlock)
+                .textEditorPrompt(text: model.questionContent, #localized("Enter the question content here"), style: Color.gray.opacity(0.3))
                 .font(.title2)
                 .fontWidth(.condensed)
                 .fontWeight(.semibold)
@@ -60,7 +77,9 @@ struct QAInputView: QANavigationLeaf {
                 }
                 .menuStyle(.button)
                 .foregroundStyle(.secondary)
-                TextArea(text: model.binding(for: \.answerContent), prompt: #localized("请输入Markdown格式的回答"), promptColor: Color.gray.opacity(0.3), initalFocused: false)
+                TextEditor(text: model.binding(for: \.answerContent))
+                    .focused($blockFocusState, equals: BlockFocusState.answerBlock)
+                    .textEditorPrompt(text: model.answerContent, #localized("Enter the answer in Markdown format here"), style: Color.gray.opacity(0.3))
                     .font(.title2)
                     .fontWeight(model.answerContent.isEmpty ? .semibold : .regular)
                     .padding(.horizontal, 3)
@@ -113,7 +132,7 @@ extension QAInputView {
                 .fontDesign(.serif)
                 .foregroundStyle(Color.deepOrange)
         }
-        ToolbarItem(placement: .topBarTrailing) {
+        ToolbarItemGroup(placement: .topBarTrailing) {
             Menu {
                 QANavigationLink(QASinglePageView.self) {
                     Text("Convert To Long Image")
@@ -128,6 +147,11 @@ extension QAInputView {
             .buttonStyle(.plain)
             .foregroundStyle(Color.deepOrange)
             .padding(5)
+            
+            if blockFocusState != nil {
+                Button("Done") { self.blockFocusState = nil }
+                    .foregroundStyle(Color.deepOrange)
+            }
         }
     }
 }

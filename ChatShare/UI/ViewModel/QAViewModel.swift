@@ -114,4 +114,16 @@ final class QAViewModel {
     var pdfResult: ShareFileURL?
     var imageResult: ShareFileURL?
     var pageRotation: QAPageRotation = .rotation4To3
+    
+    func updateSuggestedPagePadding(pageWidth: CGFloat) {
+        let size = CGSize(width: pageWidth, height: pageWidth)
+        if let pageLayout = QATemplateManager.current.pageRects(for: selectedTemplate, preferredSize: size) {
+            let paddingLeft = max(0, pageLayout.suggestedRect.minX - pageLayout.suggestedRect.minX)
+            let paddingRight = max(0, pageLayout.layoutRect.maxX - pageLayout.suggestedRect.maxX)
+            let paddingTop = max(0, pageLayout.suggestedRect.minY - pageLayout.layoutRect.minY)
+            let paddingBottom = max(0, pageLayout.layoutRect.maxY - pageLayout.suggestedRect.maxY)
+            verticalPagePadding = max(paddingTop, paddingBottom)
+            horizontalPagePadding = max(paddingLeft, paddingRight)
+        }
+    }
 }

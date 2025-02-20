@@ -117,6 +117,36 @@
         }
       }
     },
+    "Done" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "完成"
+          }
+        }
+      }
+    },
+    "Enter the answer in Markdown format here" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请输入Markdown格式的回答"
+          }
+        }
+      }
+    },
+    "Enter the question content here" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请输入问题内容"
+          }
+        }
+      }
+    },
     "Generate" : {
       "localizations" : {
         "zh-Hans" : {
@@ -146,6 +176,9 @@
           }
         }
       }
+    },
+    "Image" : {
+
     },
     "Markdown Theme" : {
       "localizations" : {
@@ -289,6 +322,12 @@
         }
       }
     },
+    "Share as Images" : {
+
+    },
+    "Share as PDF" : {
+
+    },
     "Share Failured" : {
       "localizations" : {
         "zh-Hans" : {
@@ -378,12 +417,6 @@
           }
         }
       }
-    },
-    "请输入Markdown格式的回答" : {
-
-    },
-    "请输入问题内容" : {
-
     }
   },
   "version" : "1.0"

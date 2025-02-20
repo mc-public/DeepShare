@@ -24,44 +24,27 @@ extension DownTeX {
             }
         }
     }
-    /// The relevant settings for executing LaTeX typesetting.
-    private struct TypesettingConfiguration {
-        /// The font size associated with this configuration.
-        let fontSize: FontSize
-        /// The page size associated with this configuration.
-        let pageSize: CGSize
-        /// Rectangles available for layout on the page.
-        let layoutRect: CGRect
-        /// Indicates whether the text area is allowed to overflow the layout area.
-        let allowTextOverflow: Bool
-        /// The background image.
-        let image: UIImage
-        /// The file name of the image.
-        static let ImageFileName: String = "image.png"
-        
-        fileprivate init(fontSize: FontSize, pageSize: CGSize, layoutRect: CGRect, allowTextOverflow: Bool, image: UIImage) {
-            assert(CGRect(origin: .zero, size: pageSize).contains(layoutRect), "[\(Self.self)][\(#function)] The page rectangle must contain text-layout rectangle.")
-            self.fontSize = fontSize
-            self.pageSize = pageSize
-            self.layoutRect = layoutRect
-            self.allowTextOverflow = allowTextOverflow
-            self.image = image
-        }
-    }
-    
     //MARK: - Compile Template
     /// Layout configuration when converting Markdown text to PDF text.
     public struct ConvertConfiguration {
         /// The font size used for the main text when typesetting.
         public let fontSize: FontSize
-        /// The currently preferred page size (in units of `pt`).
-        ///
-        /// This value is just a suggestion, and the final page size will be based on the output PDF file.
-        public let preferredPageSize: CGSize
+        /// The currently used page size (in units of `pt`).
+        public let pageSize: CGSize
         /// The area for layoutable text, based on the page rectangle (unit is `pt`).
         ///
-        /// This value is just a suggestion, and the final page size will be based on the output PDF file.
-        public let preferredLayoutRect: CGRect
+        /// The rect must be the sub-rectangle of page rectangle.
+        public let contentRect: CGRect
+        /// The background image for all pages.
+        ///
+        /// Specifying this value as `nil` indicates that there is no page background.
+        public let pageImage: UIImage?
+        static let PageImageFileName = "PageImage.png"
+        /// The title image about the article.
+        public let titleImage: UIImage
+        /// The title image rectangle in `PDF` page coordinator.
+        public let titleRect: CGRect
+        static let TitleImageFileName = "TitleImage.png"
         /// Indicates whether the text area is allowed to overflow the layout area.
         public let allowTextOverflow: Bool
         /// Create a layout configuration.
@@ -70,16 +53,19 @@ extension DownTeX {
         /// - Parameter preferredPageSize: The currently preferred page size (in units of `pt`).
         /// - Parameter preferredLayoutRect: The area for layoutable text, based on the page rectangle (unit is `pt`).
         /// - Parameter allowTextOverflow: Indicates whether the text area is allowed to overflow the layout area.
-        public init(fontSize: FontSize, preferredPageSize: CGSize, preferredLayoutRect: CGRect, allowTextOverflow: Bool) {
-            assert(CGRect(origin: .zero, size: preferredPageSize).contains(preferredLayoutRect), "[\(Self.self)][\(#function)] The page rectangle must contain text-layout rectangle.")
+        public init(fontSize: FontSize, pageSize: CGSize, contentRect: CGRect, allowTextOverflow: Bool, pageImage: UIImage?, titleImage: UIImage, titleRect: CGRect) {
+            assert(CGRect(origin: .zero, size: pageSize).contains(contentRect), "[\(Self.self)][\(#function)] The page rectangle must contain text-content rectangle.")
             self.fontSize = fontSize
-            self.preferredPageSize = preferredPageSize
-            self.preferredLayoutRect = preferredLayoutRect
+            self.pageSize = pageSize
+            self.contentRect = contentRect
             self.allowTextOverflow = allowTextOverflow
+            self.pageImage = pageImage
+            self.titleImage = titleImage
+            self.titleRect = titleRect
         }
     }
     
-    func convertToPDFData(markdown: String, template: QATemplateModel, config: ConvertConfiguration) async throws(OperationError) -> Data {
+    public func convertToPDFData(markdown: String, config: ConvertConfiguration) async throws(OperationError) -> Data {
         
         if self.state == .initFailed { throw .resourceFailured }
         while self.state != .ready {
@@ -87,48 +73,41 @@ extension DownTeX {
         }
         self.state = .running
         defer { self.state = .ready }
-        return try await unsafe_convertToPDFData(markdown: markdown, template: template, config: config)
+        return try await unsafe_convertToPDFData(markdown: markdown, config: config)
     }
     
-    func unsafe_convertToPDFData(markdown: String, template: QATemplateModel, config: ConvertConfiguration) async throws(OperationError) -> Data {
+    func unsafe_convertToPDFData(markdown: String, config: ConvertConfiguration) async throws(OperationError) -> Data {
         let latexContent = try await self.unsafe_convertToLaTeX(markdownString: markdown)
-        guard let templateResult = QATemplateManager.current.renderingResult(for: template, preferredSize: config.preferredPageSize) else {
-            fatalError("[\(Self.self)][\(#function)] Valid preferred size: \(config.preferredPageSize). Please check input parameters.")
+        var imagesDic = [String: UIImage]()
+        if let pageImage = config.pageImage {
+            imagesDic[ConvertConfiguration.PageImageFileName] = pageImage
         }
-        let pageImage = await templateResult.totalImage()
-        let newConfig = TypesettingConfiguration(
-            fontSize: config.fontSize,
-            pageSize: pageImage.size,
-            layoutRect: templateResult.textRect.intersection(
-                CGRect(origin: .zero, size: pageImage.size)
-            ),
-            allowTextOverflow: config.allowTextOverflow,
-            image: pageImage
-        )
+        imagesDic[ConvertConfiguration.TitleImageFileName] = config.titleImage
         return try await self.unsafe_compileToPDF(
-            latexString: self.template(latexContent: latexContent, config: newConfig),
-            image: pageImage,
-            imageFileName: TypesettingConfiguration.ImageFileName
+            latexString: self.template(latexContent: latexContent, config: config),
+            images: imagesDic
         )
     }
     
     //MARK: - Template Content
     
-    private func template(latexContent: String, config: TypesettingConfiguration) -> String {
+    private func template(latexContent: String, config: ConvertConfiguration) -> String {
         let latexContent = latexContent
             .replacingOccurrences(of: "//includegraphics", with: "//fakeincludegraphics")
-        let top = config.layoutRect.minY
-        let bottom = config.pageSize.height - config.layoutRect.maxY
-        let left = config.layoutRect.minX
-        let right = config.pageSize.width - config.layoutRect.maxX
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let top = config.contentRect.minY
+        let bottom = config.pageSize.height - config.contentRect.maxY
+        let left = config.contentRect.minX
+        let right = config.pageSize.width - config.contentRect.maxX
+        let titleTop = config.titleRect.minY
         return
 """
 % Options for packages loaded elsewhere
 \\PassOptionsToPackage{unicode}{hyperref}
 \\PassOptionsToPackage{hyphens}{url}
-\\documentclass[\(Int(config.fontSize.pointSize))pt]{extarticle}
-\\usepackage[fontset=none]{ctex}
-\\usepackage{xcolor, extsizes}
+\\documentclass[\(Int(config.fontSize.pointSize))pt,scheme=plain,fontset=none]{ctexart}
+%\\usepackage[fontset=none]{ctex}
+\\usepackage{extsizes, xcolor}
 \\usepackage{amsmath,amssymb, mathrsfs, graphicx}
 \\usepackage{geometry, fontspec}
 \\usepackage{microtype}
@@ -138,9 +117,12 @@ extension DownTeX {
     paperheight=\(Int(config.pageSize.height))pt,  % Page height
     left=\(Int(left))pt, right=\(Int(right))pt, top=\(Int(top))pt, bottom=\(Int(bottom))pt % Page Margin
 }
+\(config.pageImage != nil ?
+"""
 \\AddToHook{shipout/background}{%
-    \\put (0in,-\\paperheight){\\includegraphics[width=\\paperwidth,height=\\paperheight]{\(TypesettingConfiguration.ImageFileName)}}%
+    \\put (0in,-\\paperheight){\\includegraphics[width=\\paperwidth,height=\\paperheight]{\(ConvertConfiguration.PageImageFileName)}}%
 }
+""" : String())
 \\xeCJKsetup{CheckSingle,CJKmath=true}
 \\setmathrm{LatinModernMath-Regular}
 \\setmainfont{SFProText-Regular}
@@ -255,6 +237,14 @@ extension DownTeX {
 \\date{}
 \\pagestyle{empty}
 \\begin{document}
+\(
+"""
+\\vspace*{\\dimexpr-\(top)pt+\(Int(titleTop))pt-1em-5pt\\relax}
+\\begin{center}
+\\includegraphics[width=\\textwidth]{\(ConvertConfiguration.TitleImageFileName)}
+\\end{center}\\nointerlineskip
+"""
+)
 \(latexContent)
 \\end{document}
 """

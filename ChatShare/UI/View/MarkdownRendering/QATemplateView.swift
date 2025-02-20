@@ -43,6 +43,7 @@ struct QATemplateRotationView<Content>: View where Content: View {
     var textContent: some View {
         VStackLayout(alignment: .center, spacing: 0.0) {
             content()
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }
@@ -87,13 +88,21 @@ fileprivate struct QAScrollTemplateContainer<Content>: View where Content: View 
         let layoutRect = containerLayout?.layoutRect ?? .zero
         ScrollView(.vertical) {
             Frame(totalSize, alignment: .top) {
-                VStack(alignment: .center, spacing: 0.0) {
+                VStack(alignment: .leading, spacing: 0.0) {
                     Rectangle()
                         .fill(.clear)
                         .frame(height: containerLayout?.layoutRect.minY ?? 0.0)
-                    Frame(width: max(0.0, layoutRect.width - horizontalPadding), height: layoutRect.height, alignment: .top) {
-                        content()
+                    HStack(alignment: .top, spacing: 0.0) {
+                        Spacer()
+                            .frame(width: layoutRect.minX)
+                        Frame(width: layoutRect.width, height: layoutRect.height, alignment: .top) {
+                            content()
+                        }
+//                        .border(.black, width: 3.0)
+                        Spacer()
+                            .frame(width: totalSize.width - layoutRect.maxX)
                     }
+                    .frame(width: totalSize.width)
 //                        .border(.yellow, width: 5.0)
                 }
             }
@@ -175,6 +184,7 @@ fileprivate class QATemplateContentView: UIPlainView {
     private var tileImageView = UIImageView()
     private var bottomImageView = UIPlainView()
     private var textRectView = UIPlainView()
+    private var suggestedRectView = UIPlainView()
     
     private func cleanRenderingCache() {
 //        self.tileImageView.clean()
@@ -188,6 +198,7 @@ fileprivate class QATemplateContentView: UIPlainView {
             self.addSubview(self.tileImageView)
             self.addSubview(self.bottomImageView)
             self.addSubview(self.textRectView)
+            self.addSubview(self.suggestedRectView)
             self.topImageView.layer.allowsEdgeAntialiasing = false
             self.tileImageView.layer.allowsEdgeAntialiasing = false
             self.bottomImageView.layer.allowsEdgeAntialiasing = false
@@ -198,7 +209,7 @@ fileprivate class QATemplateContentView: UIPlainView {
         let topImageViewHeight = renderingResult.topRect.height
         let tileImageViewHeight = CGFloat(renderingResult.tileRects.count) * (renderingResult.tileImage.size.height)
         let bottomImageViewHeight = renderingResult.bottomRect.height
-        print(topImageViewHeight + tileImageViewHeight + bottomImageViewHeight, renderingResult.size.height)
+        //debugPrint(topImageViewHeight + tileImageViewHeight + bottomImageViewHeight, renderingResult.size.height)
         self.renderingResult = renderingResult
         self.topImageView.snp.remakeConstraints { make in
             make.top.equalTo(self)
@@ -230,6 +241,12 @@ fileprivate class QATemplateContentView: UIPlainView {
 //        textRectView.layer.borderWidth = 3.0
 //        textRectView.frame = renderingResult.textRect
 //        self.bringSubviewToFront(textRectView)
+//        
+//        suggestedRectView.backgroundColor = .clear
+//        suggestedRectView.layer.borderColor = UIColor.orange.cgColor
+//        suggestedRectView.layer.borderWidth = 3.0
+//        suggestedRectView.frame = renderingResult.suggestedTextRect
+//        self.bringSubviewToFront(suggestedRectView)
         self.snp.remakeConstraints { make in
             make.height.lessThanOrEqualTo(renderingResult.size.height)
         }

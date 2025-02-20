@@ -33,6 +33,8 @@ extension QATemplateManager {
         let bottomRect: CGRect
         /// The text rendering rectangle in the image coordinator.
         let textRect: CGRect
+        /// The suggested rendering rectangle in the image coordinator.
+        let suggestedTextRect: CGRect
         /// The background tone color under the text rendering rectangle.
         let textBackground: UIColor
     }
@@ -47,7 +49,7 @@ extension QATemplateManager {
     }
     
     /// Get the rendering information of a certain template in the page coordinate system.
-    private func pageRects(for template: QATemplateModel) -> (pageSize: CGSize, topRect: CGRect, tileRect: CGRect, bottomRect: CGRect, layoutRect: CGRect) {
+    private func pageRects(for template: QATemplateModel) -> (pageSize: CGSize, topRect: CGRect, tileRect: CGRect, bottomRect: CGRect, layoutRect: CGRect, suggestedRect: CGRect) {
         let page = self.page(for: template)
         let pageSize = page.bounds(for: .mediaBox).size
         let pdfScale = pageSize.height / template.pageSize.height
@@ -55,13 +57,15 @@ extension QATemplateManager {
         let pageRect = CGRect(origin: .zero, size: pageSize)
         /// The layout rect in UIKit page coordinate.
         let layoutRect = template.textRect.scale(pdfScale)
+        /// The suggest layout rect in UIKit page coordinate.
+        let suggestedRect = template.suggestedRect.scale(pdfScale)
         /// The height-append rect in UIKit page coordinate.
         let tileRect = template.heightSliceRect.scale(pdfScale)
         /// The top rect about the image.
         let firstPartRect = CGRect(origin: .zero, size: CGSize(width: pageRect.width, height: tileRect.minY))
         /// The final rect about the image.
         let finalPartRect = CGRect(origin: tileRect.bottomLeading, size: CGSize(width: pageRect.width, height: pageRect.height - tileRect.maxY))
-        return (pageSize: pageRect.size, topRect: firstPartRect, tileRect: tileRect, bottomRect: finalPartRect, layoutRect: layoutRect)
+        return (pageSize: pageRect.size, topRect: firstPartRect, tileRect: tileRect, bottomRect: finalPartRect, layoutRect: layoutRect, suggestedRect: suggestedRect)
     }
     
     func preferredSize(for template: QATemplateModel, preferredWidth: CGFloat, preferredTextHeight: CGFloat) -> CGSize {
@@ -73,7 +77,7 @@ extension QATemplateManager {
         return CGSize(width: preferredWidth, height: totalHeight)
     }
     
-    func pageRects(for template: QATemplateModel, preferredSize: CGSize) -> (scale: CGFloat, pageSize: CGSize, topRect: CGRect, tileCount: Int, tileHeight: CGFloat, tileRects: [CGRect], bottomRect: CGRect, layoutRect: CGRect)? {
+    func pageRects(for template: QATemplateModel, preferredSize: CGSize) -> (scale: CGFloat, pageSize: CGSize, topRect: CGRect, tileCount: Int, tileHeight: CGFloat, tileRects: [CGRect], bottomRect: CGRect, layoutRect: CGRect, suggestedRect: CGRect)? {
         if preferredSize.width.isAlmostZero() || preferredSize.height.isAlmostZero() { return nil }
         let pageInfo = self.pageRects(for: template)
         let pageScale = preferredSize.width / pageInfo.pageSize.width
@@ -95,15 +99,17 @@ extension QATemplateManager {
             size: pageInfo.bottomRect.size
         )
         let layoutRect = pageInfo.layoutRect.offset(dh: heightDelta)
+        let suggestedRect = pageInfo.suggestedRect.offset(dh: heightDelta)
         return (
-            scale: pageScale,
-            pageSize: pageSize.scale(pageScale),
-            topRect: pageInfo.topRect.scale(pageScale),
-            tileCount: tileCount,
-            tileHeight: pixelAlignedTileHeight * pageScale,
-            tileRects: tileRects.map { $0.scale(pageScale) },
-            bottomRect: bottomRect.scale(pageScale),
-            layoutRect: layoutRect.scale(pageScale)
+            scale:         pageScale,
+            pageSize:      pageSize.scale(pageScale),
+            topRect:       pageInfo.topRect.scale(pageScale),
+            tileCount:     tileCount,
+            tileHeight:    pixelAlignedTileHeight * pageScale,
+            tileRects:     tileRects.map { $0.scale(pageScale) },
+            bottomRect:    bottomRect.scale(pageScale),
+            layoutRect:    layoutRect.scale(pageScale),
+            suggestedRect: suggestedRect.scale(pageScale)
         )
     }
     
@@ -132,6 +138,7 @@ extension QATemplateManager {
             bottomImage: cache.bottomImage,
             bottomRect: pageInfo.bottomRect,
             textRect: pageInfo.layoutRect,
+            suggestedTextRect: pageInfo.suggestedRect,
             textBackground: template.textBackgroundColor
         )
     }
