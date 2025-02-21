@@ -218,7 +218,7 @@ public final class DownTeX {
         public var id: String { self.command }
         public var extensionName: String
         public static var allCases: [TargetFormat] {
-            [.plainText, .reStructuredText, .latex, .reStructuredText, .html]
+            [.plainText, .reStructuredText, .latex, .html]
         }
         
         public init?(rawValue: String) {
