@@ -87,12 +87,42 @@
         }
       }
     },
+    "Convert to Other Text Formats" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "转换为其它文本格式"
+          }
+        }
+      }
+    },
     "Convert to Short Image Slices" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "转换为短图合集"
+          }
+        }
+      }
+    },
+    "Copied to Clipboard" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已复制到剪切板"
+          }
+        }
+      }
+    },
+    "Copy to Clipboard" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "复制到剪切板"
           }
         }
       }
@@ -187,12 +217,32 @@
         }
       }
     },
+    "HTML" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "HTML"
+          }
+        }
+      }
+    },
     "Image" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "图片"
+          }
+        }
+      }
+    },
+    "LaTeX" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LaTeX"
           }
         }
       }
@@ -267,6 +317,16 @@
         }
       }
     },
+    "Plain Text" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "纯文本"
+          }
+        }
+      }
+    },
     "Please Check spelling or input a new search text." : {
       "localizations" : {
         "zh-Hans" : {
@@ -307,6 +367,16 @@
         }
       }
     },
+    "reStructuredText" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "reStructuredText"
+          }
+        }
+      }
+    },
     "Search" : {
       "localizations" : {
         "zh-Hans" : {
@@ -335,6 +405,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "分享"
+          }
+        }
+      }
+    },
+    "Share as File" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "以文件格式分享"
           }
         }
       }

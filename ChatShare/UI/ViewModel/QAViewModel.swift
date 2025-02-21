@@ -107,6 +107,7 @@ final class QAViewModel {
     //MARK: - Page Sheets
     var isShowingSinglePageSheet = false
     var isShowingSplitedPageSheet = false
+    var isShowingTextConvertSheet = false
     
     //MARK: - QARenderingOptions
     var selectedTemplate: QATemplateModel = QATemplateManager.current.defaultTemplate

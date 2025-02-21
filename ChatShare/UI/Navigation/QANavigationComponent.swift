@@ -96,7 +96,7 @@ extension QANavigationRoot {
                             .environment(QAViewModel.current)
                             .environment(QADataManager.current)
                             .onAppear(perform: target.onCompletion)
-                    }  else {
+                    } else {
                         AnyView(
                             target.target.init()
                                 .onAppear(perform: target.onCompletion)

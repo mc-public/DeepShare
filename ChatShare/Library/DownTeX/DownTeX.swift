@@ -9,6 +9,7 @@ import SwiftUI
 import UIKit
 import WebKit
 import TeXEngine
+import Localization
 
 /// A class for executing Markdown to LaTeX and PDF conversion.
 @Observable @MainActor
@@ -161,17 +162,17 @@ public final class DownTeX {
         }
     }
     
-    /// Convert specific Markdown string to LaTeX string.
+    /// Convert specific Markdown string to specific plain-text string.
     ///
     /// - Parameter markdownString: The markdown string.
-    public func convertToLaTeX(markdownString: String) async throws(OperationError) -> String {
+    public func convertToText(markdownString: String, format: TargetFormat) async throws(OperationError) -> String {
         if self.state == .initFailed { throw .resourceFailured }
         while self.state != .ready {
             try? await Task.sleep(for: .microseconds(10))
         }
         self.state = .running
         defer { self.state = .ready }
-        return try await unsafe_convertToLaTeX(markdownString: markdownString)
+        return try await unsafe_convertToText(markdownString: markdownString, format: format)
     }
     
     func unsafe_compileToPDF(latexString: String, images: [String: UIImage]) async throws(OperationError) -> Data {
@@ -209,13 +210,47 @@ public final class DownTeX {
         }
     }
     
-    func unsafe_convertToLaTeX(markdownString: String) async throws(OperationError) -> String {
+    public struct TargetFormat: CaseIterable, Hashable, Identifiable, RawRepresentable {
+        
+        fileprivate var command: String
+        public var title: String
+        public var rawValue: String { self.command }
+        public var id: String { self.command }
+        public var extensionName: String
+        public static var allCases: [TargetFormat] {
+            [.plainText, .reStructuredText, .latex, .reStructuredText, .html]
+        }
+        
+        public init?(rawValue: String) {
+            for item in Self.allCases + [.unsafe_latex] where item.command == rawValue {
+                self.command = item.command
+                self.title = item.title
+                self.extensionName = item.extensionName
+            }
+            return nil
+        }
+        
+        private init(command: String, title: String, extensionName: String) {
+            self.command = command
+            self.title = title
+            self.extensionName = extensionName
+        }
+        
+        public static let plainText = TargetFormat(command: "-f markdown -t plain", title: #localized("Plain Text"), extensionName: "txt")
+        public static let reStructuredText = TargetFormat(command: "-f markdown -t rst", title: #localized("reStructuredText"), extensionName: "rst")
+        public static let latex = TargetFormat(command: "--standalone -f markdown -t latex", title: #localized("LaTeX"), extensionName: "tex")
+        public static let html = TargetFormat(command: "-f markdown -t html", title:  #localized("HTML"), extensionName: "html")
+        
+        fileprivate static let unsafe_latex = TargetFormat(command: "-f markdown -t latex", title: #localized("LaTeX"), extensionName: "tex")
+    }
+    
+    func unsafe_convertToText(markdownString: String, format: TargetFormat) async throws(OperationError) -> String {
         if markdownString.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            throw .illegalTextContent
+            return String()
         }
         let safedString = markdownString.javaScriptString
         let fetchResult = {
-            (try? await Self.pandocView.content.evaluateJavaScript("window.pandoc('-f markdown -t latex', \"\(safedString)\")")) as? String
+            (try? await Self.pandocView.content.evaluateJavaScript("window.pandoc('\(format.command)', \"\(safedString)\")")) as? String
         }
         guard let result = await fetchResult() else {
             await unsafe_configurePandocView()
@@ -226,6 +261,13 @@ public final class DownTeX {
             }
         }
         return result
+    }
+    
+    func unsafe_convertToLaTeX(markdownString: String) async throws(OperationError) -> String {
+        if markdownString.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            throw .illegalTextContent
+        }
+        return try await unsafe_convertToText(markdownString: markdownString, format: .unsafe_latex)
     }
 }
 

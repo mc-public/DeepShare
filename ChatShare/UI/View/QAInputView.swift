@@ -40,6 +40,10 @@ struct QAInputView: QANavigationLeaf {
             QASplitedPagesView()
                 .interactiveDismissDisabled()
         }
+        .sheet(isPresented: model.binding(for: \.isShowingTextConvertSheet)) {
+            QATextConvertView()
+                .interactiveDismissDisabled()
+        }
     }
     
     
@@ -146,6 +150,9 @@ extension QAInputView {
                         }
                         Button("Convert to Short Image Slices", systemImage: "photo.stack") {
                             model.isShowingSplitedPageSheet = true
+                        }
+                        Button("Convert to Other Text Formats", systemImage: "text.page") {
+                            model.isShowingTextConvertSheet = true
                         }
                     } label: {
                         Text("Convert")
