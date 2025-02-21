@@ -34,7 +34,7 @@ struct QATextConvertView: View {
         .onChange(of: convertFormat, initial: true) { _, newValue in
             self.convert(format: newValue)
         }
-        .alert("Share Failured", isPresented: viewModel.binding(for: \.isShowingShareFailuredAlert), actions: {
+        .alert("Share Failured", isPresented: $isShareFileFailured, actions: {
             Button("OK") {}
         })
         .fileShareSheet(item: $convertFileURL)
@@ -106,10 +106,10 @@ struct QATextConvertView: View {
         UIPasteboard.general.string = self.convertResult
         self.isDisabled = true
         Task {
+            defer { self.isDisabled = false }
             if let image = UIImage(systemName: "checkmark") {
                 SVProgressHUD.show(image, status: #localized("Copied to Clipboard"))
                 await SVProgressHUD.dismiss(withDelay: 1.5)
-                self.isDisabled = false
             }
         }
     }
