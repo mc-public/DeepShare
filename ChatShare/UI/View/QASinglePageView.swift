@@ -56,6 +56,9 @@ struct QASinglePageView: QANavigationLeaf {
             viewModel.updateSuggestedPagePadding(pageWidth: scrollViewFrameSize.width)
             controller.backgroundColor = Color(newValue.textBackgroundColor).opacity(0)
         }
+        .onChange(of: controller.theme, initial: true) { _, _ in
+            controller.backgroundColor = Color(viewModel.selectedTemplate.textBackgroundColor).opacity(0)
+        }
     }
     
     

@@ -10,7 +10,6 @@
 		E51729572D59226C00A65085 /* ObservableDefaults in Frameworks */ = {isa = PBXBuildFile; productRef = E51729562D59226C00A65085 /* ObservableDefaults */; };
 		E52146182D5253220055E0F7 /* MarkdownView in Frameworks */ = {isa = PBXBuildFile; productRef = E52146172D5253220055E0F7 /* MarkdownView */; };
 		E5418F7D2D51F26600A6655C /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = E5418F7C2D51F26600A6655C /* SwiftUIIntrospect */; };
-		E5418F802D51F2A400A6655C /* EnvironmentOverrides in Frameworks */ = {isa = PBXBuildFile; productRef = E5418F7F2D51F2A400A6655C /* EnvironmentOverrides */; };
 		E5418F832D51F42E00A6655C /* SVProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = E5418F822D51F42E00A6655C /* SVProgressHUD */; };
 		E54760D02D6798D100C9EB0E /* PDFPreviewer in Frameworks */ = {isa = PBXBuildFile; productRef = E54760CF2D6798D100C9EB0E /* PDFPreviewer */; };
 		E57ADDC12D5F3429001BCED0 /* FPSMonitorLabel in Frameworks */ = {isa = PBXBuildFile; productRef = E57ADDC02D5F3429001BCED0 /* FPSMonitorLabel */; };
@@ -71,7 +70,6 @@
 				E5FCD05F2D632C1500C8DB4B /* Zip in Frameworks */,
 				E59D9C7B2D63C3CA009A53F6 /* TeXEngine in Frameworks */,
 				E5C907BE2D57845000730092 /* Localization in Frameworks */,
-				E5418F802D51F2A400A6655C /* EnvironmentOverrides in Frameworks */,
 				E57ADDC92D5F8A08001BCED0 /* SnapKit in Frameworks */,
 				E52146182D5253220055E0F7 /* MarkdownView in Frameworks */,
 				E5418F7D2D51F26600A6655C /* SwiftUIIntrospect in Frameworks */,
@@ -129,7 +127,6 @@
 			name = ChatShare;
 			packageProductDependencies = (
 				E5418F7C2D51F26600A6655C /* SwiftUIIntrospect */,
-				E5418F7F2D51F2A400A6655C /* EnvironmentOverrides */,
 				E5418F822D51F42E00A6655C /* SVProgressHUD */,
 				E52146172D5253220055E0F7 /* MarkdownView */,
 				E5C907BD2D57845000730092 /* Localization */,
@@ -174,7 +171,6 @@
 			packageReferences = (
 				E5418F7A2D51F1F600A6655C /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
 				E5418F7B2D51F26600A6655C /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
-				E5418F7E2D51F2A400A6655C /* XCRemoteSwiftPackageReference "EnvironmentOverrides" */,
 				E5418F812D51F42E00A6655C /* XCRemoteSwiftPackageReference "SVProgressHUD" */,
 				E5D82EE32D524E6C000CAE11 /* XCLocalSwiftPackageReference "SwiftMarkdown" */,
 				E5C907BC2D57845000730092 /* XCLocalSwiftPackageReference "Localization" */,
@@ -491,14 +487,6 @@
 				minimumVersion = 1.3.0;
 			};
 		};
-		E5418F7E2D51F2A400A6655C /* XCRemoteSwiftPackageReference "EnvironmentOverrides" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/nalexn/EnvironmentOverrides.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.0.4;
-			};
-		};
 		E5418F812D51F42E00A6655C /* XCRemoteSwiftPackageReference "SVProgressHUD" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SVProgressHUD/SVProgressHUD.git";
@@ -564,11 +552,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E5418F7B2D51F26600A6655C /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
 			productName = SwiftUIIntrospect;
-		};
-		E5418F7F2D51F2A400A6655C /* EnvironmentOverrides */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E5418F7E2D51F2A400A6655C /* XCRemoteSwiftPackageReference "EnvironmentOverrides" */;
-			productName = EnvironmentOverrides;
 		};
 		E5418F822D51F42E00A6655C /* SVProgressHUD */ = {
 			isa = XCSwiftPackageProductDependency;

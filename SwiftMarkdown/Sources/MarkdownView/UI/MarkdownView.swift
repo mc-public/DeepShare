@@ -113,12 +113,12 @@ public class MarkdownState {
     /// The default color is `.white`.
     public var backgroundColor: Color {
         didSet {
-            #if os(iOS)
+#if os(iOS)
             container.backgroundColor = PlatformColor(backgroundColor)
             container.scrollView.backgroundColor = PlatformColor(backgroundColor)
 #elseif os(macOS)
             Task { await container.updateBackgroundColor(PlatformColor(backgroundColor)) }
-            #endif
+#endif
         }
     }
     /// Return color schemes suggested based on the background color.
@@ -148,6 +148,8 @@ public class MarkdownState {
         await container.updateFontSize(fontSize)
         await container.updateHorizontalPadding(horizontalPadding)
         await container.updateVerticalPadding(top: topPadding, bottom: bottomPadding)
+        container.backgroundColor = PlatformColor(backgroundColor)
+        container.scrollView.backgroundColor = PlatformColor(backgroundColor)
     }
     
     /// Create a `Markdown` state.
