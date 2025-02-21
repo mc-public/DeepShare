@@ -90,9 +90,8 @@ struct QATextConvertView: View {
             }
             let normalizedTitle = viewModel.questionContent.trimmingCharacters(in: .whitespacesAndNewlines)
             let normalizedAnswer = viewModel.answerContent.trimmingCharacters(in: .whitespacesAndNewlines)
-            let title = (normalizedTitle.isEmpty ? String() : "# ") + normalizedTitle + (normalizedAnswer.isEmpty ? String() : ("\n\n" + normalizedAnswer))
-            let markdownString = title + viewModel.answerContent.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard let result = try? await DownTeX.current.convertToText(markdownString: markdownString, format: format) else {
+            let markdownContent = (normalizedTitle.isEmpty ? String() : "# ") + normalizedTitle + (normalizedAnswer.isEmpty ? String() : ("\n\n" + normalizedAnswer))
+            guard let result = try? await DownTeX.current.convertToText(markdownString: markdownContent, format: format) else {
                 isConvertFailured = true
                 return
             }
