@@ -22,6 +22,7 @@ struct QASinglePageView: QANavigationLeaf {
     @State var scrollViewFrameSize = CGSize.zero
     @State var isDisable: Bool = true
     @Environment(QAViewModel.self) var viewModel: QAViewModel
+    @Environment(\.dismiss) var dismiss
     
     var navigationTitleColor: Color { .dynamicBlack }
     
@@ -72,6 +73,13 @@ struct QASinglePageView: QANavigationLeaf {
 extension QASinglePageView {
     @ToolbarContentBuilder
     func toolbarContent() -> some ToolbarContent {
+        ToolbarItem(placement: .cancellationAction) {
+            Button {
+                dismiss()
+            } label: {
+                Text("Cancel")
+            }
+        }
         ToolbarItem(placement: .topBarTrailing) {
             Button("Share", action: shareImage)
             .menuStyle(.button)

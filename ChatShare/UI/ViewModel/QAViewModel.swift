@@ -104,6 +104,10 @@ final class QAViewModel {
         }
     }
     
+    //MARK: - Page Sheets
+    var isShowingSinglePageSheet = false
+    var isShowingSplitedPageSheet = false
+    
     //MARK: - QARenderingOptions
     var selectedTemplate: QATemplateModel = QATemplateManager.current.defaultTemplate
     var usingWaterMark = true

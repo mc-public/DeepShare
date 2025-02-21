@@ -96,6 +96,18 @@ extension QANavigationRoot {
                             .environment(QAViewModel.current)
                             .environment(QADataManager.current)
                             .onAppear(perform: target.onCompletion)
+                    } else if target == QASinglePageView.NavigationTarget {
+                        QASinglePageView()
+                            .onAppear(perform: target.onCompletion)
+                            .environment(QANavigationModel.current)
+                            .environment(QAViewModel.current)
+                            .environment(QADataManager.current)
+                    } else if target == QASplitedPagesView.NavigationTarget {
+                        QASplitedPagesView()
+                            .onAppear(perform: target.onCompletion)
+                            .environment(QANavigationModel.current)
+                            .environment(QAViewModel.current)
+                            .environment(QADataManager.current)
                     } else {
                         AnyView(
                             target.target.init()

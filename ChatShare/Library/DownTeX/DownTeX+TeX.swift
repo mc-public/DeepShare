@@ -41,9 +41,9 @@ extension DownTeX {
         public let pageImage: UIImage?
         static let PageImageFileName = "PageImage.png"
         /// The title image about the article.
-        public let titleImage: UIImage
+        public let titleImage: UIImage?
         /// The title image rectangle in `PDF` page coordinator.
-        public let titleRect: CGRect
+        public let titleRect: CGRect?
         static let TitleImageFileName = "TitleImage.png"
         /// Indicates whether the text area is allowed to overflow the layout area.
         public let allowTextOverflow: Bool
@@ -53,7 +53,7 @@ extension DownTeX {
         /// - Parameter preferredPageSize: The currently preferred page size (in units of `pt`).
         /// - Parameter preferredLayoutRect: The area for layoutable text, based on the page rectangle (unit is `pt`).
         /// - Parameter allowTextOverflow: Indicates whether the text area is allowed to overflow the layout area.
-        public init(fontSize: FontSize, pageSize: CGSize, contentRect: CGRect, allowTextOverflow: Bool, pageImage: UIImage?, titleImage: UIImage, titleRect: CGRect) {
+        public init(fontSize: FontSize, pageSize: CGSize, contentRect: CGRect, allowTextOverflow: Bool, pageImage: UIImage?, titleImage: UIImage?, titleRect: CGRect?) {
             assert(CGRect(origin: .zero, size: pageSize).contains(contentRect), "[\(Self.self)][\(#function)] The page rectangle must contain text-content rectangle.")
             self.fontSize = fontSize
             self.pageSize = pageSize
@@ -82,6 +82,9 @@ extension DownTeX {
         if let pageImage = config.pageImage {
             imagesDic[ConvertConfiguration.PageImageFileName] = pageImage
         }
+        if let titleImage = config.titleImage {
+            imagesDic[ConvertConfiguration.TitleImageFileName] = titleImage
+        }
         imagesDic[ConvertConfiguration.TitleImageFileName] = config.titleImage
         return try await self.unsafe_compileToPDF(
             latexString: self.template(latexContent: latexContent, config: config),
@@ -99,7 +102,7 @@ extension DownTeX {
         let bottom = config.pageSize.height - config.contentRect.maxY
         let left = config.contentRect.minX
         let right = config.pageSize.width - config.contentRect.maxX
-        let titleTop = config.titleRect.minY
+        let titleTop = config.titleRect?.minY ?? 0.0
         return
 """
 % Options for packages loaded elsewhere
@@ -237,13 +240,13 @@ extension DownTeX {
 \\date{}
 \\pagestyle{empty}
 \\begin{document}
-\(
+\(config.titleImage != nil ?
 """
 \\vspace*{\\dimexpr-\(top)pt+\(Int(titleTop))pt-1em-5pt\\relax}
 \\begin{center}
 \\includegraphics[width=\\textwidth]{\(ConvertConfiguration.TitleImageFileName)}
 \\end{center}\\nointerlineskip
-"""
+""" : String()
 )
 \(latexContent)
 \\end{document}

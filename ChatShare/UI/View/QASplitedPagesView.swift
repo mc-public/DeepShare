@@ -21,6 +21,7 @@ struct QASplitedPagesView: QANavigationLeaf {
     }
     
     @Environment(QAViewModel.self) var viewModel: QAViewModel
+    @Environment(\.dismiss) var dismiss
     @State var markdownState = MarkdownState()
     /// Disabled critical buttons when rendering contents.
     @State var isDisabled = true
@@ -86,6 +87,13 @@ struct QASplitedPagesView: QANavigationLeaf {
     
     @ToolbarContentBuilder
     func toolbarContent() -> some ToolbarContent {
+        ToolbarItem(placement: .cancellationAction) {
+            Button {
+                dismiss()
+            } label: {
+                Text("Cancel")
+            }
+        }
         ToolbarItem(placement: .topBarTrailing) {
             Button("Generate", action: generate)
                 .menuStyle(.button)
@@ -121,13 +129,13 @@ extension QASplitedPagesView {
             return nil
         }
         let textRectMinX = layoutResult.textRect.minX + viewModel.horizontalPagePadding
-        let titleCellImageRect = CGRect.init(x: textRectMinX, y: layoutResult.textRect.minY, width: titleCellSize.width, height: titleCellSize.height)
+        
         let titleRenderer = ImageRenderer(content: self.markdownContent.titleCell.frame(width: titleCellSize.width, height: titleCellSize.height))
+        
         titleRenderer.scale = 5.0
         titleRenderer.proposedSize = .init(titleCellSize)
-        guard let titleCellImage = titleRenderer.uiImage else {
-            return nil
-        }
+        let titleCellImage = titleRenderer.uiImage
+        let titleCellImageRect = (titleCellImage == nil) ? nil : CGRect.init(x: textRectMinX, y: layoutResult.textRect.minY, width: titleCellSize.width, height: titleCellSize.height)
         let pageImage = await layoutResult.totalImage()
         let newContentRect = layoutResult.textRect.inseting(
             top: viewModel.verticalPagePadding,
@@ -141,7 +149,8 @@ extension QASplitedPagesView {
             contentRect: newContentRect,
             allowTextOverflow: true,
             pageImage: pageImage,
-            titleImage: titleCellImage, titleRect: titleCellImageRect
+            titleImage: titleCellImage,
+            titleRect: titleCellImageRect
         )
         guard let data = try? await  DownTeX.current.convertToPDFData(markdown: viewModel.answerContent, config: config) else {
             return nil
@@ -180,8 +189,8 @@ struct QASplitedPagesSettingsView: View {
     var content: some View {
         List {
             let splitedSize = viewModel.pageRotation.size(width: windowSize.width)
-            let layoutResult = QATemplateManager.current.renderingResult(for: viewModel.selectedTemplate, preferredSize: splitedSize)
-            let maximumPadding = 0.3 * (layoutResult?.textRect.height ?? 0.0)
+            let layoutResult = QATemplateManager.current.pageRects(for: viewModel.selectedTemplate, preferredSize: splitedSize)
+            let maximumPadding = 0.3 * (layoutResult?.layoutRect.height ?? 0.0)
             Section("Style") {
                 QAPageSettingLabel.usingWaterMarkLabel(viewModel: viewModel)
                 QAPageSettingLabel.usingTitleBorder(viewModel: viewModel)
@@ -254,16 +263,12 @@ struct QASplitedPagesResultView: View {
     
     @ToolbarContentBuilder
     func toolbarContent() -> some ToolbarContent {
-        ToolbarItem(placement: .topBarLeading) {
-            Button.init {
+        ToolbarItem(placement: .cancellationAction) {
+            Button {
                 dismiss()
             } label: {
-                HStack {
-                    Image(systemName: "xmark").fontWeight(.medium)
-                    Text("Close")
-                }
+                Text("Cancel")
             }
-            .padding(.leading, length: -4.0)
         }
         ToolbarItem(placement: .topBarTrailing) {
             Menu("Share") {

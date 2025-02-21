@@ -32,6 +32,14 @@ struct QAInputView: QANavigationLeaf {
         .background(Color.listBackgroundColor, ignoresSafeAreaEdges: .all)
         .toolbar(content: toolbarContent)
         .navigationBarBackButtonHidden()
+        .sheet(isPresented: model.binding(for: \.isShowingSinglePageSheet)) {
+            NavigationStack(root: QASinglePageView.init)
+                .interactiveDismissDisabled()
+        }
+        .sheet(isPresented: model.binding(for: \.isShowingSplitedPageSheet)) {
+            NavigationStack(root: QASplitedPagesView.init)
+                .interactiveDismissDisabled()
+        }
     }
     
     
@@ -127,11 +135,11 @@ extension QAInputView {
         ToolbarItemGroup(placement: .topBarTrailing) {
             HStack(alignment: .firstTextBaseline) {
                 Menu {
-                    QANavigationLink(QASinglePageView.self) {
-                        Label("Convert To Long Image", systemImage: "photo")
+                    Button("Convert To Long Image", systemImage: "photo") {
+                        model.isShowingSinglePageSheet = true
                     }
-                    QANavigationLink(QASplitedPagesView.self) {
-                        Label("Convert to Short Image Slices", systemImage: "photo.stack")
+                    Button("Convert to Short Image Slices", systemImage: "photo.stack") {
+                        model.isShowingSplitedPageSheet = true
                     }
                 } label: {
                     Text("Convert")
