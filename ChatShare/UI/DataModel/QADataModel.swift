@@ -9,7 +9,11 @@ import Foundation
 import Localization
 import SwiftUI
 
+#if DEBUG
 private let USING_TEST_DATA = true
+#else
+private let USING_TEST_DATA = false
+#endif
 
 //MARK: - Data Model
 
