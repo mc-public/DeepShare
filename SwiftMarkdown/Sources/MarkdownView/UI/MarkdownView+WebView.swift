@@ -159,7 +159,6 @@ document.body.appendChild(window.md_style);
     
     @available(macOS 14.0, iOS 17.0, *)
     func updateBackgroundColor(_ color: PlatformColor?) async {
-
         #if os(iOS)
         guard let color = (color ?? self.backgroundColor)?.toRGBComponents() else {
             assertionFailure()

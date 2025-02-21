@@ -12,7 +12,7 @@ import Localization
 import PDFPreviewer
 import PDFKit
 
-struct QASplitedPagesView: QANavigationLeaf {
+struct QASplitedPagesView: View {
     
     struct RenderingResult: Identifiable {
         var id = UUID()
@@ -32,6 +32,16 @@ struct QASplitedPagesView: QANavigationLeaf {
     /// Rendering results.
     @State var renderingResult: RenderingResult?
     
+    var body: some View {
+        NavigationStack {
+            content
+        }
+        .onGeometryChange(body: {
+            windowSize = $0
+        })
+    }
+    
+    @ViewBuilder
     var content: some View {
         let preferredSize = viewModel.pageRotation.size(width: windowSize.width)
         let containerLayout = QATemplateManager.current.pageRects(for: viewModel.selectedTemplate, preferredSize: preferredSize)
@@ -39,9 +49,9 @@ struct QASplitedPagesView: QANavigationLeaf {
         let topCellHeight = 0.7 * windowSize.height
         let contentView = VStack(spacing: 0.0) {
             Spacer()
-                .frame(height: max(0.0, topCellHeight - previewContentSize.height))
+                .frame(width: windowSize.width, height: max(0.0, topCellHeight - previewContentSize.height))
             scrollContent
-                .frame(height: previewContentSize.height)
+                .frame(width: windowSize.width, height: previewContentSize.height)
         }
         QASplitedPagesSettingsView(markdownState: $markdownState, selectedFontSize: $fontSize, windowSize: $windowSize)
             .disabled(isDisabled)
@@ -52,7 +62,6 @@ struct QASplitedPagesView: QANavigationLeaf {
                     .frame(width: windowSize.width, height: topCellHeight)
             }
             .toolbar(content: toolbarContent)
-            .onGeometryChange(body: { windowSize = $0 })
             .alert("Share Failured", isPresented: viewModel.binding(for: \.isShowingShareFailuredAlert), actions: {
                 Button("OK") {}
             })
@@ -147,7 +156,7 @@ extension QASplitedPagesView {
             fontSize: fontSize,
             pageSize: layoutResult.size,
             contentRect: newContentRect,
-            allowTextOverflow: true,
+            allowTextOverflow: viewModel.allowTextOverflow,
             pageImage: pageImage,
             titleImage: titleCellImage,
             titleRect: titleCellImageRect
@@ -199,6 +208,7 @@ struct QASplitedPagesSettingsView: View {
                 QAPageSettingLabel.pageVerticalPaddingLabel(viewModel: viewModel, maximumHeight: maximumPadding)
                 rotationLabel
                 fontSizeLabel
+                textOverflowLabel
             }
         }
     }
@@ -217,6 +227,10 @@ struct QASplitedPagesSettingsView: View {
                 Text("\(Int(size.pointSize)) pt").tag(size)
             }
         }
+    }
+    
+    var textOverflowLabel: some View {
+        Toggle("Allow Text Overflow", isOn: viewModel.binding(for: \.allowTextOverflow))
     }
 }
 

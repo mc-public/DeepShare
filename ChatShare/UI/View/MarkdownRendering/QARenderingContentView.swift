@@ -19,6 +19,7 @@ struct QARenderingContentView: View {
     @ViewBuilder
     var body: some View {
         VStackLayout(alignment: .leading, spacing: 0.0) {
+            Spacer().frame(height: viewModel.verticalPagePadding)
             if !viewModel.questionContent.isEmpty {
                 titleCell
                     .onGeometryChange(body: { titleCellSize = $0 })
@@ -67,7 +68,6 @@ struct QARenderingContentView: View {
         })
         .padding(.horizontal, controller.horizontalPadding)
         .padding(.bottom)
-        .padding(.top, viewModel.verticalPagePadding)
     }
 }
 

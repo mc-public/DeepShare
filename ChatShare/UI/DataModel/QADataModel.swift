@@ -9,7 +9,7 @@ import Foundation
 import Localization
 import SwiftUI
 
-private let USING_TEST_DATA = false
+private let USING_TEST_DATA = true
 
 //MARK: - Data Model
 

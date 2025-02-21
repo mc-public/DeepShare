@@ -1,7 +1,7 @@
 [
     {
       "filename": "example1.txt",
-      "question": "如何推导线性回归的闭式解（解析解）？"
+      "question": "请全面解析卷积神经网络（CNN）的核心原理、关键技术改进及其在计算机视觉任务中的应用实践，涵盖从基础结构到最前沿模型的演进过程。"
     },
     {
       "filename": "example2.txt",

@@ -118,6 +118,7 @@ final class QAViewModel {
     var pdfResult: ShareFileURL?
     var imageResult: ShareFileURL?
     var pageRotation: QAPageRotation = .rotation4To3
+    var allowTextOverflow = false
     
     func updateSuggestedPagePadding(pageWidth: CGFloat) {
         let size = CGSize(width: pageWidth, height: pageWidth)

@@ -122,6 +122,12 @@ extension DownTeX {
 }
 \(config.pageImage != nil ?
 """
+\\usepackage{longtable, booktabs, array, etoolbox, footnote, calc}
+\\makeatletter
+\\patchcmd\\longtable{\\par}{\\if@noskipsec\\mbox{}\\fi\\par}{}{}
+\\makeatother
+\\makesavenoteenv{longtable}
+%%%%% --- Config Page Background --- %%%%%
 \\AddToHook{shipout/background}{%
     \\put (0in,-\\paperheight){\\includegraphics[width=\\paperwidth,height=\\paperheight]{\(ConvertConfiguration.PageImageFileName)}}%
 }
@@ -130,14 +136,14 @@ extension DownTeX {
 \\setmathrm{LatinModernMath-Regular}
 \\setmainfont{SFProText-Regular}
 \\setmonofont{SFMono-Regular}
-\\setCJKmainfont[AutoFakeSlant=true,AutoFakeBold=true]{PingFangSC-Regular}
+\\setCJKmainfont[AutoFakeSlant=true,AutoFakeBold={3}]{PingFangSC-Regular}
 \\setCJKfamilyfont{songti}{PingFangSC-Regular}
 \\setCJKfamilyfont{heiti}{PingFangSC-Semibold}
 \\setCJKfamilyfont{kaishu}{PingFangSC-Regular}
 \\newcommand{\\songti}{\\CJKfamily{songti}}
 \\newcommand{\\heiti}{\\CJKfamily{heiti}}
 \\newcommand{\\kaishu}{\\CJKfamily{kaishu}}
-\\tolerance=10000
+\(config.allowTextOverflow ? String() : "\\tolerance=10000")
 \\setcounter{secnumdepth}{0} % remove section numbering
 \\usepackage{iftex}
 \\ifPDFTeX

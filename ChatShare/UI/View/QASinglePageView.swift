@@ -41,7 +41,7 @@ struct QASinglePageView: QANavigationLeaf {
         .safeAreaInset(edge: .bottom, alignment: .center, spacing: 0.0) {
             QARenderingSettingsView(markdownController: $controller)
                 .disabled(isDisable)
-                .frame(maxWidth: .infinity, maxHeight: 0.4 * windowSize.height)
+                .frame(maxWidth: .infinity, maxHeight: 0.5 * windowSize.height)
         }
         .alert("Share Failured", isPresented: viewModel.binding(for: \.isShowingShareFailuredAlert), actions: {
             Button("OK") {}

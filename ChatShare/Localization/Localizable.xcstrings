@@ -27,6 +27,16 @@
     "%lld pt" : {
 
     },
+    "Allow Text Overflow" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "允许文本溢出页面"
+          }
+        }
+      }
+    },
     "Ascending" : {
       "localizations" : {
         "zh-Hans" : {
@@ -53,17 +63,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "取消"
-          }
-        }
-      }
-    },
-    "Close" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "关闭"
           }
         }
       }

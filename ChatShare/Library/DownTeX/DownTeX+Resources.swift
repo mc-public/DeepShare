@@ -41,7 +41,7 @@ extension DownTeX {
         /// Indicates whether all resources are currently available.
         ///
         /// Default is `false`. You need to call `prepareResources()` before using all resources.
-        @AppStorage("\(DownTeX.self)_TeXMF_State")
+        @AppStorage("\(DownTeX.self)_TeXMF_Unzip_Boolean")
         static private(set) var isResourcesReady: Bool = false
         /// Load all resources.
         ///

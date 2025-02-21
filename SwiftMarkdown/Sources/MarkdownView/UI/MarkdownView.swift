@@ -54,10 +54,10 @@ public class MarkdownState {
     /// The default theme is `.github`.
     public var theme: Theme = .github {
         didSet {
+            if theme.colorSupport == .light {
+                backgroundColor = .white
+            }
             Task {
-                if theme.colorSupport == .light {
-                    backgroundColor = .white
-                }
                 await applyStyle()
             }
         }
@@ -233,37 +233,7 @@ public struct MarkdownView: PlatformViewRepresentable {
         weak var controller: MarkdownState?
         var startTime: CFAbsoluteTime?
         
-        init(controller: MarkdownState) {
-            startTime = CFAbsoluteTimeGetCurrent()
-            platformView = controller.container
-            self.controller = controller
-            super.init()
-            
-            platformView?.navigationDelegate = self
-            
-#if DEBUG && os(iOS)
-            self.platformView?.isInspectable = true
-#elseif os(iOS)
-            self.platformView?.isInspectable = false
-#endif
-            /// So that the `View` adjusts its height automatically.
-            platformView?.setContentHuggingPriority(.required, for: .vertical)
-            /// Disables scrolling.
-#if os(iOS)
-            platformView?.scrollView.isScrollEnabled = false
-#endif
-            /// Set transparent background.
-#if os(macOS)
-            platformView?.setValue(false, forKey: "drawsBackground")
-            /// Equavalent to `.setValue(true, forKey: "drawsTransparentBackground")` on macOS 10.12 and before, which this library doesn't target.
-#elseif os(iOS)
-            platformView?.isOpaque = false
-#endif
-            /// Receive messages from the web view.
-            platformView?.configuration.userContentController = .init()
-            platformView?.configuration.userContentController.add(self, name: "sizeChangeHandler")
-            platformView?.configuration.userContentController.add(self, name: "renderedContentHandler")
-            platformView?.configuration.userContentController.add(self, name: "copyToPasteboard")
+        static func loadHTMLContent(scriptHandler: some WKScriptMessageHandler, for webView: WebView?) {
 #if os(macOS)
             let defaultStylesheetFileName = "default-macOS"
 #elseif os(iOS)
@@ -284,13 +254,47 @@ public struct MarkdownView: PlatformViewRepresentable {
             let htmlString = templateString
                 .replacingOccurrences(of: "PLACEHOLDER_SCRIPT", with: script)
                 .replacingOccurrences(of: "PLACEHOLDER_STYLESHEET", with: stylesheet ?? defaultStylesheet)
-            platformView?.loadHTMLString(htmlString, baseURL: Bundle.module.bundleURL.appendingPathComponent("index", conformingTo: .html))
+            webView?.loadHTMLString(htmlString, baseURL: Bundle.module.bundleURL.appendingPathComponent("index", conformingTo: .html))
+        }
+        
+        init(controller: MarkdownState) {
+            startTime = CFAbsoluteTimeGetCurrent()
+            platformView = controller.container
+            self.controller = controller
+            super.init()
+            platformView?.navigationDelegate = self
+            
+#if DEBUG && os(iOS)
+            self.platformView?.isInspectable = true
+#else
+            self.platformView?.isInspectable = false
+#endif
+            /// So that the `View` adjusts its height automatically.
+            platformView?.setContentHuggingPriority(.required, for: .vertical)
+            /// Disables scrolling.
+#if os(iOS)
+            platformView?.scrollView.isScrollEnabled = false
+#endif
+            /// Set transparent background.
+#if os(macOS)
+            platformView?.setValue(false, forKey: "drawsBackground")
+            /// Equavalent to `.setValue(true, forKey: "drawsTransparentBackground")` on macOS 10.12 and before, which this library doesn't target.
+#elseif os(iOS)
+            platformView?.isOpaque = false
+#endif
+            /// Receive messages from the web view.
+            platformView?.configuration.userContentController = .init()
+            platformView?.configuration.userContentController.add(self, name: "sizeChangeHandler")
+            platformView?.configuration.userContentController.add(self, name: "renderedContentHandler")
+            platformView?.configuration.userContentController.add(self, name: "copyToPasteboard")
+            Self.loadHTMLContent(scriptHandler: self, for: platformView)
         }
         
         /// Update the content on first finishing loading.
         public func webView(_ webView: WKWebView, didFinish _: WKNavigation!) {
             Task {
                 await self.controller?.updateText(await: true)
+                await self.controller?.applyStyle()
             }
         }
         
@@ -330,6 +334,11 @@ public struct MarkdownView: PlatformViewRepresentable {
                 default:
                     return
             }
+        }
+        
+        public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+            guard let webView = webView as? WebView else { return }
+            Self.loadHTMLContent(scriptHandler: self, for: webView)
         }
     }
 }

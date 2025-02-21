@@ -37,7 +37,7 @@ struct QAInputView: QANavigationLeaf {
                 .interactiveDismissDisabled()
         }
         .sheet(isPresented: model.binding(for: \.isShowingSplitedPageSheet)) {
-            NavigationStack(root: QASplitedPagesView.init)
+            QASplitedPagesView()
                 .interactiveDismissDisabled()
         }
     }
@@ -134,27 +134,27 @@ extension QAInputView {
         }
         ToolbarItemGroup(placement: .topBarTrailing) {
             HStack(alignment: .firstTextBaseline) {
-                Menu {
-                    Button("Convert To Long Image", systemImage: "photo") {
-                        model.isShowingSinglePageSheet = true
-                    }
-                    Button("Convert to Short Image Slices", systemImage: "photo.stack") {
-                        model.isShowingSplitedPageSheet = true
-                    }
-                } label: {
-                    Text("Convert")
-                        .bold()
-                        .foregroundStyle(model.isContentEmpty ? Color.deepOrange.opacity(0.6) : Color.deepOrange)
-                }
-                .menuStyle(.button)
-                .disabled(model.isContentEmpty)
-                .padding(.trailing, length: 5)
-                
                 if blockFocusState != nil {
                     Button("Done") { self.blockFocusState = nil }
                         .foregroundStyle(Color.deepOrange)
                         .bold()
                         .padding(.trailing, length: 5)
+                } else {
+                    Menu {
+                        Button("Convert To Long Image", systemImage: "photo") {
+                            model.isShowingSinglePageSheet = true
+                        }
+                        Button("Convert to Short Image Slices", systemImage: "photo.stack") {
+                            model.isShowingSplitedPageSheet = true
+                        }
+                    } label: {
+                        Text("Convert")
+                            .bold()
+                            .foregroundStyle(model.isContentEmpty ? Color.deepOrange.opacity(0.6) : Color.deepOrange)
+                    }
+                    .menuStyle(.button)
+                    .disabled(model.isContentEmpty)
+                    .padding(.trailing, length: 5)
                 }
             }
             .animation(nil, value: blockFocusState)

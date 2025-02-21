@@ -8,6 +8,14 @@
 import SwiftUI
 import FPSMonitorLabel
 
+struct EqualStorage<Value>: Equatable {
+    static func == (lhs: EqualStorage<Value>, rhs: EqualStorage<Value>) -> Bool {
+        true
+    }
+    
+    let value: Value
+}
+
 @main
 struct ChatShareApp: App {
     static nonisolated let Name = "ChatShare"
@@ -20,6 +28,9 @@ struct ChatShareApp: App {
                 }
                 .task {
                     _ = DownTeX.current
+                }
+                .onAppear {
+                    
                 }
         }
     }

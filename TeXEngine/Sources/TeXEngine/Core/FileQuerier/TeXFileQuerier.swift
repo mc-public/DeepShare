@@ -145,7 +145,7 @@ public class TeXFileQuerier: NSObject, FileQueryProvider {
         if (fileName as NSString).isAbsolutePath {
             let url = URL(path: fileName).standardizedFileURL
             if FileManager.default.fileExists(atPath: url.versionPath) {
-                self.restoreResource(url: url)
+                //self.restoreResource(url: url)
                 return .texlive(url: url)
             }
         }
@@ -161,7 +161,7 @@ public class TeXFileQuerier: NSObject, FileQueryProvider {
         }
         if let texResourceQueryResult = await self.searchTeXResources(for: fileName, with: type) {
             let url = texResourceQueryResult.standardizedFileURL
-            self.restoreResource(url: url)
+            //self.restoreResource(url: url)
             return .texlive(url: texResourceQueryResult)
         }
         return .notFound
