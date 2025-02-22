@@ -28,7 +28,6 @@ struct ChatShareApp: App {
                         .ignoresSafeArea(.all, edges: .all)
                 }
                 .task {
-                    isResourcesFailured = true
                     if DownTeX.current.state == .initFailed {
                         isResourcesFailured = true
                     }
