@@ -11,9 +11,9 @@ import SVProgressHUD
 import Localization
 import PDFKit
 
-//MARK: - QA Result Display (Rendering) View
+//MARK: - QAImageConvertLongPageView
 
-struct QASinglePageView: QANavigationLeaf {
+struct QAImageConvertLongPageView: QANavigationLeaf {
     
     @State var controller = MarkdownState()
     @State var windowSize: CGSize = .zero
@@ -27,39 +27,42 @@ struct QASinglePageView: QANavigationLeaf {
     var navigationTitleColor: Color { .dynamicBlack }
     
     var content: some View {
-        QATemplateScrollView(
+        let view = QATemplateScrollView(
             template: viewModel.selectedTemplate,
             horizontalPadding: viewModel.horizontalPagePadding,
             textLayoutSize: $textLayoutSize,
             content: { markdownContent }
         )
-        .onGeometryChange(body: { scrollViewFrameSize = $0 })
-        .scrollBackgroundColor(controller.backgroundColor)
-        .scrollEdgeColor(.top, .bottom, color: controller.backgroundColor)
-        .environment(\.colorScheme, .light)
-        .toolbar(content: toolbarContent)
-        .safeAreaInset(edge: .bottom, alignment: .center, spacing: 0.0) {
-            QARenderingSettingsView(markdownController: $controller)
-                .disabled(isDisable)
-                .frame(maxWidth: .infinity, maxHeight: 0.5 * windowSize.height)
-        }
-        .alert("Share Failured", isPresented: viewModel.binding(for: \.isShowingShareFailuredAlert), actions: {
-            Button("OK") {}
-        })
-        .onGeometryChange(body: { windowSize = $0 })
-        .navigationTitle("Preview")
-        .navigationBarTitleDisplayMode(.inline)
-        .fileShareSheet(item: viewModel.binding(for: \.imageResult))
-        .fileShareSheet(item: viewModel.binding(for: \.pdfResult))
-        .onDisappear(perform: SVProgressHUD.dismiss)
-        .environment(\.dynamicTypeSize, .medium)
-        .onChange(of: viewModel.selectedTemplate, initial: true) { _, newValue in
-            viewModel.updateSuggestedPagePadding(pageWidth: scrollViewFrameSize.width)
-            controller.backgroundColor = Color(newValue.textBackgroundColor).opacity(0)
-        }
-        .onChange(of: controller.theme, initial: true) { _, _ in
-            controller.backgroundColor = Color(viewModel.selectedTemplate.textBackgroundColor).opacity(0)
-        }
+            .onGeometryChange(body: { scrollViewFrameSize = $0 })
+            .scrollBackgroundColor(controller.backgroundColor)
+            .scrollEdgeColor(.top, .bottom, color: controller.backgroundColor)
+            .environment(\.colorScheme, .light)
+            .toolbar(content: toolbarContent)
+            .safeAreaInset(edge: .bottom, alignment: .center, spacing: 0.0) {
+                QARenderingSettingsView(markdownController: $controller)
+                    .frame(maxWidth: .infinity, maxHeight: 0.5 * windowSize.height)
+            }
+            .disabled(isDisable)
+        view
+            .onGeometryChange(body: { windowSize = $0 })
+            .alert("Share Failured", isPresented: viewModel.binding(for: \.isShowingShareFailuredAlert), actions: {
+                Button("OK") {}
+            })
+        
+            .navigationTitle("Preview")
+            .navigationBarTitleDisplayMode(.inline)
+            .fileShareSheet(item: viewModel.binding(for: \.imageResult))
+            .fileShareSheet(item: viewModel.binding(for: \.pdfResult))
+            .onDisappear(perform: SVProgressHUD.dismiss)
+            .onDisappear(perform: SVProgressHUD.dismiss)
+            .environment(\.dynamicTypeSize, .medium)
+            .onChange(of: viewModel.selectedTemplate, initial: true) { _, newValue in
+                viewModel.updateSuggestedPagePadding(pageWidth: scrollViewFrameSize.width)
+                controller.backgroundColor = Color(newValue.textBackgroundColor).opacity(0)
+            }
+            .onChange(of: controller.theme, initial: true) { _, _ in
+                controller.backgroundColor = Color(viewModel.selectedTemplate.textBackgroundColor).opacity(0)
+            }
     }
     
     
@@ -70,7 +73,7 @@ struct QASinglePageView: QANavigationLeaf {
     
 }
 
-extension QASinglePageView {
+extension QAImageConvertLongPageView {
     @ToolbarContentBuilder
     func toolbarContent() -> some ToolbarContent {
         ToolbarItem(placement: .cancellationAction) {
@@ -82,12 +85,11 @@ extension QASinglePageView {
         }
         ToolbarItem(placement: .topBarTrailing) {
             Button("Share", action: shareImage)
-            .menuStyle(.button)
-            .font(.headline)
-            .buttonStyle(.borderedProminent)
-            .buttonBorderShape(.capsule)
-            .tint(Color.teal)
-            .disabled(isDisable)
+                .menuStyle(.button)
+                .font(.headline)
+                .buttonStyle(.borderedProminent)
+                .buttonBorderShape(.capsule)
+                .tint(Color.teal)
         }
     }
     
@@ -181,13 +183,13 @@ fileprivate struct QARenderingSettingsView: View {
     var content: some View {
         List {
             Section("Style") {
-                QAPageSettingLabel.usingWaterMarkLabel(viewModel: viewModel)
-                QAPageSettingLabel.usingTitleBorder(viewModel: viewModel)
-                QAPageSettingLabel.templateLabel(viewModel: viewModel)
+                QAImageConvertSettingLabel.usingWaterMarkLabel(viewModel: viewModel)
+                QAImageConvertSettingLabel.usingTitleBorder(viewModel: viewModel)
+                QAImageConvertSettingLabel.templateLabel(viewModel: viewModel)
                 themeLabel
                 fontSizeLabel
-                QAPageSettingLabel.pageHorizontalPaddingLabel(viewModel: viewModel, markdownState: markdownController)
-                QAPageSettingLabel.pageVerticalPaddingLabel(viewModel: viewModel)
+                QAImageConvertSettingLabel.pageHorizontalPaddingLabel(viewModel: viewModel, markdownState: markdownController)
+                QAImageConvertSettingLabel.pageVerticalPaddingLabel(viewModel: viewModel)
             }
         }
         .scrollContentBackground(.hidden)

@@ -8,7 +8,7 @@
 import SwiftUI
 import MarkdownView
 
-struct QAPageSettingLabel {
+struct QAImageConvertSettingLabel {
     private init() {}
     @MainActor
     static func pageHorizontalPaddingLabel(viewModel: QAViewModel, markdownState: MarkdownState) -> some View {

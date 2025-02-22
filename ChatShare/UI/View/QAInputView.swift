@@ -33,11 +33,11 @@ struct QAInputView: QANavigationLeaf {
         .toolbar(content: toolbarContent)
         .navigationBarBackButtonHidden()
         .sheet(isPresented: model.binding(for: \.isShowingSinglePageSheet)) {
-            NavigationStack(root: QASinglePageView.init)
+            NavigationStack(root: QAImageConvertLongPageView.init)
                 .interactiveDismissDisabled()
         }
         .sheet(isPresented: model.binding(for: \.isShowingSplitedPageSheet)) {
-            QASplitedPagesView()
+            QAImageConvertSplitedPagesView()
                 .interactiveDismissDisabled()
         }
         .sheet(isPresented: model.binding(for: \.isShowingTextConvertSheet)) {

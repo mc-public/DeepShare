@@ -12,10 +12,10 @@ import Localization
 import PDFPreviewer
 import PDFKit
 
-struct QASplitedPagesView: View {
+struct QAImageConvertSplitedPagesView: View {
     
     struct RenderingResult: Identifiable {
-        var id = UUID()
+        let id = UUID()
         let data: Data
         let url: URL
     }
@@ -54,7 +54,6 @@ struct QASplitedPagesView: View {
                 .frame(width: windowSize.width, height: previewContentSize.height)
         }
         QASplitedPagesSettingsView(markdownState: $markdownState, selectedFontSize: $fontSize, windowSize: $windowSize)
-            .disabled(isDisabled)
             .environment(viewModel)
             .safeAreaInset(edge: .top, alignment: .center, spacing: 0.0) {
                 ScrollView { contentView }
@@ -62,6 +61,7 @@ struct QASplitedPagesView: View {
                     .frame(width: windowSize.width, height: topCellHeight)
             }
             .toolbar(content: toolbarContent)
+            .disabled(isDisabled)
             .alert("Share Failured", isPresented: viewModel.binding(for: \.isShowingShareFailuredAlert), actions: {
                 Button("OK") {}
             })
@@ -115,7 +115,7 @@ struct QASplitedPagesView: View {
     }
 }
 
-extension QASplitedPagesView {
+extension QAImageConvertSplitedPagesView {
     func generate() {
         self.isDisabled = true
         Task {
@@ -201,11 +201,11 @@ struct QASplitedPagesSettingsView: View {
             let layoutResult = QATemplateManager.current.pageRects(for: viewModel.selectedTemplate, preferredSize: splitedSize)
             let maximumPadding = 0.3 * (layoutResult?.layoutRect.height ?? 0.0)
             Section("Style") {
-                QAPageSettingLabel.usingWaterMarkLabel(viewModel: viewModel)
-                QAPageSettingLabel.usingTitleBorder(viewModel: viewModel)
-                QAPageSettingLabel.templateLabel(viewModel: viewModel)
-                QAPageSettingLabel.pageHorizontalPaddingLabel(viewModel: viewModel, markdownState: markdownState)
-                QAPageSettingLabel.pageVerticalPaddingLabel(viewModel: viewModel, maximumHeight: maximumPadding)
+                QAImageConvertSettingLabel.usingWaterMarkLabel(viewModel: viewModel)
+                QAImageConvertSettingLabel.usingTitleBorder(viewModel: viewModel)
+                QAImageConvertSettingLabel.templateLabel(viewModel: viewModel)
+                QAImageConvertSettingLabel.pageHorizontalPaddingLabel(viewModel: viewModel, markdownState: markdownState)
+                QAImageConvertSettingLabel.pageVerticalPaddingLabel(viewModel: viewModel, maximumHeight: maximumPadding)
                 rotationLabel
                 fontSizeLabel
                 textOverflowLabel
