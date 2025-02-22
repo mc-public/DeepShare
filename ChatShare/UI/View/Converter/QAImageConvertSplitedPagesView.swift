@@ -142,7 +142,7 @@ extension QAImageConvertSplitedPagesView {
         titleRenderer.scale = 5.0
         titleRenderer.proposedSize = .init(titleCellSize)
         let titleCellImage = titleRenderer.uiImage
-        let titleCellImageRect = (titleCellImage == nil) ? nil : CGRect.init(x: textRectMinX, y: layoutResult.textRect.minY, width: titleCellSize.width, height: titleCellSize.height)
+        let titleCellImageRect = (titleCellImage == nil) ? nil : CGRect.init(x: textRectMinX, y: layoutResult.textRect.minY + viewModel.verticalPagePadding, width: titleCellSize.width, height: titleCellSize.height)
         let pageImage = await layoutResult.totalImage()
         let newContentRect = layoutResult.textRect.inseting(
             top: viewModel.verticalPagePadding,

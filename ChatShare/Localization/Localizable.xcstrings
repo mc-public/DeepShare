@@ -357,6 +357,16 @@
         }
       }
     },
+    "Please check if the current device has enough storage space." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请检查您的设备是否有足够的存储空间。"
+          }
+        }
+      }
+    },
     "Please Check spelling or input a new search text." : {
       "localizations" : {
         "zh-Hans" : {
@@ -393,6 +403,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "最近30日"
+          }
+        }
+      }
+    },
+    "Resource Decompression Failed" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "解压缩资源文件失败"
           }
         }
       }

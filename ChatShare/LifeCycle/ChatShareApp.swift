@@ -19,6 +19,7 @@ struct EqualStorage<Value>: Equatable {
 @main
 struct ChatShareApp: App {
     static nonisolated let Name = "ChatShare"
+    @State var isResourcesFailured = false
     var body: some Scene {
         WindowGroup {
             QANavigationView()
@@ -27,10 +28,20 @@ struct ChatShareApp: App {
                         .ignoresSafeArea(.all, edges: .all)
                 }
                 .task {
-                    _ = DownTeX.current
+                    isResourcesFailured = true
+                    if DownTeX.current.state == .initFailed {
+                        isResourcesFailured = true
+                    }
                 }
-                .onAppear {
-                    
+                .alert("Resource Decompression Failed", isPresented: $isResourcesFailured) {
+                    Button("OK") {
+                        UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
+                        Task { @MainActor in
+                            fatalError("[\(ChatShareApp.Name)] Application Killed.")
+                        }
+                    }
+                } message: {
+                    Text("Please check if the current device has enough storage space.")
                 }
         }
     }

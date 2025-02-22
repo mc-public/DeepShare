@@ -253,7 +253,7 @@ extension DownTeX {
 \\begin{document}
 \(config.titleImage != nil ?
 """
-\\vspace*{\\dimexpr-\(top)pt+\(Int(titleTop))pt-1em-5pt\\relax}
+\\vspace*{\\dimexpr-\(Int(top))pt+\(Int(titleTop))pt-1em-5pt\\relax}
 \\begin{center}
 \\includegraphics[width=\\textwidth]{\(ConvertConfiguration.TitleImageFileName)}
 \\end{center}\\nointerlineskip

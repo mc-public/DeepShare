@@ -94,6 +94,7 @@ public final class DownTeX {
                 self.state = .initFailed
             }
         }
+        if self.state == .initFailed { return }
         Task {
             await self.unsafe_configurePandocView()
             await self.unsafe_configureTeXEngine()
