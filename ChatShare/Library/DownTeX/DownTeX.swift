@@ -83,6 +83,8 @@ public final class DownTeX {
     
     private static let LaTeXEngine = TeXEngine(engineType: .xetex)
     
+    //MARK: - Init And Configuration
+    
     private init() {
         self.state = .initializing
         self.navigationDelegate.downTeX = self
@@ -132,7 +134,7 @@ public final class DownTeX {
         Self.pandocView.content = .init(frame: .zero, configuration: Self.PandocViewConfiguration)
 #if DEBUG
         Self.pandocView.content.isInspectable = true
-#endif        
+#endif
         Self.pandocView.content.navigationDelegate = self.navigationDelegate
         Self.pandocView.content.loadFileURL(Resources.PandocHTMLResource, allowingReadAccessTo: Resources.PandocResource)
         /// Checking load state.
@@ -162,9 +164,25 @@ public final class DownTeX {
         }
     }
     
+    //MARK: - Public API
+    /// Convert specific Markdown string to Microsoft-DOCX data.
+    ///
+    /// - Parameter markdownString: The markdown string.
+    public func convertToDocx(markdownString: String) async throws(OperationError) -> Data {
+        if self.state == .initFailed { throw .resourceFailured }
+        while self.state != .ready {
+            try? await Task.sleep(for: .microseconds(10))
+        }
+        self.state = .running
+        defer { self.state = .ready }
+        return try await unsafe_convertToDocx(markdownString: markdownString)
+    }
+    
+    
     /// Convert specific Markdown string to specific plain-text string.
     ///
     /// - Parameter markdownString: The markdown string.
+    /// - Parameter format: The target text-format.
     public func convertToText(markdownString: String, format: TargetFormat) async throws(OperationError) -> String {
         if self.state == .initFailed { throw .resourceFailured }
         while self.state != .ready {
@@ -175,40 +193,7 @@ public final class DownTeX {
         return try await unsafe_convertToText(markdownString: markdownString, format: format)
     }
     
-    func unsafe_compileToPDF(latexString: String, images: [String: UIImage]) async throws(OperationError) -> Data {
-        let latexString = latexString.trimmingCharacters(in: .whitespacesAndNewlines)
-        if latexString.isEmpty {
-            throw .illegalTextContent
-        }
-        let texDirURL = URL.temporaryDirectory.appending(path: UUID().uuidString)
-        do {
-            try FileManager.default.createDirectory(at: texDirURL, withIntermediateDirectories: true)
-        } catch { throw .fileOperationFailured }
-        
-        let texURL = texDirURL.appending(path: "content.tex")
-        if !FileManager.default.createFile(atPath: texURL.path(percentEncoded: false), contents: latexString.data(using: .utf8)) {
-            throw .fileOperationFailured
-        }
-        for (fileName, image) in images {
-            let imageURL = texDirURL.appending(path: fileName)
-            if !FileManager.default.createFile(atPath: imageURL.path(percentEncoded: false), contents: image.pngData()) {
-                throw .fileOperationFailured
-            }
-        }
-        let result: CompileResult?
-        do {
-            result = try await Self.LaTeXEngine.compileTeX(by: .latex, tex: texURL)
-        } catch {
-            debugPrint(error)
-            try? await Self.LaTeXEngine.reloadEngineCore()
-            return try await self.unsafe_compileToPDF(latexString: latexString, images: images)
-        }
-        if let data = result?.pdf {
-            return data
-        } else {
-            throw OperationError.illegalTextContent
-        }
-    }
+    
     
     public struct TargetFormat: CaseIterable, Hashable, Identifiable, RawRepresentable, Sendable {
         
@@ -244,7 +229,8 @@ public final class DownTeX {
         fileprivate static let unsafe_latex = TargetFormat(command: "-f markdown -t latex", title: #localized("LaTeX"), extensionName: "tex")
     }
     
-    func unsafe_convertToText(markdownString: String, format: TargetFormat) async throws(OperationError) -> String {
+    //MARK: - Private API
+    private func unsafe_convertToText(markdownString: String, format: TargetFormat) async throws(OperationError) -> String {
         if markdownString.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             return String()
         }
@@ -263,11 +249,70 @@ public final class DownTeX {
         return result
     }
     
+    private func unsafe_convertToDocx(markdownString: String) async throws(OperationError) -> Data {
+        if markdownString.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return Data()
+        }
+        let safedString = markdownString.javaScriptString
+        let fetchResult = { () -> Data? in
+            guard let base64String = (try? await Self.pandocView.content.evaluateJavaScript("window.pandoc_docx(\"\(safedString)\")")) as? String, !base64String.isEmpty else {
+                return nil
+            }
+            return Data(base64Encoded: base64String)
+        }
+        guard let result = await fetchResult() else {
+            await unsafe_configurePandocView()
+            if let result = await fetchResult() {
+                return result
+            } else {
+                throw .illegalTextContent
+            }
+        }
+        return result
+    }
+    
+    //MARK: - Internal API
+    
     func unsafe_convertToLaTeX(markdownString: String) async throws(OperationError) -> String {
         if markdownString.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             throw .illegalTextContent
         }
         return try await unsafe_convertToText(markdownString: markdownString, format: .unsafe_latex)
+    }
+    
+    func unsafe_compileToPDF(latexString: String, images: [String: UIImage]) async throws(OperationError) -> Data {
+        let latexString = latexString.trimmingCharacters(in: .whitespacesAndNewlines)
+        if latexString.isEmpty {
+            throw .illegalTextContent
+        }
+        let texDirURL = URL.temporaryDirectory.appending(path: UUID().uuidString)
+        do {
+            try FileManager.default.createDirectory(at: texDirURL, withIntermediateDirectories: true)
+        } catch { throw .fileOperationFailured }
+        
+        let texURL = texDirURL.appending(path: "content.tex")
+        if !FileManager.default.createFile(atPath: texURL.path(percentEncoded: false), contents: latexString.data(using: .utf8)) {
+            throw .fileOperationFailured
+        }
+        for (fileName, image) in images {
+            let imageURL = texDirURL.appending(path: fileName)
+            if !FileManager.default.createFile(atPath: imageURL.path(percentEncoded: false), contents: image.pngData()) {
+                throw .fileOperationFailured
+            }
+        }
+        let result: CompileResult?
+        do {
+            result = try await Self.LaTeXEngine.compileTeX(by: .latex, tex: texURL)
+        } catch {
+            debugPrint(error)
+            try? await Self.LaTeXEngine.reloadEngineCore()
+            return try await self.unsafe_compileToPDF(latexString: latexString, images: images)
+        }
+        if let data = result?.pdf {
+            return data
+        } else {
+            throw OperationError.illegalTextContent
+        }
     }
 }
 

@@ -67,6 +67,16 @@
         }
       }
     },
+    "Conversion Failed" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "转换失败"
+          }
+        }
+      }
+    },
     "Convert" : {
       "localizations" : {
         "zh-Hans" : {
@@ -83,6 +93,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "转换为长图"
+          }
+        }
+      }
+    },
+    "Convert to Office Open XML Format (.docx)" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "转换为Office Open XML（.docx）文件格式"
           }
         }
       }
@@ -196,6 +216,9 @@
           }
         }
       }
+    },
+    "Generation Failed" : {
+
     },
     "History" : {
       "localizations" : {
@@ -439,7 +462,7 @@
         }
       }
     },
-    "Share Failured" : {
+    "Share Failed" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {

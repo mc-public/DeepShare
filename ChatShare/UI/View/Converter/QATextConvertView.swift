@@ -34,7 +34,7 @@ struct QATextConvertView: View {
         .onChange(of: convertFormat, initial: true) { _, newValue in
             self.convert(format: newValue)
         }
-        .alert("Share Failured", isPresented: $isShareFileFailured, actions: {
+        .alert("Share Failed", isPresented: $isShareFileFailured, actions: {
             Button("OK") {}
         })
         .fileShareSheet(item: $convertFileURL)
@@ -88,10 +88,7 @@ struct QATextConvertView: View {
                 isDisabled = false
                 SVProgressHUD.dismiss()
             }
-            let normalizedTitle = viewModel.questionContent.trimmingCharacters(in: .whitespacesAndNewlines)
-            let normalizedAnswer = viewModel.answerContent.trimmingCharacters(in: .whitespacesAndNewlines)
-            let markdownContent = (normalizedTitle.isEmpty ? String() : "# ") + normalizedTitle + (normalizedAnswer.isEmpty ? String() : ("\n\n" + normalizedAnswer))
-            guard var result = try? await DownTeX.current.convertToText(markdownString: markdownContent, format: format) else {
+            guard var result = try? await DownTeX.current.convertToText(markdownString: viewModel.normalizedQAMarkdownContent(), format: format) else {
                 isConvertFailured = true
                 return
             }
@@ -109,10 +106,7 @@ struct QATextConvertView: View {
         self.isDisabled = true
         Task {
             defer { self.isDisabled = false }
-            if let image = UIImage(systemName: "checkmark") {
-                SVProgressHUD.show(image, status: #localized("Copied to Clipboard"))
-                await SVProgressHUD.dismiss(withDelay: 1.5)
-            }
+            await SVProgressHUD.displayingSuccessInfo(title: #localized("Copied to Clipboard"))
         }
     }
     

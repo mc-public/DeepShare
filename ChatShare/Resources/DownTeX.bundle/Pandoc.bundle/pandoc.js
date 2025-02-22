@@ -6,6 +6,49 @@ import {
     PreopenDirectory,
 } from "./index.js";
 
+function utility_arraybuffer_to_base64(arrayBuffer) {
+    var base64    = '';
+    var encodings = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  
+    var bytes         = new Uint8Array(arrayBuffer);
+    var byteLength    = bytes.byteLength;
+    var byteRemainder = byteLength % 3;
+    var mainLength    = byteLength - byteRemainder;
+    var a, b, c, d;
+    var chunk;
+    for (var i = 0; i < mainLength; i = i + 3) {
+      // Combine the three bytes into a single integer
+      chunk = (bytes[i] << 16) | (bytes[i + 1] << 8) | bytes[i + 2];
+  
+      // Use bitmasks to extract 6-bit segments from the triplet
+      a = (chunk & 16515072) >> 18; // 16515072 = (2^6 - 1) << 18
+      b = (chunk & 258048)   >> 12; // 258048   = (2^6 - 1) << 12
+      c = (chunk & 4032)     >>  6; // 4032     = (2^6 - 1) << 6
+      d = chunk & 63;               // 63       = 2^6 - 1
+      base64 += encodings[a] + encodings[b] + encodings[c] + encodings[d];
+    }
+  
+    // Deal with the remaining bytes and padding
+    if (byteRemainder == 1) {
+      chunk = bytes[mainLength];
+  
+      a = (chunk & 252) >> 2; // 252 = (2^6 - 1) << 2
+  
+      // Set the 4 least significant bits to zero
+      b = (chunk & 3)   << 4; // 3   = 2^2 - 1
+  
+      base64 += encodings[a] + encodings[b] + '=='
+    } else if (byteRemainder == 2) {
+      chunk = (bytes[mainLength] << 8) | bytes[mainLength + 1];
+      a = (chunk & 64512) >> 10; // 64512 = (2^6 - 1) << 10
+      b = (chunk & 1008)  >>  4; // 1008  = (2^6 - 1) << 4
+      // Set the 2 least significant bits to zero
+      c = (chunk & 15)    <<  2; // 15    = 2^4 - 1
+      base64 += encodings[a] + encodings[b] + encodings[c] + '=';
+    }
+    return base64;
+}
+
 class PandocWASI {
     #instance = null;
     #isInitialized = false;
@@ -14,16 +57,13 @@ class PandocWASI {
     #argvPtr = null;
 
     constructor() {
-        // 初始化固定参数
         this.args = ["pandoc.wasm", "+RTS", "-H64m", "-RTS"];
         this.env = [];
         this.options = { debug: false };
 
-        // 初始化文件系统
         this.inFile = new File(new Uint8Array(), { readonly: true });
         this.outFile = new File(new Uint8Array(), { readonly: false });
 
-        // 配置文件描述符
         this.fds = [
             new OpenFile(new File(new Uint8Array(), { readonly: true })),
             ConsoleStdout.lineBuffered(msg => console.log(`[WASI stdout] ${msg}`)),
@@ -33,8 +73,6 @@ class PandocWASI {
                 ["out", this.outFile],
             ]),
         ];
-
-        // 初始化WASI实例
         this.wasi = new WASI(
             this.args,
             this.env,
@@ -42,17 +80,14 @@ class PandocWASI {
             this.options
         );
     }
-
-    // 私有方法：获取内存视图
+    
     #memoryDataView() {
         return new DataView(this.#instance.exports.memory.buffer);
     }
 
-    // 异步初始化方法
     async initialize() {
         if (this.#isInitialized) return;
 
-        // 加载并实例化WASM模块
         const response = await fetch("./pandoc.wasm");
         const wasmBytes = await response.arrayBuffer();
         const { instance } = await WebAssembly.instantiate(
@@ -64,7 +99,6 @@ class PandocWASI {
         this.wasi.initialize(this.#instance);
         this.#instance.exports.__wasm_call_ctors();
 
-        // 初始化运行时参数
         this.#argcPtr = this.#instance.exports.malloc(4);
         this.#memoryDataView().setUint32(this.#argcPtr, this.args.length, true);
 
@@ -98,10 +132,8 @@ class PandocWASI {
 
         this.#isInitialized = true;
     }
-
-    // 主转换方法
-    pandoc(argsStr, input) {
-        // 准备输入参数
+    
+    #convert(argsStr, input) {
         const argsPtr = this.#instance.exports.malloc(argsStr.length);
         new TextEncoder().encodeInto(
             argsStr,
@@ -111,16 +143,21 @@ class PandocWASI {
                 argsStr.length
             )
         );
-
-        // 设置输入内容
         this.inFile.data = new TextEncoder().encode(input);
-
-        // 执行转换
         this.#instance.exports.wasm_main(argsPtr, argsStr.length);
-
-        // 获取并返回输出
+    }
+    
+    pandoc(argsStr, input) {
+        this.#convert(argsStr, input);
         return new TextDecoder("utf-8", { fatal: true })
             .decode(this.outFile.data);
+    }
+    
+    pandoc_docx(input) {
+        this.#convert('-f markdown -t docx --sandbox', input);
+        let result = utility_arraybuffer_to_base64(this.outFile.data);
+        console.log(result);
+        return result;
     }
 }
 
@@ -129,8 +166,12 @@ await pandocInstance.initialize();
 export const wasi_constant = {
     pandoc: (pars, content) => {
         return pandocInstance.pandoc(pars, content);
+    },
+    pandoc_docx: (content) => {
+        return pandocInstance.pandoc_docx(content);
     }
 };
 
 window.pandoc = wasi_constant.pandoc;
+window.pandoc_docx = wasi_constant.pandoc_docx;
 export default PandocWASI;

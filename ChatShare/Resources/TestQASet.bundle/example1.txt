@@ -1,215 +1,204 @@
-### 答案：
+# TeXEngine
 
----
+![](https://img.shields.io/badge/Platform_Compatibility-iOS16.0+-blue)
+![](https://img.shields.io/badge/Swift_Compatibility-5.8-red)
 
-#### **一、卷积神经网络的基础理论**
+TeXEngine 是一个 Swift 包，为开发者在 iOS 设备上使用 TeX Live 提供的 TeX 引擎提供了可能。目前，此框架中附带了 XeTeX 引擎与 pdfTeX 引擎的修改版本。
 
-卷积神经网络（CNN）的诞生彻底改变了计算机视觉领域的格局。其核心思想源自生物视觉系统的层次化信息处理机制——从简单边缘检测到复杂模式识别。与传统全连接神经网络相比，CNN通过三个关键设计实现突破：**局部感受野**、**权重共享**和**空间下采样**。这些特性不仅大幅减少参数量，还保留了图像的空间结构信息。
+## 框架结构
+TeXEngine 框架提供了以下几个类和协议。
+ |结构|类型|说明|
+ |---|---|---|
+ |`TeXEngine`|类|用于操作 TeX 引擎执行排版|
+ |`EngineType`|结构体|用于指定 TeX 引擎的类型|
+ |`TeXLogParser`|类|用于解析引擎编译后得到的日志文件|
 
-早期的LeNet-5模型（1998年）展示了CNN在数字识别中的潜力，但受限于当时计算能力和数据规模，未能引起广泛关注。直到2012年AlexNet在ImageNet竞赛中以压倒性优势夺冠，CNN才真正进入黄金发展期。AlexNet的创新点包括使用ReLU激活函数缓解梯度消失、引入Dropout正则化防止过拟合，以及利用GPU并行加速训练。
+ `TeXEngine` 框架是通过以下的想法把 XeTeX 和 pdfTeX 引擎带到 iOS 和 iPadOS 平台的。
 
----
+ - 把 XeTeX 或者 pdfTeX 的源代码使用 WebAssembly 技术编译为 WASM 格式的文件以及辅助其在网页上运行的 JavaScript 脚本。
+  > WASM 格式文件可以理解为 **可以在网页(HTML)上被执行的可执行文件**，而辅助 JavaScript 脚本是用于帮助浏览器运行 WASM 文件的脚本文件。
+ - 使用 Apple 的 WebKit 框架，在 `WKWebView`（浏览器视图）中加载一个网页，这个网页中事先编写好了一些代码以加载上述的辅助 JavaScript 脚本。
+  > 辅助 JavaScript脚本可以帮助我们加载其对应的 WASM 文件。
 
-#### **二、经典CNN架构演进分析**
+ - 通过调用 `WKWebView` 提供的相关方法，通过执行 JavaScript 命令的方式，控制 WASM 可执行文件中的 TeX 引擎执行实际的排版操作。
+ - 剩余的问题是，**运行在 WASM 可执行文件中的 TeX 引擎是如何读取存储在用户磁盘中的 TeX Live 资源文件的**。答案是，TeXEngine 框架使用了大量 WebKit 技术以捕获所有的文件存取操作，例如实现了 `WKURLSchemeHandler` 协议等方法。
 
-1. **VGGNet（2014）**
-   通过堆叠多个3×3小卷积核替代大尺寸卷积核，在保持相同感受野的同时减少参数数量。其16~19层的深度结构验证了网络深度对性能提升的重要性，但也暴露出梯度传递难题。
+## API 说明
 
-2. **Inception系列（2014-2016）**
-   Google提出的多尺度并行计算架构，通过1×1卷积进行通道维度压缩，结合不同尺寸卷积核提取多尺度特征。Inception v3进一步引入因子分解思想，将7×7卷积分解为1×7和7×1的级联操作。
-
-3. **ResNet（2015）**
-   残差学习框架通过跳跃连接（Skip Connection）解决深层网络梯度消失问题，使得训练超过1000层的网络成为可能。其核心公式 \( H(x) = F(x) + x \) 让网络可以学习残差映射而非直接拟合目标函数。
-
----
-
-#### **三、关键技术改进与优化策略**
-
-1. **注意力机制**
-   SENet（2017）通过通道注意力动态调整特征图权重，CBAM进一步结合通道与空间注意力。Transformer与CNN的混合架构（如ViT）开创了全局依赖建模的新范式。
-
-2. **轻量化设计**
-   MobileNet使用深度可分离卷积将标准卷积分解为逐通道卷积和逐点卷积，在精度损失小于3%的情况下将计算量降低至1/9。ShuffleNet通过通道混洗操作促进跨通道信息交流。
-
-3. **自监督预训练**
-   SimCLR、MoCo等对比学习框架利用数据增强生成正负样本对，无需人工标注即可学习通用视觉表示，在迁移学习任务中达到有监督预训练90%以上的性能。
-
----
-
-#### **四、工业级实现的关键细节**
-
-1. **数据增强方案**
-   - 基础增强：随机裁剪（Random Crop）、水平翻转（Horizontal Flip）、色彩抖动（Color Jitter）
-   - 高级增强：MixUp（线性插值混合样本）、CutMix（区域替换混合）、AutoAugment（自动搜索最优策略）
-
-2. **训练优化技巧**
-   - 学习率调度：余弦退火（Cosine Annealing）、热重启（Warm Restart）
-   - 正则化策略：Label Smoothing（标签平滑）、Stochastic Depth（随机深度）
-   - 损失函数设计：Focal Loss（解决类别不平衡）、Triplet Loss（度量学习）
-
-3. **部署加速技术**
-   - 模型压缩：知识蒸馏（Knowledge Distillation）、量化训练（Quantization Aware Training）
-   - 推理优化：TensorRT引擎优化、算子融合（Operator Fusion）
-
----
-
-#### **五、典型应用场景与实战案例**
-
-1. **医疗影像分析**
-   在乳腺癌病理切片分类任务中，基于DenseNet的改进模型通过多尺度特征融合，在Camelyon16数据集上达到97.8%的准确率，超越人类专家水平。关键技术包括：
-   - 针对WSI（Whole Slide Image）设计的patch采样策略
-   - 结合细胞核形态学的注意力机制
-   - 不确定区域主动学习标注
-
-2. **自动驾驶感知系统**
-   Tesla FSD芯片搭载的HydraNet多任务网络，单模型同时处理目标检测、语义分割、深度估计等任务：
-   - 共享骨干网络（EfficientNet-B5）提取通用特征
-   - 任务特异性解码器动态分配计算资源
-   - 时空融合模块整合连续帧信息
-
-3. **工业质检**
-   某3C制造企业部署的AOI（自动光学检测）系统：
-   - 使用U-Net++架构实现微米级缺陷分割
-   - 引入GAN生成罕见缺陷样本提升模型鲁棒性
-   - 采用模型并行技术实现产线实时检测（<50ms/图像）
-
----
-
-#### **六、前沿研究方向与挑战**
-
-1. **神经架构搜索（NAS）**
-   DARTS、EfficientNet等算法通过自动化网络设计，在ImageNet上取得超越人工设计模型的性能。最新进展包括：
-   - 零成本代理指标加速搜索过程
-   - 多目标优化平衡精度与延迟
-   - 跨任务可迁移架构设计
-
-2. **动态推理网络**
-   根据输入样本复杂度自适应调整计算路径：
-   - SkipNet：动态跳过非关键层
-   - MSDNet：多尺度早退机制
-   - 在嵌入式设备上实现2-4倍推理加速
-
-3. **联邦学习与隐私保护**
-   医疗、金融等敏感领域的分布式训练框架：
-   - 差分隐私（Differential Privacy）确保数据安全
-   - 个性化联邦学习处理数据异构性
-   - 模型反演攻击防御技术
-
----
-
-#### **七、代码实现示例**
-
-```python
-# 基于PyTorch的ResNet-50实现
-import torch
-import torch.nn as nn
-
-class Bottleneck(nn.Module):
-    expansion = 4
-    def __init__(self, inplanes, planes, stride=1, downsample=None):
-        super().__init__()
-        self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1, bias=False)
-        self.bn1 = nn.BatchNorm2d(planes)
-        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride,
-                               padding=1, bias=False)
-        self.bn2 = nn.BatchNorm2d(planes)
-        self.conv3 = nn.Conv2d(planes, planes * self.expansion,
-                               kernel_size=1, bias=False)
-        self.bn3 = nn.BatchNorm2d(planes * self.expansion)
-        self.relu = nn.ReLU(inplace=True)
-        self.downsample = downsample
-
-    def forward(self, x):
-        identity = x
-        out = self.conv1(x)
-        out = self.bn1(out)
-        out = self.relu(out)
-        out = self.conv2(out)
-        out = self.bn2(out)
-        out = self.relu(out)
-        out = self.conv3(out)
-        out = self.bn3(out)
-        if self.downsample is not None:
-            identity = self.downsample(x)
-        out += identity
-        out = self.relu(out)
-        return out
-
-class ResNet(nn.Module):
-    def __init__(self, block, layers, num_classes=1000):
-        super().__init__()
-        self.inplanes = 64
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3, bias=False)
-        self.bn1 = nn.BatchNorm2d(64)
-        self.relu = nn.ReLU(inplace=True)
-        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        self.layer1 = self._make_layer(block, 64, layers[0])
-        self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
-        self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
-        self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
-        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(512 * block.expansion, num_classes)
-
-    def _make_layer(self, block, planes, blocks, stride=1):
-        downsample = None
-        if stride != 1 or self.inplanes != planes * block.expansion:
-            downsample = nn.Sequential(
-                nn.Conv2d(self.inplanes, planes * block.expansion,
-                          kernel_size=1, stride=stride, bias=False),
-                nn.BatchNorm2d(planes * block.expansion),
-            )
-        layers = []
-        layers.append(block(self.inplanes, planes, stride, downsample))
-        self.inplanes = planes * block.expansion
-        for _ in range(1, blocks):
-            layers.append(block(self.inplanes, planes))
-        return nn.Sequential(*layers)
-
-    def forward(self, x):
-        x = self.conv1(x)
-        x = self.bn1(x)
-        x = self.relu(x)
-        x = self.maxpool(x)
-        x = self.layer1(x)
-        x = self.layer2(x)
-        x = self.layer3(x)
-        x = self.layer4(x)
-        x = self.avgpool(x)
-        x = torch.flatten(x, 1)
-        x = self.fc(x)
-        return x
+### 初始化引擎
+初始化 `TeXEngine` 类的方法非常简单。
+```swift
+let engine = TeXEngine(engineType: .xetex) /* .pdftex */
 ```
 
----
----
+### 文件查询服务
+初始化此类后，还需要初始化 **TeX 资源文件查询服务**。
 
-### **补充内容：经典CNN模型性能对比表**
 
-在CNN发展历程中，各经典模型在计算效率与精度之间不断寻求平衡。下表对比了主流模型的参数量、计算量（FLOPs）及在ImageNet数据集上的性能表现：
+#### 准备 TeX Live 源文件
+准备一个完全安装版本的 TeX Live 的 `TEXMF` 树的文件夹。在该文件夹下，需要包含 `texmf-dist`、`texmf-config` 和 `texmf-var` 这三个文件夹，在这三个文件夹中均需要包含 `ls-R` 文件。然后，把该文件夹拷贝至 `APP` 沙盒的某个文件夹中。接下来，我们始终假设该文件夹在设备上的 `URL` 为 `texliveURL`，这个 `texliveURL` 文件夹中包含了上述的三个子文件夹。
 
-| 模型名称       | 提出时间 | 核心创新点                     | 参数量 (M) | FLOPs (G) | ImageNet Top-1 (%) | 适用场景                |
-|----------------|----------|--------------------------------|------------|-----------|--------------------|-----------------------|
-| **AlexNet**    | 2012     | ReLU激活、Dropout正则化        | 61.0       | 1.5       | 63.3               | 通用图像分类          |
-| **VGG16**      | 2014     | 深层小卷积堆叠                 | 138.0      | 30.9      | 74.5               | 学术基准测试          |
-| **ResNet-50**  | 2015     | 残差跳跃连接                   | 25.6       | 7.8       | 78.5               | 工业级特征提取        |
-| **Inception-v3** | 2016   | 多尺度并行计算                 | 23.8       | 11.4      | 79.8               | 高精度识别任务        |
-| **MobileNet-v2** | 2018   | 倒置残差结构                   | 3.4        | 0.6       | 72.0               | 移动端实时推理        |
-| **EfficientNet-B4** | 2019 | 复合缩放策略                   | 19.3       | 4.2       | 82.9               | 资源受限的高精度场景  |
-| **ViT-B/16**   | 2021     | 纯Transformer架构              | 86.6       | 55.4      | 84.2               | 大数据预训练任务      |
+#### 加载引擎
+加载引擎主要包括两个方面，一方面是加载 TeX 资源文件查询器，另一方面是加载运行引擎的网页。这些步骤是比较耗时的（大约需要 5s 至 12s 之间的时间）。以下给出了示例代码。
+```swift
+@MainActor
+class TeXEngineController {
+    let engine: TeXEngine = .init(engineType: .xetex)
+    let texliveURL: URL
 
-#### **表格说明**：
-1. **FLOPs** 以224×224输入分辨率计算
-2. **精度对比** 均基于ImageNet-1K单模型单裁剪测试结果
-3. **适用场景** 反映模型设计时的核心优化目标
+    init(texliveURL: URL) {
+        self.texliveURL = texliveURL
+    }
 
----
+    /// completionHandler(true) 表示初始化成功
+    func loadFileQuerier(completionHandler: @escaping (Bool) -> ()) {
+        Task { @MainActor in
+            completionHandler((try? await self.engine.loadEngine(texlive: texliveURL)) != nil)
+        }
+    }
+}
+```
+如果以上初始化方法执行了闭包：`completionHandler(false)`，则说明没有设置好 `texliveURL` 中的文件结构，需要仔细调整文件结构再继续尝试。
 
-#### **关键结论**：
-- **精度与效率的权衡**：传统CNN（如ResNet）在参数量/计算量上仍有优势，而Transformer架构（ViT）依赖大数据但上限更高
-- **工业部署趋势**：轻量化模型（MobileNet）的FLOPs可压缩至传统模型的1/50，适合边缘计算
-- **创新方向**：EfficientNet的复合缩放法则（同时调整深度/宽度/分辨率）成为新一代设计范式
+#### TeX 文件查询器
+为了加深对 TeX 资源文件查询器的理解，接下来简述文件查询器的基本行为。
+- 文件查询器在初始化时将读取 `texmf-dist/ls-R`、`texmf-config/ls-R` 以及 `texmf-var/ls-R` 这三个文件（它们被称为 **ls-R 数据库**），并且把它们提供的所有信息放置在缓存中。
+- 在执行文件查询（搜索文件名 `FILENAME` 对应的文件路径）时，文件查询器将先搜索被编译的 `tex` 文件所在的文件夹。
+- 如果没有找到，文件查询器会深度（磁盘）搜索 `dynamicSearchResources` 中的所有文件夹 `URL` 的文件，并从中查找文件名对应的文件（从而查找到对应的路径）。
+- 如果仍然没有找到，将在第一步中提到的 ls-R 数据库缓存中查找 `FILENAME` 对应的文件路径。
 
-该表格系统梳理了CNN核心模型的演进脉络，为模型选型提供量化参考依据。
 
-### 总结
-本文系统阐述了CNN从基础理论到尖端应用的完整知识体系，涵盖经典模型演进、工业实现细节、典型应用场景与前沿研究方向。揭示了卷积神经网络持续引领计算机视觉发展的内在逻辑，为研究者和工程师提供了全景式技术图谱。
+
+### 编译类型
+
+所谓的编译类型，其实指的是框架在执行排版时使用的编译方式。例如，当前框架支持使用 plain-TeX 编译方式、LaTeX 编译方式和 LaTeX 与 BibTeX 混合编译方式。
+
+#### 当前框架支持的编译类型
+
+目前支持 `CompileFormat.latex`、`CompileFormat.plain` 和 `CompileFormat.biblatex` 这三种编译类型。
+
+#### 准备编译类型对应的格式文件
+
+对于 `CompileFormat.latex` 或者 `CompileFormat.biblatex` 编译类型，它们实质上属于 LaTeX 格式，所以需要准备 LaTeX 格式文件。而 `CompileFormat.plain` 属于 `plain-TeX` 格式，所以需要准备 plain-TeX 格式文件。
+
+格式文件其实和引擎、TeX Live 资源文件都有关联。也就是说，引擎不同，格式文件不同；TeX Live 资源文件的年份不同，格式文件不同。例如，框架已经自带了相应于 pdfTeX 引擎的 `pdflatex.fmt` 格式文件与相应于 XeTeX 引擎的 `xelatex.fmt` 格式文件，但是它们仅适用于 TeX Live 2022 的资源文件。
+
+如果你准备好的 TeX Live 版本不是 2022，就需要自行编译新的格式文件；如果准备好的版本就是 2022，你可以跳过接下来和格式文件编译有关的部分。
+
+#### 格式文件的编译
+
+编译格式文件的具体过程如下。
+- 确保 `pdflatex.ini` 和 `pdftex.ini` 等（与引擎相关）位于 `texliveURL` 文件夹中（可能很深）。
+- 在之前的例子中的 `TeXEngineController` 中，添加以下实例方法（仅举 `xelatex.ini` 的例子）：
+```swift
+func compileFormatFile(outputDir: URL, completionHandler: @escaping (Bool) -> ()) {
+    Task { @MainActor in
+         completionHandler(try? await engine.compileFMT(for: .latex, target: outputDir) != nil)
+    }
+}
+```
+- 先初始化引擎的文件查询服务，然后再尝试编译格式文件。编译成功的话，可以去相应目录中获取对应的文件。
+
+#### 自定义格式文件的路径
+`TeXEngine` 类提供了两个属性：`plainFormatURL` 与 `latexFormatURL`。这两个属性分别指代了 LaTeX 格式和 plain-TeX 格式所对应的框架自带格式文件(TeX Live 2022)的 `URL`。在想要使用自定义格式文件时，可以对这两个属性进行赋值。
+
+例如，假设新的 `xelatex.fmt` 的 `URL` 为 `newFMTURL`，在调用本类进行编译之前，只需：
+```swift
+engine.latexFormatURL = newFMTURL
+```
+即可指定新的 `xelatex.fmt` 的路径。
+
+需要指出，传入给这两个静态属性的新的 `URL` 的文件名称必须符合以下规定，否则将导致编译失败。
+|属性|文件名|
+|---|---|
+|`TeXEngine.plainFormatURL`|`xetex.fmt`, `pdftex.fmt`(相应于引擎类型)|
+|`TeXEngine.latexFormatURL`|`xelatex.fmt`, `pdflatex.fmt`(相应于引擎类型)|
+
+### `TeX` 文件的编译
+
+#### 一个典型的例子
+假设在 APP 沙盒的 `texProject` 文件夹中有以下三个文件: `main.tex`、`123.jpg` 和 `sub.tex`。其中，`main.tex` 文件的内容为：
+```latex
+\documentclass{ctexart}
+\begin{document}
+这是一个 \LaTeX 文件。
+
+现在测试图片嵌入：
+\includegraphics{123.jpg}
+
+现在测试 `tex` 文件的导入：
+\include{sub.tex}
+\end{document}
+```
+而 `sub.tex` 文件的内容为：
+```latex
+这是 \texttt{sub.tex} 文件所包含的内容。
+```
+假设 `main.tex` 的 `URL` 为 `mainTeXFileURL`。仍接上例中的 `TeXEngineController`（由于使用了中文，这里必须使用 XeTeX 引擎），在其中添加以下方法：
+```swift
+func compile(completionHandler: @escaping (Bool) -> ()) {
+    Task { @MainActor in
+        completionHandler((try? await engine.compileTeX(by: .latex, tex: mainTeXFileURL, target: nil)) != nil)
+    }
+}
+```
+调用此方法后，在闭包 `completionHandler(_:)` 被呼叫后，我们可以去 `texProject` 文件夹中寻找输出的 `PDF` 文件与编译过程中引擎所生成的日志文件。
+
+需要注意的是，`TeXEngine.compileTeX(by:tex:target)` 方法仅会在 **引擎崩溃** 时抛出错误。如果引擎崩溃，可以这样做：
+```swift
+func resetEngine() {
+    try? await self.engine.cleanEngine()
+}
+```
+但在调用此方法之前，需要确保已经加载了引擎（即调用了 `TeXEngine.loadEngine` 方法）。
+
+#### 动态文件搜寻
+有时会遇到用户想要安装 **文档类** 的需求。这时候可以访问 `TeXEngine` 实例的 `fileQuerier.dynamicSearchResources` 属性，并且把 **文档类所在的文件夹** 添加到该属性对应的列表中。
+
+请注意，文件查询器将深度遍历 `fileQuerier.dynamicSearchResources` 属性里的所有文件夹内的所有内容，为了避免影响编译速度，最好不要在该属性中提供包含了较多文件的文件夹。
+
+### XeTeX 的字体搜索
+
+传统的（指之前 TeX Live 中自带的）XeTeX 引擎可以 **读取操作系统中安装的字体** 并把它们应用于排版过程。在 `Windows` 和 `Linux` 上，此功能依靠 `fontconfig` 框架实现；而在 `MacOS` 上，此功能依靠 `CoreText` 框架实现。
+
+对于本框架，为了读取 `iOS` 与 `iPadOS` 上安装的本机字体，和 `MacOS` 的行为类似，框架也基于 `iOS` 上的 `CoreText` 框架，提供了一些字体相关的功能。
+
+#### 字体数据库文件
+字体数据库文件的路径为 `.../texmf-dist/font.json`（可能不存在）。
+- 在初始化文件查询服务时，将会判断 `/texmf-dist` 中是否包含了 `font.json` 文件。
+- `font.json` 其实是供 `TeXEngine` 的文件查询器使用的 **字体数据库**，用于（且仅用于）缓存 TeX Live 安装文件的中的所有 `opentype` 和 `truetype` 字体信息。
+- 如果该文件存在，`TeXEngine` 的文件查询器将从这个文件中读取字体的数据（字体全名、字体族等）；如果不存在，框架将遍历 `/texmf-dist/font` 中安装的所有  `truetype` 和 `opentype` 字体，使用 `CoreText` 框架读取这些字体的信息，并且将这些信息写入到 `/texmf-dist/font.json` 文件中。
+
+#### 字体搜索的行为
+在框架内部的 XeTeX 引擎尝试搜索某个字体时，其会按照以下步骤依次进行搜索：（假设使用名称 `FONTNAME` 进行搜索）
+- 先在 `font.json` 数据库中搜索，这时会依次把 `FONTNAME` 当做字体的 `PostScript` 名称和 `FullName` 名称进行搜索。
+- 如果在上一步中没有搜索到任何结果，但是 `FONTNAME` 的格式类似于 `FONTNAME-FAMILY`（即：`FONTNAME` 的中间有一个 `-`，例如 `Semafor-常规体`），我们将把第一个出现的 `-` 的前半部分当做字体的 `FamilyName`（字体族），把后半部分当做字体的 `StyleName`（字体风格）。然后再在 `font.json` 中进行相应的搜索。
+- 如果上一步中依旧没有搜索到任何结果，我们将使用 `CoreText` 框架，在 `iOS` 的系统字体数据库中查找字体。查找的方式和前边的两步完全相同。
+
+#### `fontspec` 宏包的使用提示
+根据以上字体搜索的步骤，如果想使用本框架去编译使用了 `fontspec` 宏包去自定义字体的 TeX 文件，在向 `fontspec` 宏包提供字体名称时，应尽可能地提供字体的 `PostScript` 名称。
+
+另外，由于本框架提供的 XeTeX 引擎支持读取系统字体，用户可以使用 `iPadOS` 的系统字体安装功能去安装字体，安装好的字体可以被本框架提供的 XeTeX 引擎读取。
+
+## 关于 `TeXLogParser` 的一些说明
+
+这个类的使用非常简单。阅读以下例子即可自明。
+```swift
+class TeXLogParserController {
+    let parser: TeXLogParser = .init()
+
+    func parseLog(logURL: URL, completionHandler: ([TeXLogParseResultItem]?) -> ()) {
+        guard let data = try? Data(contentsOf: logURL) else {
+            completionHandler(nil)
+            return
+        }
+        Task {
+            let result = try? await self.parser.parse(data: data, encoding: .utf8)
+            completionHandler(result)
+        }
+        //如果执行了 completionHandler(nil)，说明解析过程出现了错误
+    }
+}
+```
+其中，`parseLog` 的 `logURL` 参数应当传入 `TeX` 引擎输出的日志文件的 `URL`。
+

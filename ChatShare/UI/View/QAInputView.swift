@@ -6,7 +6,11 @@
 //
 
 import SwiftUI
+import QuickLook
+import SVProgressHUD
 import Localization
+
+//MARK: - QAInputView
 
 struct QAInputView: QANavigationLeaf {
     
@@ -21,6 +25,7 @@ struct QAInputView: QANavigationLeaf {
     }
     
     @FocusState private var blockFocusState: BlockFocusState?
+    @State private var isDisabled = false
     
     var content: some View {
         GeometryReader { proxy in
@@ -32,8 +37,10 @@ struct QAInputView: QANavigationLeaf {
         .background(Color.listBackgroundColor, ignoresSafeAreaEdges: .all)
         .toolbar(content: toolbarContent)
         .navigationBarBackButtonHidden()
+        .disabled(isDisabled)
+        .quickLookPreview(model.binding(for: \.docxConvertResultURL))
         .sheet(isPresented: model.binding(for: \.isShowingSinglePageSheet)) {
-            NavigationStack(root: QAImageConvertLongPageView.init)
+            QAImageConvertLongPageView()
                 .interactiveDismissDisabled()
         }
         .sheet(isPresented: model.binding(for: \.isShowingSplitedPageSheet)) {
@@ -46,8 +53,7 @@ struct QAInputView: QANavigationLeaf {
         }
     }
     
-    
-    
+    //MARK: - Input Blocks
     var questionBlock: some View {
         HStack(alignment: .top, spacing: 0.0) {
             circleImage(image: Image(systemName: "person.fill.questionmark").foregroundStyle(HierarchicalShapeStyle.secondary), backgroundStyle: Color.listCellBackgroundColor, width: 40.0)
@@ -117,7 +123,35 @@ struct QAInputView: QANavigationLeaf {
     }
 }
 
+//MARK: - Toolbar
+
 extension QAInputView {
+    
+    @ViewBuilder
+    var shareMenu: some View {
+        Menu {
+            Button("Convert To Long Image", systemImage: "photo") {
+                model.isShowingSinglePageSheet = true
+            }
+            Button("Convert to Short Image Slices", systemImage: "photo.stack") {
+                model.isShowingSplitedPageSheet = true
+            }
+            Button("Convert to Office Open XML Format (.docx)", systemImage: "richtext.page") {
+                convertToDocx()
+            }
+            Button("Convert to Other Text Formats", systemImage: "text.page") {
+                model.isShowingTextConvertSheet = true
+            }
+        } label: {
+            Text("Convert")
+                .bold()
+                .foregroundStyle(model.isContentEmpty ? Color.deepOrange.opacity(0.6) : Color.deepOrange)
+        }
+        .menuStyle(.button)
+        .disabled(model.isContentEmpty)
+        .padding(.trailing, length: 5)
+    }
+    
     @ToolbarContentBuilder
     func toolbarContent() -> some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
@@ -143,28 +177,29 @@ extension QAInputView {
                         .foregroundStyle(Color.deepOrange)
                         .bold()
                         .padding(.trailing, length: 5)
-                } else {
-                    Menu {
-                        Button("Convert To Long Image", systemImage: "photo") {
-                            model.isShowingSinglePageSheet = true
-                        }
-                        Button("Convert to Short Image Slices", systemImage: "photo.stack") {
-                            model.isShowingSplitedPageSheet = true
-                        }
-                        Button("Convert to Other Text Formats", systemImage: "text.page") {
-                            model.isShowingTextConvertSheet = true
-                        }
-                    } label: {
-                        Text("Convert")
-                            .bold()
-                            .foregroundStyle(model.isContentEmpty ? Color.deepOrange.opacity(0.6) : Color.deepOrange)
-                    }
-                    .menuStyle(.button)
-                    .disabled(model.isContentEmpty)
-                    .padding(.trailing, length: 5)
-                }
+                } else { shareMenu }
             }
             .animation(nil, value: blockFocusState)
+        }
+    }
+    
+    func convertToDocx() {
+        isDisabled = true
+        SVProgressHUD.show()
+        Task {
+            defer { isDisabled = false }
+            let content = self.model.normalizedQAMarkdownContent()
+            guard let data = try? await DownTeX.current.convertToDocx(markdownString: content),
+                  let url = await URL.temporaryFileURL(
+                    data: data,
+                    fileName: model.questionContent.sanitizedFileName(empty: #localized("Untitled")),
+                    extensionName: "docx"
+                  ) else {
+                await SVProgressHUD.displayingFailuredInfo(title: #localized("Conversion Failed"))
+                return
+            }
+            model.docxConvertResultURL = url
+            await SVProgressHUD.dismiss()
         }
     }
 }

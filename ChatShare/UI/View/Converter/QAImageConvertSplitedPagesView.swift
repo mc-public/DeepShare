@@ -36,9 +36,7 @@ struct QAImageConvertSplitedPagesView: View {
         NavigationStack {
             content
         }
-        .onGeometryChange(body: {
-            windowSize = $0
-        })
+        .onGeometryChange(body: { windowSize = $0 })
     }
     
     @ViewBuilder
@@ -62,7 +60,7 @@ struct QAImageConvertSplitedPagesView: View {
             }
             .toolbar(content: toolbarContent)
             .disabled(isDisabled)
-            .alert("Share Failured", isPresented: viewModel.binding(for: \.isShowingShareFailuredAlert), actions: {
+            .alert("Generation Failed", isPresented: viewModel.binding(for: \.isShowingShareFailuredAlert), actions: {
                 Button("OK") {}
             })
             .navigationTitle("Preview")
@@ -268,7 +266,7 @@ struct QASplitedPagesResultView: View {
                 .toolbar(content: toolbarContent)
                 .fileShareSheet(item: $selectedPDFURL)
                 .fileShareSheet(item: $selectedImagesURL)
-                .alert("Share Failured", isPresented: $isShowingShareFailuredAlert) {
+                .alert("Share Failed", isPresented: $isShowingShareFailuredAlert) {
                     Button("OK") {}
                 }
         }

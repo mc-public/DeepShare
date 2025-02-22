@@ -96,7 +96,7 @@ extension DownTeX {
     
     private func template(latexContent: String, config: ConvertConfiguration) -> String {
         let latexContent = latexContent
-            .replacingOccurrences(of: "//includegraphics", with: "//fakeincludegraphics")
+            .replacingOccurrences(of: "\\pandocbounded{\\includegraphics", with: "\\pandocbounded{\\fakeincludegraphics")
             .trimmingCharacters(in: .whitespacesAndNewlines)
         let top = config.contentRect.minY
         let bottom = config.pageSize.height - config.contentRect.maxY

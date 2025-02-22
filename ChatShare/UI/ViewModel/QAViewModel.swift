@@ -67,6 +67,13 @@ final class QAViewModel {
 
     var isContentEmpty: Bool { questionContent.isEmpty && answerContent.isEmpty }
     
+    func normalizedQAMarkdownContent() -> String {
+        let normalizedTitle = questionContent.trimmingCharacters(in: .whitespacesAndNewlines)
+        let normalizedAnswer = answerContent.trimmingCharacters(in: .whitespacesAndNewlines)
+        let markdownContent = (normalizedTitle.isEmpty ? String() : "# ") + normalizedTitle + (normalizedAnswer.isEmpty ? String() : ("\n\n" + normalizedAnswer))
+        return markdownContent
+    }
+    
     func prepareForQAModel(_ model: QADataModel) {
         selectDataModelID = model.id
     }
@@ -106,18 +113,19 @@ final class QAViewModel {
     var isShowingSinglePageSheet = false
     var isShowingSplitedPageSheet = false
     var isShowingTextConvertSheet = false
+    var docxConvertResultURL: URL?
     
     //MARK: - QARenderingOptions
     var selectedTemplate: QATemplateModel = QATemplateManager.current.defaultTemplate
     var usingWaterMark = true
-    var usingTitleBorder = true
+    var usingTitleBorder = false
     var isShowingShareFailuredAlert = false
     var horizontalPagePadding: CGFloat = 0.0
     var verticalPagePadding: CGFloat = 10.0
     var pdfResult: ShareFileURL?
     var imageResult: ShareFileURL?
     var pageRotation: QAPageRotation = .rotation4To3
-    var allowTextOverflow = false
+    var allowTextOverflow = true
     
     func updateSuggestedPagePadding(pageWidth: CGFloat) {
         let size = CGSize(width: pageWidth, height: pageWidth)

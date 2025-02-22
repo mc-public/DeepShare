@@ -13,7 +13,7 @@ import PDFKit
 
 //MARK: - QAImageConvertLongPageView
 
-struct QAImageConvertLongPageView: QANavigationLeaf {
+struct QAImageConvertLongPageView: View {
     
     @State var controller = MarkdownState()
     @State var windowSize: CGSize = .zero
@@ -26,6 +26,13 @@ struct QAImageConvertLongPageView: QANavigationLeaf {
     
     var navigationTitleColor: Color { .dynamicBlack }
     
+    var body: some View {
+        NavigationStack(root: {
+            content.navigationTitleColor(.dynamicBlack)
+        })
+    }
+    
+    @ViewBuilder
     var content: some View {
         let view = QATemplateScrollView(
             template: viewModel.selectedTemplate,
@@ -45,7 +52,7 @@ struct QAImageConvertLongPageView: QANavigationLeaf {
             .disabled(isDisable)
         view
             .onGeometryChange(body: { windowSize = $0 })
-            .alert("Share Failured", isPresented: viewModel.binding(for: \.isShowingShareFailuredAlert), actions: {
+            .alert("Share Failed", isPresented: viewModel.binding(for: \.isShowingShareFailuredAlert), actions: {
                 Button("OK") {}
             })
         
