@@ -134,7 +134,7 @@ extension QAImageConvertLongPageView {
         guard let titleCellImage = titleRenderer.uiImage else {
             return nil
         }
-        let textRectMinX = layoutResult.textRect.minX + viewModel.horizontalPagePadding
+        let textRectMinX = layoutResult.textRect.minX
         let titleCellImageRect = CGRect.init(x: textRectMinX, y: layoutResult.textRect.minY, width: titleCellSize.width, height: titleCellSize.height)
         let totalBackgroundImage = await layoutResult.totalImage()
         guard let contentPDFData = await controller.container.pdfData(),
