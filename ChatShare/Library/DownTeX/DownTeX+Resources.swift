@@ -10,7 +10,16 @@ import Zip
 import SwiftUI
 
 extension DownTeX {
+    
     internal class Resources {
+        
+        @MainActor
+        private static let shared = Resources()
+        
+        init() {
+            _isResourcesReady = .init(wrappedValue: false, "\(DownTeX.self)_TeXMF_Unzip_Boolean")
+        }
+        
         /// The total `DownTeX` package `URL`.
         static var TotalBundle: URL {
             guard let allBundle = Bundle.main.url(forResource: "DownTeX", withExtension: "bundle") else { fatalError("[\(Resources.self)][\(#function)] Cannot load Resource file.")}
@@ -38,14 +47,27 @@ extension DownTeX {
             assert(FileManager.default.fileExists(at: target), "[\(Resources.self)][\(#function)] Cannot load Resource file.")
             return target
         }
+        
+        
         /// Indicates whether all resources are currently available.
         ///
         /// Default is `false`. You need to call `prepareResources()` before using all resources.
-        @AppStorage("\(DownTeX.self)_TeXMF_Unzip_Boolean")
-        static private(set) var isResourcesReady: Bool = false
+        @AppStorage
+        var isResourcesReady: Bool
+        
+        /// Indicates whether all resources are currently available.
+        ///
+        /// Default is `false`. You need to call `prepareResources()` before using all resources.
+        @MainActor
+        static private(set) var isResourcesReady: Bool {
+            get { Resources.shared.isResourcesReady }
+            set { Resources.shared.isResourcesReady = newValue }
+        }
+        
         /// Load all resources.
         ///
         /// - Returns: A Boolean value indicating whether the resource decompression was successful.
+        @MainActor
         static func prepareResources() -> Bool {
             do {
                 try Zip.unzipFile(TeXBundleResource, destination: TeXResources, overwrite: true, password: nil)

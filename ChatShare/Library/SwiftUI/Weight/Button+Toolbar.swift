@@ -15,7 +15,7 @@ extension Button {
     ///
     /// - Parameter systemImage: The name of the system symbol image. Use the SF Symbols app to look up the names of system symbol images.
     /// - Parameter action: A view that describes the purpose of the button’s action.
-    init(systemImage: String, scale: Image.Scale? = nil, role: ButtonRole? = nil, action: @escaping () -> ()) where Label == AnyView {
+    init(systemImage: String, scale: Image.Scale? = nil, role: ButtonRole? = nil, action: @escaping @MainActor () -> ()) where Label == AnyView {
         if let scale {
             self.init(role: role) {
                 action()
@@ -39,7 +39,7 @@ extension Button {
     ///
     /// - Parameter systemImage: The name of the system symbol image. Use the SF Symbols app to look up the names of system symbol images.
     /// - Parameter action: A view that describes the purpose of the button’s action.
-    init(systemImage: String, role: ButtonRole? = nil, action: @escaping () -> ()) where Label == Image {
+    init(systemImage: String, role: ButtonRole? = nil, action: @escaping @MainActor () -> ()) where Label == Image {
         self.init(role: role) {
             action()
         } label: {

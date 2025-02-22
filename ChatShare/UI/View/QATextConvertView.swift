@@ -91,9 +91,12 @@ struct QATextConvertView: View {
             let normalizedTitle = viewModel.questionContent.trimmingCharacters(in: .whitespacesAndNewlines)
             let normalizedAnswer = viewModel.answerContent.trimmingCharacters(in: .whitespacesAndNewlines)
             let markdownContent = (normalizedTitle.isEmpty ? String() : "# ") + normalizedTitle + (normalizedAnswer.isEmpty ? String() : ("\n\n" + normalizedAnswer))
-            guard let result = try? await DownTeX.current.convertToText(markdownString: markdownContent, format: format) else {
+            guard var result = try? await DownTeX.current.convertToText(markdownString: markdownContent, format: format) else {
                 isConvertFailured = true
                 return
+            }
+            if format == .latex {
+                result.replace("pdfcreator={LaTeX via pandoc}", with: "pdfcreator={LaTeX via \(ChatShareApp.Name)}")
             }
             isConvertFailured = false
             self.convertResult = result

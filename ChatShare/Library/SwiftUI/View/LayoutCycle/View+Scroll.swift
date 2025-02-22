@@ -90,8 +90,8 @@ extension View {
 fileprivate class ScrollTopEdgeColorView: UIView {}
 fileprivate class ScrollBottomEdgeColorView: UIView {}
 
-private var unsafe_associatedKey: UInt8 = 0
-private var unsafe_associatedKeyLock = NSLock()
+nonisolated(unsafe) private var unsafe_associatedKey: UInt8 = 0
+nonisolated(unsafe) private var unsafe_associatedKeyLock = NSLock()
 
 extension UIScrollView {
     fileprivate var unsafe_temporaryProperty: Any? {

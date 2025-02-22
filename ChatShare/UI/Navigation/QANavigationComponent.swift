@@ -11,7 +11,7 @@ import SwiftUI
 struct QANavigationLink<Target, Label>: View where Target: QANavigationLeaf, Label: View {
     private let targetType: Target.Type
     private let label: () -> Label
-    private let onCompletion: () -> ()
+    private let onCompletion: @MainActor () -> ()
     /// Create a button for performing navigation actions.
     ///
     /// - Parameter target: The type of the target view for navigation.

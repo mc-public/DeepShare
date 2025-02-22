@@ -210,7 +210,7 @@ public final class DownTeX {
         }
     }
     
-    public struct TargetFormat: CaseIterable, Hashable, Identifiable, RawRepresentable {
+    public struct TargetFormat: CaseIterable, Hashable, Identifiable, RawRepresentable, Sendable {
         
         fileprivate var command: String
         public var title: String
