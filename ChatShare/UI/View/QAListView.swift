@@ -30,7 +30,6 @@ struct QAListView: QANavigationRoot {
             .searchable(text: viewModel.binding(for: \.listSearchText), isPresented: viewModel.binding(for: \.isListSearching), placement: .navigationBarDrawer(displayMode: .always), prompt: nil)
             .navigationTitle("History")
             .navigationBarTitleDisplayMode(.large)
-            .onAppear(perform: { viewModel.listSelectedModels = .init() })
     }
 }
 

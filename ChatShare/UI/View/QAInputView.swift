@@ -33,6 +33,7 @@ struct QAInputView: QANavigationLeaf {
                 textInputStack(height: proxy.size.height)
             }
         }
+        .onDisappear(perform: { model.listSelectedModels = .init() })
         .navigationBarTitleDisplayMode(.inline)
         .background(Color.listBackgroundColor, ignoresSafeAreaEdges: .all)
         .toolbar(content: toolbarContent)

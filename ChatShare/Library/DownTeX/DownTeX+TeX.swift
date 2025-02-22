@@ -77,6 +77,11 @@ extension DownTeX {
     }
     
     func unsafe_convertToPDFData(markdown: String, config: ConvertConfiguration) async throws(OperationError) -> Data {
+        let patternLeft = "(?<!\\n\\n)\\\\\\["
+        let patternRight = "\\\\\\](?!\\n\\n)"
+        let markdown = markdown
+            .replacingOccurrences(of: patternLeft, with: "\n\\\\[", options: .regularExpression)
+            .replacingOccurrences(of: patternRight, with: "\\\\]\n")
         let latexContent = try await self.unsafe_convertToLaTeX(markdownString: markdown)
         var imagesDic = [String: UIImage]()
         if let pageImage = config.pageImage {

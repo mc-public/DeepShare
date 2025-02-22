@@ -225,7 +225,7 @@ public final class DownTeX {
         public static let reStructuredText = TargetFormat(command: "-f markdown -t rst", title: #localized("reStructuredText"), extensionName: "rst")
         public static let latex = TargetFormat(command: "--standalone -f markdown -t latex", title: #localized("LaTeX"), extensionName: "tex")
         public static let html = TargetFormat(command: "-f markdown -t html", title:  #localized("HTML"), extensionName: "html")
-        fileprivate static let unsafe_latex = TargetFormat(command: "-f markdown -t latex", title: #localized("LaTeX"), extensionName: "tex")
+        fileprivate static let unsafe_latex = TargetFormat(command: "-f markdown+tex_math_single_backslash -t latex", title: #localized("LaTeX"), extensionName: "tex")
     }
     
     //MARK: - Private API

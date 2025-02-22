@@ -29,6 +29,7 @@ final class QANavigationModel {
     /// A Bool value indicating whether it has returned to the navigation root.
     ///
     /// Used to fix potential issues with navigation animations in SwiftUI when state restoration occurs.
+    @ObservationIgnored
     private var rootFlag: Bool = false
     
     /// Create an empty navigation model.
