@@ -4,8 +4,6 @@
 <dict>
 	<key>CFBundleGetInfoString</key>
 	<string></string>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<true/>
 	<key>UIFileSharingEnabled</key>
 	<false/>
 </dict>
