@@ -19,6 +19,9 @@ public class TeXFileQuerier: NSObject, FileQueryProvider {
         let format: TeXFileType
     }
     
+    /// Whether to dump the resource files and their hierarchy used at each compilation.
+    public static let usingResourcesBackup: Bool = false
+    
     /// 是否启用详细日志
     ///
     /// 将该属性设置为 `true` 将使得当前类在 Xcode 的控制台中输出详细的文件查找信息。该属性在调试配置下的默认值为 `true`，在发布配置下的默认值为 `false`。
@@ -145,7 +148,9 @@ public class TeXFileQuerier: NSObject, FileQueryProvider {
         if (fileName as NSString).isAbsolutePath {
             let url = URL(path: fileName).standardizedFileURL
             if FileManager.default.fileExists(atPath: url.versionPath) {
-                //self.restoreResource(url: url)
+                if Self.usingResourcesBackup {
+                    self.restoreResource(url: url)
+                }
                 return .texlive(url: url)
             }
         }
@@ -161,7 +166,9 @@ public class TeXFileQuerier: NSObject, FileQueryProvider {
         }
         if let texResourceQueryResult = await self.searchTeXResources(for: fileName, with: type) {
             let url = texResourceQueryResult.standardizedFileURL
-            //self.restoreResource(url: url)
+            if Self.usingResourcesBackup {
+                self.restoreResource(url: url)
+            }
             return .texlive(url: texResourceQueryResult)
         }
         return .notFound

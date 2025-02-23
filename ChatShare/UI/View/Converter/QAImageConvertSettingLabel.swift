@@ -11,7 +11,7 @@ import MarkdownView
 struct QAImageConvertSettingLabel {
     private init() {}
     @MainActor
-    static func pageHorizontalPaddingLabel(viewModel: QAViewModel, markdownState: MarkdownState) -> some View {
+    static func pageHorizontalPaddingLabel(viewModel: QAViewModel, markdownState: MarkdownState, maximumHeight: CGFloat) -> some View {
         VStack {
             HStack {
                 Text("Horizontal Page Margins")
@@ -20,7 +20,7 @@ struct QAImageConvertSettingLabel {
                     .foregroundStyle(.secondary)
             }
             @Bindable var state = viewModel
-            Slider(value: $state.horizontalPagePadding, in: markdownState.horizontalPaddingRange, step: 1.0, label: {  }, minimumValueLabel: { Image(systemName: "number").imageScale(.small) }, maximumValueLabel: { Image(systemName: "number").imageScale(.medium) })
+            Slider(value: $state.horizontalPagePadding, in: 0.0...max(maximumHeight, 10.0), step: 1.0, label: {  }, minimumValueLabel: { Image(systemName: "number").imageScale(.small) }, maximumValueLabel: { Image(systemName: "number").imageScale(.medium) })
         }
     }
     

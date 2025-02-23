@@ -17,11 +17,19 @@ import UIKit
 
 @available(macOS 14.0, iOS 17.0, *)
 extension MarkdownView {
+    
+    static let ContentHeightChangeNotification = Notification.Name(rawValue: "SwiftMarkdown-\(Self.self)-ContentSizeChange")
     /// The internal `WKWebView` for displaying the markdown content.
     public class WebView: WKWebView {
         
         /// The content height of current non-scrollable view.
-        var contentHeight: CGFloat = 0
+        var contentHeight: CGFloat = 0 {
+            didSet {
+                if oldValue != contentHeight {
+                    NotificationCenter.default.post(name: ContentHeightChangeNotification, object: contentHeight)
+                }
+            }
+        }
         /// The natural size for the receiving view, considering only properties of the view itself.
         override public var intrinsicContentSize: CGSize {
             .init(width: super.intrinsicContentSize.width, height: contentHeight)

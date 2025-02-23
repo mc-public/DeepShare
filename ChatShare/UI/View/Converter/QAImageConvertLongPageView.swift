@@ -30,6 +30,11 @@ struct QAImageConvertLongPageView: View {
         NavigationStack(root: {
             content.navigationTitleColor(.dynamicBlack)
         })
+        .onGeometryChange(body: { windowSize = $0 })
+        .onDisappear(perform: {
+            viewModel.cleanRenderingOptions()
+            controller.cleanMemory()
+        })
     }
     
     @ViewBuilder
@@ -46,16 +51,14 @@ struct QAImageConvertLongPageView: View {
             .environment(\.colorScheme, .light)
             .toolbar(content: toolbarContent)
             .safeAreaInset(edge: .bottom, alignment: .center, spacing: 0.0) {
-                QARenderingSettingsView(markdownController: $controller)
+                QARenderingSettingsView(markdownController: $controller, windowSize: $windowSize)
                     .frame(maxWidth: .infinity, maxHeight: 0.5 * windowSize.height)
             }
             .disabled(isDisable)
         view
-            .onGeometryChange(body: { windowSize = $0 })
             .alert("Share Failed", isPresented: viewModel.binding(for: \.isShowingShareFailuredAlert), actions: {
                 Button("OK") {}
             })
-        
             .navigationTitle("Preview")
             .navigationBarTitleDisplayMode(.inline)
             .fileShareSheet(item: viewModel.binding(for: \.imageResult))
@@ -64,10 +67,12 @@ struct QAImageConvertLongPageView: View {
             .onDisappear(perform: SVProgressHUD.dismiss)
             .environment(\.dynamicTypeSize, .medium)
             .onChange(of: viewModel.selectedTemplate, initial: true) { _, newValue in
-                viewModel.updateSuggestedPagePadding(pageWidth: scrollViewFrameSize.width)
+                viewModel.updateSuggestedPagePadding(pageWidth: windowSize.width)
+                
                 controller.backgroundColor = Color(newValue.textBackgroundColor).opacity(0)
             }
             .onChange(of: controller.theme, initial: true) { _, _ in
+                viewModel.updateSuggestedPagePadding(pageWidth: scrollViewFrameSize.width)
                 controller.backgroundColor = Color(viewModel.selectedTemplate.textBackgroundColor).opacity(0)
             }
     }
@@ -137,7 +142,7 @@ extension QAImageConvertLongPageView {
         let textRectMinX = layoutResult.textRect.minX
         let titleCellImageRect = CGRect.init(x: textRectMinX, y: layoutResult.textRect.minY + viewModel.verticalPagePadding, width: titleCellSize.width, height: titleCellSize.height)
         let totalBackgroundImage = await layoutResult.totalImage()
-        guard let contentPDFData = await controller.container.pdfData(),
+        guard let contentPDFData = await controller.container?.pdfData(),
               let contentPDFDocument = PDFDocument(data: contentPDFData) else {
             return nil
         }
@@ -172,6 +177,7 @@ extension QAImageConvertLongPageView {
 fileprivate struct QARenderingSettingsView: View {
     @Binding var markdownController: MarkdownState
     @Environment(QAViewModel.self) var viewModel
+    @Binding var windowSize: CGSize
     var body: some View {
         VStack(alignment: .center, spacing: 0.0) {
             Divider()
@@ -189,13 +195,16 @@ fileprivate struct QARenderingSettingsView: View {
     
     var content: some View {
         List {
+            let splitedSize = viewModel.pageRotation.size(width: windowSize.width)
+            let layoutResult = QATemplateManager.current.pageRects(for: viewModel.selectedTemplate, preferredSize: splitedSize)
+            let maximumHorizontalPadding = 0.1 * (layoutResult?.layoutRect.width ?? 0.0)
             Section("Style") {
                 QAImageConvertSettingLabel.usingWaterMarkLabel(viewModel: viewModel)
                 QAImageConvertSettingLabel.usingTitleBorder(viewModel: viewModel)
                 QAImageConvertSettingLabel.templateLabel(viewModel: viewModel)
                 themeLabel
                 fontSizeLabel
-                QAImageConvertSettingLabel.pageHorizontalPaddingLabel(viewModel: viewModel, markdownState: markdownController)
+                QAImageConvertSettingLabel.pageHorizontalPaddingLabel(viewModel: viewModel, markdownState: markdownController, maximumHeight: maximumHorizontalPadding)
                 QAImageConvertSettingLabel.pageVerticalPaddingLabel(viewModel: viewModel)
             }
         }

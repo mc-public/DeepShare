@@ -304,7 +304,7 @@ class TeXFontQuerier {
                 return
             }
             let setURLSchemeTaskNotFound = {
-                print("[TeXEngine][XeTeX.FontQuerier][format=\(queryType)]字体未找到。索取文件名：\(name)")
+                debugPrint("[TeXEngine][XeTeX.FontQuerier][format=\(queryType)]字体未找到。索取文件名：\(name)")
                 let respone = URLResponse(url: url, mimeType: nil, expectedContentLength: -1, textEncodingName: nil)
                 urlSchemeTask.didReceive(respone)
                 urlSchemeTask.didFinish()
@@ -367,9 +367,6 @@ extension TeXFontQuerier {
      - Returns: 返回已经被正规化后的字体简介对象，该对象即为最匹配参数指定的字体名称的字体简介对象。保证该对象在文件系统中真实存在。
      */
     public nonisolated static func searchSystemFont(name: String) -> CTFontDescriptor? {
-        if name == "PingFangSC-Regular" {
-            print("正在搜索")
-        }
         /* 按照 PSName 和 FullName 进行查找 */
         let keys: [CTFont.Attribute] = [.name, .displayName]
         for key in keys {

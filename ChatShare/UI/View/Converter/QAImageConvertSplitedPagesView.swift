@@ -22,6 +22,7 @@ struct QAImageConvertSplitedPagesView: View {
     
     @Environment(QAViewModel.self) var viewModel: QAViewModel
     @Environment(\.dismiss) var dismiss
+    
     @State var markdownState = MarkdownState()
     /// Disabled critical buttons when rendering contents.
     @State var isDisabled = true
@@ -37,6 +38,10 @@ struct QAImageConvertSplitedPagesView: View {
             content
         }
         .onGeometryChange(body: { windowSize = $0 })
+        .onDisappear(perform: {
+            viewModel.cleanRenderingOptions()
+            markdownState.cleanMemory()
+        })
     }
     
     @ViewBuilder
@@ -147,8 +152,9 @@ extension QAImageConvertSplitedPagesView {
         let newContentRect = layoutResult.textRect.inseting(
             top: viewModel.verticalPagePadding,
             bottom: viewModel.verticalPagePadding,
-            left: viewModel.horizontalPagePadding,
-            right: viewModel.horizontalPagePadding
+            //TODO: Check why the parameter 2.0 is being passed here.
+            left: 2 * viewModel.horizontalPagePadding,
+            right: 2 * viewModel.horizontalPagePadding
         )
         let config = DownTeX.ConvertConfiguration(
             fontSize: fontSize,
@@ -197,13 +203,14 @@ struct QASplitedPagesSettingsView: View {
         List {
             let splitedSize = viewModel.pageRotation.size(width: windowSize.width)
             let layoutResult = QATemplateManager.current.pageRects(for: viewModel.selectedTemplate, preferredSize: splitedSize)
-            let maximumPadding = 0.3 * (layoutResult?.layoutRect.height ?? 0.0)
+            let maximumVerticalPadding = 0.3 * (layoutResult?.layoutRect.height ?? 0.0)
+            let maximumHorizontalPadding = 0.1 * (layoutResult?.layoutRect.width ?? 0.0)
             Section("Style") {
                 QAImageConvertSettingLabel.usingWaterMarkLabel(viewModel: viewModel)
                 QAImageConvertSettingLabel.usingTitleBorder(viewModel: viewModel)
                 QAImageConvertSettingLabel.templateLabel(viewModel: viewModel)
-                QAImageConvertSettingLabel.pageHorizontalPaddingLabel(viewModel: viewModel, markdownState: markdownState)
-                QAImageConvertSettingLabel.pageVerticalPaddingLabel(viewModel: viewModel, maximumHeight: maximumPadding)
+                QAImageConvertSettingLabel.pageHorizontalPaddingLabel(viewModel: viewModel, markdownState: markdownState, maximumHeight: maximumHorizontalPadding)
+                QAImageConvertSettingLabel.pageVerticalPaddingLabel(viewModel: viewModel, maximumHeight: maximumVerticalPadding)
                 rotationLabel
                 fontSizeLabel
                 textOverflowLabel
@@ -228,7 +235,7 @@ struct QASplitedPagesSettingsView: View {
     }
     
     var textOverflowLabel: some View {
-        Toggle("Allow Text Overflow", isOn: viewModel.binding(for: \.allowTextOverflow))
+        Toggle("Try to Prevent Text Overflow", isOn: viewModel.binding(for: \.preventTextOverflow))
     }
 }
 

@@ -39,7 +39,7 @@ extension DownTeX {
         }
         /// The `TeXMF` resources `URL`.
         static var TeXResources: URL {
-            URL.libraryDirectory.appending(path: "texmf")
+            URL.documentsDirectory.appending(path: "texmf")
         }
         /// The `TeXMF` zip-package `URL`.
         private static var TeXBundleResource: URL {
@@ -47,7 +47,6 @@ extension DownTeX {
             assert(FileManager.default.fileExists(at: target), "[\(Resources.self)][\(#function)] Cannot load Resource file.")
             return target
         }
-        
         
         /// Indicates whether all resources are currently available.
         ///
@@ -70,7 +69,7 @@ extension DownTeX {
         @MainActor
         static func prepareResources() -> Bool {
             do {
-                try Zip.unzipFile(TeXBundleResource, destination: TeXResources, overwrite: true, password: nil)
+                try Zip.unzipFile(TeXBundleResource, destination: TeXResources, overwrite: true, password: nil, progress: { print($0) })
                 Self.isResourcesReady = true
                 return true
             } catch {

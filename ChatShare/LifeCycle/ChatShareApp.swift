@@ -23,10 +23,7 @@ struct ChatShareApp: App {
     var body: some Scene {
         WindowGroup {
             QANavigationView()
-                .background {
-                    DownTeX.placeHolder
-                        .ignoresSafeArea(.all, edges: .all)
-                }
+                .background { DownTeX.placeHolder.ignoresSafeArea(.all, edges: .all) }
                 .task {
                     if DownTeX.current.state == .initFailed {
                         isResourcesFailured = true

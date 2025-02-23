@@ -33,7 +33,14 @@ public class MarkdownState {
     
     /// A subclass instance of WKWebView that displays Markdown text content.
     @ObservationIgnored
-    public let container = MarkdownView.WebView()
+    public private(set) var container: MarkdownView.WebView? = MarkdownView.WebView()
+    
+    /// Clean memory allocated by current state.
+    ///
+    /// If you find that the WebView is not being released correctly, you can call this method to manually clean up the memory.
+    public func cleanMemory() {
+        container = nil
+    }
     
     /// Indicates whether a Markdown rendering operation is currently in progress.
     ///
@@ -57,9 +64,7 @@ public class MarkdownState {
             if theme.colorSupport == .light {
                 backgroundColor = .white
             }
-            Task {
-                await applyStyle()
-            }
+            Task { await applyStyle() }
         }
     }
     
@@ -75,7 +80,7 @@ public class MarkdownState {
     
     /// The available range for horizontal padding.
     public var horizontalPaddingRange: ClosedRange<CGFloat> {
-        let maximumWidth = max(0.2 * container.bounds.width, 10.0)
+        let maximumWidth = max(0.2 * (container?.bounds.width ?? 0.0), 10.0)
         return 0.0...maximumWidth
     }
     
@@ -114,8 +119,8 @@ public class MarkdownState {
     public var backgroundColor: Color {
         didSet {
 #if os(iOS)
-            container.backgroundColor = PlatformColor(backgroundColor)
-            container.scrollView.backgroundColor = PlatformColor(backgroundColor)
+            container?.backgroundColor = PlatformColor(backgroundColor)
+            container?.scrollView.backgroundColor = PlatformColor(backgroundColor)
 #elseif os(macOS)
             Task { await container.updateBackgroundColor(PlatformColor(backgroundColor)) }
 #endif
@@ -132,9 +137,9 @@ public class MarkdownState {
     var onContentRendered: (() async throws -> Void)? = nil
     
     func updateText(await: Bool = false) async {
-        if container.isLoading { return }
+        if container?.isLoading == true { return }
         self.isRenderingContent = true
-        await container.updateMarkdownContent(self.text)
+        await container?.updateMarkdownContent(self.text)
         await applyStyle()
         if `await` {
             try? await Task.sleep(for: .seconds(0.2))
@@ -144,19 +149,19 @@ public class MarkdownState {
     }
     
     func applyStyle() async {
-        await container.updateTheme(for: theme)
-        await container.updateFontSize(fontSize)
-        await container.updateHorizontalPadding(horizontalPadding)
-        await container.updateVerticalPadding(top: topPadding, bottom: bottomPadding)
-        container.backgroundColor = PlatformColor(backgroundColor)
-        container.scrollView.backgroundColor = PlatformColor(backgroundColor)
+        await container?.updateTheme(for: theme)
+        await container?.updateFontSize(fontSize)
+        await container?.updateHorizontalPadding(horizontalPadding)
+        await container?.updateVerticalPadding(top: topPadding, bottom: bottomPadding)
+        container?.backgroundColor = PlatformColor(backgroundColor)
+        container?.scrollView.backgroundColor = PlatformColor(backgroundColor)
     }
     
     /// Create a `Markdown` state.
     public init() {
         backgroundColor = .white
         #if os(iOS)
-        container.backgroundColor = PlatformColor(.white)
+        container?.backgroundColor = PlatformColor(.white)
         #endif
     }
 }
@@ -212,7 +217,7 @@ public struct MarkdownView: PlatformViewRepresentable {
     }
 #elseif os(iOS)
     public func makeUIView(context: Context) -> WebView {
-        controller.container
+        controller.container ?? .init()
     }
 #endif
     

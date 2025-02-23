@@ -126,6 +126,16 @@ final class QAViewModel {
     var imageResult: ShareFileURL?
     var pageRotation: QAPageRotation = .rotation4To3
     var allowTextOverflow = true
+    var preventTextOverflow: Bool {
+        get { !allowTextOverflow }
+        set { allowTextOverflow = !newValue }
+    }
+    
+    func cleanRenderingOptions() {
+        selectedTemplate = QATemplateManager.current.defaultTemplate
+        horizontalPagePadding = 0.0
+        verticalPagePadding = 10.0
+    }
     
     func updateSuggestedPagePadding(pageWidth: CGFloat) {
         let size = CGSize(width: pageWidth, height: pageWidth)
