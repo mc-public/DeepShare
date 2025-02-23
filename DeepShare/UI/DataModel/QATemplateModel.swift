@@ -65,7 +65,7 @@ final class QATemplateManager {
     private init() {
         let templates = Self.loadResources()
         self.allTemplates = templates
-        self.defaultTemplate = templates[0]
+        self.defaultTemplate = templates.filter(\.title, "Basic").first ?? templates[0]
     }
     
     func page(for template: QATemplateModel) -> PDFPage {

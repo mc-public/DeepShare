@@ -1,56 +1,51 @@
-Riemann Zeta函数 \(\zeta(s)\) 的导数计算需分情况讨论，具体步骤如下：
+Huffman coding achieves optimality through **frequency-weighted binary tree construction**. The compression ratio depends on Shannon entropy (fundamental limit) and the actual code lengths.
 
----
-
-### **1. 对于 \(\text{Re}(s) > 1\) 的情况**
-Zeta函数的定义式为：
+### Key Formula
+**Compression Ratio**
 \[
-\zeta(s) = \sum_{n=1}^\infty \frac{1}{n^s},
+R = \frac{H(S)}{L}
 \]
-此时导数可通过逐项求导得到：
+Where:
+- \( H(S) = -\sum_{i=1}^n p_i \log_2 p_i \) (Shannon entropy)
+- \( L = \sum_{i=1}^n p_i l_i \) (Average code length)
+- \( p_i \) = Probability of symbol \( i \)
+- \( l_i \) = Code length for symbol \( i \)
+
+---
+
+### Optimization Process Table
+| Step | Action | Mathematical Guarantee |
+|------|--------|-------------------------|
+| 1 | Sort symbols by frequency | \( p_1 \geq p_2 \geq ... \geq p_n \) |
+| 2 | Build priority queue | \( O(n \log n) \) time complexity |
+| 3 | Merge lowest-frequency nodes | \( l_i \propto -\log_2 p_i \) |
+| 4 | Assign 0/1 to tree branches | Prefix-free condition: \( \forall i,j,\ c_i \not\subseteq c_j \) |
+
+---
+
+**Concrete Example**
+For alphabet {A, B, C, D} with frequencies:
+
+| Symbol | Frequency | Huffman Code | Original Bits | Compressed Bits |
+|--------|-----------|--------------|---------------|-----------------|
+| A      | 0.4       | 0            | 8             | 3.2             |
+| B      | 0.3       | 10           | 8             | 2.4             |
+| C      | 0.2       | 110          | 8             | 1.6             |
+| D      | 0.1       | 111          | 8             | 0.8             |
+
+**Total**:
+Original = 32 bits (4 symbols × 8-bit ASCII)
+Compressed = 8 bits (sum of Compressed Bits column)
+**Compression Ratio** = 32/8 = **4:1**
+
+---
+
+**Technical Notes**
+1. Huffman codes satisfy:
 \[
-\zeta'(s) = -\sum_{n=2}^\infty \frac{\ln n}{n^s}.
+H(S) \leq L < H(S) + 1
 \]
-该级数在 \(\text{Re}(s) > 1\) 时绝对收敛。
+2. Optimality proof via Kraft-McMillan inequality
+3. Practical implementations use canonical Huffman codes for decoder efficiency
 
----
-
-### **2. 解析延拓后的导数**
-通过函数方程解析延拓到全复平面（除 \(s=1\)），函数方程为：
-\[
-\zeta(s) = 2^s \pi^{s-1} \sin\left(\frac{\pi s}{2}\right) \Gamma(1-s) \zeta(1-s),
-\]
-对两边求导后，需用乘积法则处理Gamma函数、正弦函数和Zeta函数的导数：
-\[
-\zeta'(s) = \text{[复杂表达式]}.
-\]
-实际应用中常借助特殊函数（如多Gamma函数 \(\psi(s)\)）简化。
-
----
-
-### **3. 特殊点的导数**
-- **在负偶数处**：\(\zeta(-2n) = 0\)（平凡零点），此处导数无需额外计算。
-- **在 \(s=0\) 处**：利用函数方程可得：
-  \[
-  \zeta'(0) = -\frac{1}{2} \ln(2\pi).
-  \]
-- **在 \(s=2\) 处**：通过积分或特殊级数计算得：
-  \[
-  \zeta'(2) = -\sum_{n=2}^\infty \frac{\ln n}{n^2} \approx -0.937548.
-  \]
-
----
-
-### **4. 数值计算**
-常用方法包括：
-- **Euler-Maclaurin公式**：加速级数收敛。
-- **积分表示**：如利用Mellin变换：
-  \[
-  \zeta(s) = \frac{1}{\Gamma(s)} \int_0^\infty \frac{x^{s-1}}{e^x - 1} dx,
-  \]
-  求导后需处理积分中的对数项和Gamma函数的导数。
-
----
-
-### **总结**
-Riemann Zeta函数的导数计算依赖于解析工具（如级数展开、函数方程、积分表示）和特殊函数理论。具体表达式在不同区域和点需选用相应方法，实际应用中常依赖数值算法或已知的数学常数。
+This problem avoids subjective debates while demonstrating fundamental information theory concepts with verifiable mathematics.

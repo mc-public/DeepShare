@@ -159,7 +159,7 @@
 				};
 			};
 			buildConfigurationList = E5418EE72D51F06E00A6655C /* Build configuration list for PBXProject "ChatShare" */;
-			developmentRegion = "zh-Hans";
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
@@ -348,7 +348,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_ASSET_PATHS = "$(SRCROOT)/DeepShare/Resources/Preview.xcassets";
 				DEVELOPMENT_TEAM = CB7HZG64JQ;
 				ENABLE_PREVIEWS = YES;
@@ -390,7 +390,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_ASSET_PATHS = "$(SRCROOT)/DeepShare/Resources/Preview.xcassets";
 				DEVELOPMENT_TEAM = CB7HZG64JQ;
 				ENABLE_PREVIEWS = YES;
