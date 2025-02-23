@@ -77,6 +77,10 @@ struct QAImageConvertSplitedPagesView: View {
                 markdownState.theme = .concise
                 markdownState.backgroundColor = Color(newValue.textBackgroundColor).opacity(0)
             }
+            .onChange(of: viewModel.pageRotation, initial: true) { _, _ in
+                viewModel.updateSuggestedPagePadding(pageWidth: windowSize.width)
+                markdownState.theme = .concise
+            }
             .sheet(item: $renderingResult) { result in
                 QASplitedPagesResultView(pdfURL: result.url, pdfData: result.data)
             }

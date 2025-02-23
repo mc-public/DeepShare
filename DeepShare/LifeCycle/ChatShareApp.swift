@@ -6,19 +6,10 @@
 //
 
 import SwiftUI
-import FPSMonitorLabel
-
-struct EqualStorage<Value>: Equatable {
-    static func == (lhs: EqualStorage<Value>, rhs: EqualStorage<Value>) -> Bool {
-        true
-    }
-    
-    let value: Value
-}
 
 @main
 struct ChatShareApp: App {
-    static nonisolated let Name = "ChatShare"
+    static nonisolated let Name = "DeepShare"
     @State var isResourcesFailured = false
     var body: some Scene {
         WindowGroup {
