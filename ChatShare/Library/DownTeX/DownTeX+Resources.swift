@@ -39,7 +39,7 @@ extension DownTeX {
         }
         /// The `TeXMF` resources `URL`.
         static var TeXResources: URL {
-            URL.documentsDirectory.appending(path: "texmf")
+            URL.libraryDirectory.appending(path: "texmf")
         }
         /// The `TeXMF` zip-package `URL`.
         private static var TeXBundleResource: URL {
