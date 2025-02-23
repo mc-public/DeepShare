@@ -146,6 +146,7 @@ fileprivate struct QAListDateView: View {
                 } label: {
                     label(model: model)
                 }
+                .listRowBackground(Color.listCellBackgroundColor)
                 .tag(model)
             }
         }
@@ -171,6 +172,7 @@ fileprivate struct QAListDateView: View {
                         } label: {
                             label(model: model)
                         }
+                        .listRowBackground(Color.listCellBackgroundColor)
                         .tag(model)
                     }
                 }, header: {
