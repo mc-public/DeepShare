@@ -39,6 +39,9 @@ struct QAInputView: QANavigationLeaf {
         .toolbar(content: toolbarContent)
         .navigationBarBackButtonHidden()
         .disabled(isDisabled)
+        .fileImporter(isPresented: model.binding(for: \.isShowingMarkdownImporter), allowedContentTypes: [.text], onCompletion: { result in
+            Task { await loadImportMarkdownURL(result: result) }
+        })
         .quickLookPreview(model.binding(for: \.docxConvertResultURL))
         .sheet(isPresented: model.binding(for: \.isShowingSinglePageSheet)) {
             QAImageConvertLongPageView()
@@ -61,7 +64,7 @@ struct QAInputView: QANavigationLeaf {
                 .padding(.horizontal)
             TextEditor(text: model.binding(for: \.questionContent))
                 .focused($blockFocusState, equals: BlockFocusState.questionBlock)
-                .textEditorPrompt(text: model.questionContent, #localized("Enter the question content here"), style: Color.gray.opacity(0.3))
+                .textEditorPrompt(text: model.questionContent, #localized("Enter the title here…"), style: Color.gray.opacity(0.3))
                 .font(.title2)
                 .fontWidth(.condensed)
                 .fontWeight(.semibold)
@@ -90,8 +93,9 @@ struct QAInputView: QANavigationLeaf {
                 .foregroundStyle(.secondary)
                 TextEditor(text: model.binding(for: \.answerContent))
                     .focused($blockFocusState, equals: BlockFocusState.answerBlock)
-                    .textEditorPrompt(text: model.answerContent, #localized("Enter the answer in Markdown format here"), style: Color.gray.opacity(0.3))
+                    .textEditorPrompt(text: model.answerContent, #localized("Enter the content in Markdown format here…"), style: Color.gray.opacity(0.3))
                     .font(.title2)
+                    .fontWidth(model.answerContent.isEmpty ? .condensed : .standard)
                     .fontWeight(model.answerContent.isEmpty ? .semibold : .regular)
                     .padding(.horizontal, 3)
                     .withCornerBackground(radius: 13.0, style: Color.listCellBackgroundColor)
@@ -117,9 +121,7 @@ struct QAInputView: QANavigationLeaf {
     func circleImage<S: ShapeStyle>(image: some View, backgroundStyle: S, width: CGFloat) -> some View {
         Circle()
             .fill(backgroundStyle)
-            .overlay(alignment: .center) {
-                image
-            }
+            .overlay(alignment: .center) { image }
             .frame(width: width, height: width, alignment: .center)
     }
 }
@@ -131,10 +133,10 @@ extension QAInputView {
     @ViewBuilder
     var shareMenu: some View {
         Menu {
-            Button("Convert To Long Image", systemImage: "photo") {
+            Button("Convert to Long Image", systemImage: "photo") {
                 model.isShowingSinglePageSheet = true
             }
-            Button("Convert to Short Image Slices", systemImage: "photo.stack") {
+            Button("Convert to Image Slices or PDF Format (.pdf)", systemImage: "photo.stack") {
                 model.isShowingSplitedPageSheet = true
             }
             Button("Convert to Office Open XML Format (.docx)", systemImage: "richtext.page") {
@@ -144,13 +146,29 @@ extension QAInputView {
                 model.isShowingTextConvertSheet = true
             }
         } label: {
-            Text("Convert")
-                .bold()
+            Image(systemName: "square.and.arrow.up")
                 .foregroundStyle(model.isContentEmpty ? Color.deepOrange.opacity(0.6) : Color.deepOrange)
         }
         .menuStyle(.button)
         .disabled(model.isContentEmpty)
-        .padding(.trailing, length: 5)
+        
+    }
+    
+    @ViewBuilder
+    var ellipsisMenu: some View {
+        Menu {
+            Button("Paste Full Text From Clipboard", systemImage: "document.on.clipboard", action: importFromPasteboard)
+                .disabled(!model.isPasteboardHasContent || !model.isContentEmpty)
+            Button("Import Full Text From Markdown File (.md)", systemImage: "square.and.arrow.down", action: importFromFile)
+                .disabled(!model.isContentEmpty)
+            Divider()
+            Button("Clear All Content", systemImage: "trash", role: .destructive, action: model.clearContent)
+                .disabled(model.isContentEmpty)
+        } label: {
+            Image(systemName: "ellipsis.circle")
+                .foregroundStyle(Color.deepOrange)
+        }
+        .menuStyle(.button)
     }
     
     @ToolbarContentBuilder
@@ -172,19 +190,56 @@ extension QAInputView {
                 .foregroundStyle(Color.deepOrange)
         }
         ToolbarItemGroup(placement: .topBarTrailing) {
-            HStack(alignment: .firstTextBaseline) {
-                if blockFocusState != nil {
-                    Button("Done") { self.blockFocusState = nil }
-                        .foregroundStyle(Color.deepOrange)
-                        .bold()
-                        .padding(.trailing, length: 5)
-                } else { shareMenu }
+            HStack(alignment: .lastTextBaseline) {
+                Group {
+                    shareMenu
+                    ellipsisMenu
+                }
+                .withCondition { view in
+                    if blockFocusState != nil {
+                        Button("Done") { self.blockFocusState = nil }
+                            .foregroundStyle(Color.deepOrange)
+                            .bold()
+                    } else { view }
+                }
+                .padding(.trailing, 5.0)
             }
             .animation(nil, value: blockFocusState)
         }
     }
+}
+
+extension QAInputView {
     
-    func convertToDocx() {
+    private func loadImportMarkdownURL(result: Result<URL, any Error>) async {
+        switch result {
+            case .success(let url):
+                let extensionName = url.pathExtension.lowercased()
+                guard ["md", "txt"].contains(extensionName) else {
+                    await SVProgressHUD.displayingFailuredInfo(title: #localized("Unsupported File Format"))
+                    return
+                }
+                do {
+                    try await model.loadMarkdownContent(url: url)
+                    await SVProgressHUD.displayingSuccessInfo(title: #localized("Import Successful"))
+                } catch { await SVProgressHUD.displayingFailuredInfo(title: error.localizedDescription) }
+            case .failure(let failure):
+                await SVProgressHUD.displayingFailuredInfo(title: failure.localizedDescription)
+        }
+    }
+    
+    private func importFromFile() {
+        model.isShowingMarkdownImporter = true
+    }
+    
+    private func importFromPasteboard() {
+        Task {
+            await model.pasteFullContent()
+            await SVProgressHUD.displayingSuccessInfo(title: #localized("Paste Completed"))
+        }
+    }
+    
+    private func convertToDocx() {
         isDisabled = true
         SVProgressHUD.show()
         Task {

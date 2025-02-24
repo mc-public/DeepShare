@@ -37,6 +37,9 @@ final class QAViewModel {
     
     //MARK: - Data Share
     
+    var isPasteboardHasContent = false
+    var isShowingMarkdownImporter = false
+    
     private var isSettingDataModelID: Bool = false
     /// Selected data model about the `QAInputView`.
     private(set) var selectDataModelID: QADataModel.QAID? {
@@ -66,6 +69,11 @@ final class QAViewModel {
     }
 
     var isContentEmpty: Bool { questionContent.isEmpty && answerContent.isEmpty }
+    
+    func clearContent() {
+        self.answerContent = .init()
+        self.questionContent = .init()
+    }
     
     func normalizedQAMarkdownContent() -> String {
         let normalizedTitle = questionContent.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -109,6 +117,30 @@ final class QAViewModel {
         }
     }
     
+    func loadMarkdownContent(url: URL) async throws {
+        guard url.startAccessingSecurityScopedResource() else {
+            url.stopAccessingSecurityScopedResource()
+            throw CocoaError(.fileReadNoPermission)
+        }
+        let data = try Data(contentsOf: url)
+        let string = try NSString.createFromData(data).content
+        self.loadMarkdownContentToQA(string as String)
+    }
+    
+    func pasteFullContent() async {
+        let content = UIPasteboard.general.string ?? ""
+        loadMarkdownContentToQA(content)
+    }
+    
+    private func loadMarkdownContentToQA(_ content: String) {
+        let content = content.trimmingCharacters(in: .whitespacesAndNewlines)
+        let parts = content.split(separator: "\n", maxSplits: 1, omittingEmptySubsequences: false)
+        let first = String(parts.first ?? "").trimmingPrefix(while: { $0 == "#" })
+        let second = parts.count > 1 ? String(parts[1]) : ""
+        self.questionContent = String(first)
+        self.answerContent = second
+    }
+    
     //MARK: - Page Sheets
     var isShowingSinglePageSheet = false
     var isShowingSplitedPageSheet = false
@@ -147,5 +179,15 @@ final class QAViewModel {
             verticalPagePadding = max(paddingTop, paddingBottom)
             horizontalPagePadding = max(paddingLeft, paddingRight)
         }
+    }
+    
+    @objc @MainActor
+    func contentDidChangeInPasteboard() {
+        isPasteboardHasContent = UIPasteboard.general.hasStrings
+    }
+    
+    private init() {
+        NotificationCenter.default.addObserver(self, selector: #selector(contentDidChangeInPasteboard), name: UIPasteboard.changedNotification, object: nil)
+        self.contentDidChangeInPasteboard()
     }
 }

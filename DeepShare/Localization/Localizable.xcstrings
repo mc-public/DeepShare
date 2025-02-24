@@ -57,6 +57,16 @@
         }
       }
     },
+    "Clear All Content" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除当前内容"
+          }
+        }
+      }
+    },
     "Conversion Failed" : {
       "localizations" : {
         "zh-Hans" : {
@@ -67,17 +77,17 @@
         }
       }
     },
-    "Convert" : {
+    "Convert to Image Slices or PDF Format (.pdf)" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "转换"
+            "value" : "转换为短图合集或PDF文件格式"
           }
         }
       }
     },
-    "Convert To Long Image" : {
+    "Convert to Long Image" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -103,16 +113,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "转换为其它文本格式"
-          }
-        }
-      }
-    },
-    "Convert to Short Image Slices" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "转换为短图合集"
           }
         }
       }
@@ -177,22 +177,22 @@
         }
       }
     },
-    "Enter the answer in Markdown format here" : {
+    "Enter the content in Markdown format here…" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "请输入Markdown格式的回答"
+            "value" : "请输入Markdown格式的内容。"
           }
         }
       }
     },
-    "Enter the question content here" : {
+    "Enter the title here…" : {
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "请输入问题内容"
+            "value" : "请输入标题。"
           }
         }
       }
@@ -253,6 +253,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "图片"
+          }
+        }
+      }
+    },
+    "Import Full Text From Markdown File (.md)" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "从Markdown文件中导入全文"
+          }
+        }
+      }
+    },
+    "Import Successful" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文档导入成功"
           }
         }
       }
@@ -333,6 +353,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "页面比例"
+          }
+        }
+      }
+    },
+    "Paste Completed" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "粘贴完成"
+          }
+        }
+      }
+    },
+    "Paste Full Text From Clipboard" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "从剪切板中导入全文"
           }
         }
       }
@@ -555,6 +595,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "尽量防止文本溢出"
+          }
+        }
+      }
+    },
+    "Unsupported File Format" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不支持的文件类型"
           }
         }
       }
