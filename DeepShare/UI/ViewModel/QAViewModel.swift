@@ -188,6 +188,7 @@ final class QAViewModel {
     
     private init() {
         NotificationCenter.default.addObserver(self, selector: #selector(contentDidChangeInPasteboard), name: UIPasteboard.changedNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(contentDidChangeInPasteboard), name: UIApplication.didBecomeActiveNotification, object: nil)
         self.contentDidChangeInPasteboard()
     }
 }
