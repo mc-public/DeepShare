@@ -16,6 +16,17 @@
 
 <a href="https://apps.apple.com/us/app/deepshare/id6742375235" target="_blank"><img width="150" alt="Download on the App Store" src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg"/></a>
 
+### About The Repository
+
+This source contains all the source code and build resources for DeepShare. 
+
+The method to build this library is as follows. 
+
+1. Clone this repository using `git clone https://github.com/mc-public/DeepShare.git`.
+2. Open `ChatShare.xcodeproj` with Xcode.
+3. Resign this project with your Apple developer account.
+4. Press `Command+R` to build and run.
+
 ### Technologies
 
 **DeepShare** is entirely written in Swift 6 and built on the `SwiftUI` lifecycle. 
